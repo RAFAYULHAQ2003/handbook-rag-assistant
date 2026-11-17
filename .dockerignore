@@ -1,0 +1,16 @@
+.git
+.venv
+.env
+.cache
+.pytest_cache
+.ruff_cache
+**/__pycache__
+*.pyc
+db.sqlite3
+media
+staticfiles
+docs
+templates
+*.pdf
+.DS_Store
+evals/results

@@ -1,6 +1,10 @@
+import os
 from pathlib import Path
 
 import pytest
+
+# Tests search vectors in memory: they must never read or write a real ChromaDB server.
+os.environ["VECTOR_STORE"] = "memory"
 
 from rag.manifest import load_corpus
 

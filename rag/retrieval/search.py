@@ -1,3 +1,4 @@
+import logging
 import re
 from dataclasses import dataclass, field
 
@@ -8,7 +9,10 @@ from rag.models import Document
 from rag.retrieval.bm25 import BM25
 from rag.retrieval.embeddings import EmbeddingCache
 from rag.retrieval.text import tokenize
+from rag.retrieval.vector_store import ChromaStore, VectorStoreError
 from rag.validity import DocStatus, State, describe
+
+log = logging.getLogger(__name__)
 
 RRF_K = 60  # standard reciprocal-rank-fusion constant; ranks matter, raw scores do not
 
@@ -74,7 +78,8 @@ class Retriever:
     """
 
     def __init__(self, docs: list[Document], passages: list[Passage],
-                 embeddings: EmbeddingCache | None = None, mode: str = "hybrid"):
+                 embeddings: EmbeddingCache | None = None, mode: str = "hybrid",
+                 vector_store: ChromaStore | None = None):
         if mode not in {"bm25", "dense", "hybrid"}:
             raise ValueError(f"unknown retrieval mode {mode!r}")
         if mode != "bm25" and embeddings is None:
@@ -84,7 +89,36 @@ class Retriever:
         self.mode = mode
         self.bm25 = BM25([p.search_text for p in passages]) if mode != "dense" else None
         self.embeddings = embeddings
+        # the vectors are always kept here too: they are needed to fill a vector store, and they are
+        # the fallback that keeps search working if that store cannot be reached
         self.matrix = embeddings.get([p.search_text for p in passages]) if mode != "bm25" else None
+        self.ids = [p.passage_id for p in passages]
+        self.store = vector_store if self.matrix is not None else None
+        self.store_error: str | None = None
+        if self.store is not None:
+            try:
+                added, removed = self.store.sync(self.ids, self.matrix, [p.doc_id for p in passages])
+                log.info("%s: %d passages (+%d, -%d)", self.store.name, len(self.ids), added, removed)
+            except VectorStoreError as exc:
+                log.error("%s; searching the in-memory vectors instead", exc)
+                self.store, self.store_error = None, str(exc)
+
+    @property
+    def vector_store_name(self) -> str:
+        if self.matrix is None:
+            return "none (keyword search only)"
+        if self.store is not None:
+            return self.store.name
+        return "memory" + (" (vector store unavailable)" if self.store_error else "")
+
+    def _cosine(self, question: str) -> np.ndarray:
+        query = self.embeddings.embedder.embed_query(question)
+        if self.store is not None:
+            try:
+                return self.store.similarities(query, self.ids)
+            except VectorStoreError as exc:
+                log.warning("%s; searching the in-memory vectors for this question", exc)
+        return self.matrix @ query
 
     def _penalties(self, statuses: dict[str, DocStatus], question: str) -> np.ndarray:
         asked = set(tokenize(question))
@@ -109,7 +143,7 @@ class Retriever:
             top_bm25 = float(scores.max())
             rankings.append(_ranks(scores))
         if self.matrix is not None:
-            cosine = self.matrix @ self.embeddings.embedder.embed_query(question)
+            cosine = self._cosine(question)
             top_cosine = float(cosine.max())
             rankings.append(_ranks(cosine + 1.0))  # shifted to (0, 2] so every passage ranks
 

@@ -43,13 +43,23 @@ _hits: dict[str, deque] = defaultdict(deque)
 _hits_lock = threading.Lock()
 
 
+def _client_ip(request) -> str:
+    """The visitor's address. Behind a trusted proxy (TRUST_PROXY=1) it is the last X-Forwarded-For
+    entry, the one the proxy added itself; earlier entries come from the client and can be faked."""
+    if getattr(settings, "TRUST_PROXY", False):
+        forwarded = [p.strip() for p in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",") if p.strip()]
+        if forwarded:
+            return forwarded[-1]
+    return request.META.get("REMOTE_ADDR", "unknown")
+
+
 def _rate_limited(request, bucket: str = "ask") -> bool:
     """A simple per-address sliding window: at most ASK_RATE_LIMIT_PER_MIN questions (or
     UPLOAD_RATE_LIMIT_PER_MIN uploads) a minute."""
     limit = getattr(settings, "UPLOAD_RATE_LIMIT_PER_MIN" if bucket == "upload" else "ASK_RATE_LIMIT_PER_MIN", 20)
     if not limit:
         return False
-    key = f"{bucket}:{request.META.get('REMOTE_ADDR', 'unknown')}"
+    key = f"{bucket}:{_client_ip(request)}"
     now = time.monotonic()
     with _hits_lock:
         window = _hits[key]
@@ -233,6 +243,7 @@ def api_health(request):
         "documents": len(index.docs),
         "passages": len(index.passages),
         "search_mode": index.mode,
+        "vector_store": index.retriever.vector_store_name,
         "model": getattr(client, "model", None),
         "fallback_model": getattr(getattr(client, "fallback", None), "model", None),
         "model_error": services.client_error(),

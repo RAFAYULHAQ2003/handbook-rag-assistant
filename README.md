@@ -48,7 +48,17 @@ Answers are cached in `.cache/llm/`, so re-running unchanged questions makes no 
 
 ## Run the app
 
-Put a model key in `.env` first (`LLM_API_KEY`, with `LLM_BASE_URL` and `LLM_MODEL`; see `.env.example`). Then:
+Put a model key in `.env` first (`LLM_API_KEY`, with `LLM_BASE_URL` and `LLM_MODEL`; see `.env.example`).
+
+**With Docker (the app plus its ChromaDB vector store):**
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:8000. The first build downloads the embedding model and embeds the handbook into the image, so the container starts in seconds. ChromaDB keeps its data in a Docker volume and is reachable only from this machine (`127.0.0.1:8001`).
+
+**Without Docker:** start ChromaDB on its own (`docker compose up -d chroma`), or set `VECTOR_STORE=memory` to keep the vectors in memory. Then:
 
 ```bash
 python manage.py migrate
@@ -66,6 +76,16 @@ curl -X POST http://127.0.0.1:8000/api/ask -H "Content-Type: application/json" \
      -d '{"question": "How many days of annual leave do I get?"}'
 curl http://127.0.0.1:8000/api/health
 ```
+
+**Vectors:** passages are embedded locally with `BAAI/bge-small-en-v1.5` and stored in ChromaDB (one collection per embedding model). Every web worker searches the same collection; uploads are added to it and removed from it at once. Keyword search (BM25), rank fusion and the document-state rules stay in the app. If ChromaDB cannot be reached, search uses an in-memory copy of the vectors and `/api/health` says so. Through ChromaDB, all 132 eval questions get exactly the same context as with in-memory search.
+
+**Deploy on a server** with Docker: point a domain at it, or use `<ip-with-dashes>.sslip.io`. Set the server lines at the end of `.env.example`, then run:
+
+```bash
+docker compose --profile https up -d --build
+```
+
+Caddy gets and renews the HTTPS certificate. The app sits behind it, and ChromaDB is never exposed. Uploads, ChromaDB data and cached answers live in Docker volumes, so they survive restarts and rebuilds.
 
 `/api/ask/stream` returns the same answer as newline-delimited JSON: first which documents are being read, then the answer. Add `"as_of": "2027-01-15"` to answer as of another date, and `"history": [{"question": "...", "answer": "..."}]` for a follow-up.
 

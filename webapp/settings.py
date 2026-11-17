@@ -35,6 +35,9 @@ if not SECRET_KEY:
     SECRET_KEY = "dev-only-insecure-key"
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+# The container's own health check calls http://127.0.0.1:8000; allow that address on any host setting.
+if "127.0.0.1" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("127.0.0.1")
 
 
 # Application definition
@@ -85,7 +88,7 @@ WSGI_APPLICATION = 'webapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': Path(os.environ.get("DJANGO_DB_PATH", "").strip() or BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -150,6 +153,26 @@ UPLOAD_MAX_BYTES = int(os.environ.get("UPLOAD_MAX_MB", "5") or 5) * 1_000_000
 UPLOAD_MAX_DOCUMENTS = int(os.environ.get("UPLOAD_MAX_DOCUMENTS", "50") or 50)
 UPLOAD_RATE_LIMIT_PER_MIN = int(os.environ.get("UPLOAD_RATE_LIMIT_PER_MIN", "10") or 0)
 STATIC_ROOT = BASE_DIR / "staticfiles"  # where collectstatic gathers files for deployment
+if STATIC_ROOT.is_dir():  # collected in the Docker image; `runserver` serves static files itself
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+# Compressed copies for WhiteNoise; cache-busting is done by the {% static_v %} content hash.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
+
+# --- Production behind HTTPS (docker-compose.yml with Caddy) ---
+# DJANGO_HTTPS=1: the site is served over HTTPS by a proxy that sets X-Forwarded-Proto.
+if os.environ.get("DJANGO_HTTPS", "0") == "1":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SECURE_REDIRECT_EXEMPT = [r"^api/health$"]  # the container health check calls plain HTTP inside the network
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDS", "86400") or 0)
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
+# TRUST_PROXY=1 only behind a proxy that appends the client address to X-Forwarded-For (Caddy does);
+# the rate limits then count real visitors instead of the proxy. Never set it without a proxy.
+TRUST_PROXY = os.environ.get("TRUST_PROXY", "0") == "1"
 
 LOGGING = {
     "version": 1,

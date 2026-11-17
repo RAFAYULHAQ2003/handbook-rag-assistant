@@ -405,3 +405,24 @@ def test_page_has_the_upload_control(web, app):
     assert 'id="upload-btn"' in page and 'id="upload-file"' in page and ".docx" in page
     js = open("webapp/handbook/static/handbook/app.js").read()
     assert 'el("a", "cite"' in js and "X-CSRFToken" in js  # [n] markers become links; uploads send the token
+
+
+def test_rate_limit_uses_the_proxy_address_only_when_trusted(web, app, monkeypatch):
+    from django.conf import settings
+    monkeypatch.setattr(settings, "ASK_RATE_LIMIT_PER_MIN", 1)
+    spoof = {"HTTP_X_FORWARDED_FOR": "1.1.1.1"}
+    assert web.post("/api/ask", data=json.dumps({"question": "a"}), content_type="application/json", **spoof).status_code == 200
+    # without TRUST_PROXY the header is ignored: a new fake address does not reset the limit
+    r = web.post("/api/ask", data=json.dumps({"question": "a"}), content_type="application/json",
+                 HTTP_X_FORWARDED_FOR="2.2.2.2")
+    assert r.status_code == 429
+    monkeypatch.setattr(settings, "TRUST_PROXY", True)
+    views._hits.clear()
+    for client in ("9.9.9.9, 3.3.3.3", "9.9.9.9, 4.4.4.4"):  # the proxy's own (last) entry decides
+        r = web.post("/api/ask", data=json.dumps({"question": "a"}), content_type="application/json",
+                     HTTP_X_FORWARDED_FOR=client)
+        assert r.status_code == 200
+
+
+def test_health_reports_the_vector_store(web, app):
+    assert web.get("/api/health").json()["vector_store"] == "none (keyword search only)"

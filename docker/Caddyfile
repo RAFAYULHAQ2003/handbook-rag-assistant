@@ -1,0 +1,7 @@
+# HTTPS for the live site: Caddy gets and renews a certificate for $DOMAIN automatically.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:8000 {
+		flush_interval -1  # pass the streamed answer through line by line, never buffered
+	}
+}

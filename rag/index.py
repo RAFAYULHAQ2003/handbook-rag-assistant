@@ -18,6 +18,7 @@ from rag.retrieval.search import (
     Retriever,
     build_context,
 )
+from rag.retrieval.vector_store import ChromaStore, VectorStoreError, store_from_env
 from rag.validity import DocStatus, ValidityFinding, assess
 
 log = logging.getLogger(__name__)
@@ -114,8 +115,13 @@ class HandbookIndex:
 
     @classmethod
     def build(cls, docs: list[Document], ref: date | str | None = None, mode: str | None = None,
-              embeddings: EmbeddingCache | None = None, findings: list | None = None) -> "HandbookIndex":
-        """Build from loaded documents. Falls back to BM25 if the embedding model cannot load."""
+              embeddings: EmbeddingCache | None = None, findings: list | None = None,
+              vector_store: ChromaStore | None = None) -> "HandbookIndex":
+        """Build from loaded documents. Falls back to BM25 if the embedding model cannot load.
+
+        Vectors are stored in and searched through ChromaDB (CHROMA_URL), unless VECTOR_STORE=memory;
+        an unreachable Chroma falls back to the in-memory vectors (see rag.retrieval.vector_store).
+        """
         mode = mode or os.environ.get("RETRIEVAL_MODE", "").strip() or DEFAULT_MODE
         if mode != "bm25" and embeddings is None:
             try:
@@ -123,8 +129,13 @@ class HandbookIndex:
             except Exception as exc:  # offline, missing model files, broken install
                 log.warning("embedding model unavailable (%s); falling back to keyword search", exc)
                 mode = "bm25"
+        if mode != "bm25" and vector_store is None:
+            try:
+                vector_store = store_from_env(embeddings.embedder.name)
+            except VectorStoreError as exc:
+                log.error("%s; searching the in-memory vectors instead", exc)
         passages = chunk_documents(docs)
-        retriever = Retriever(docs, passages, embeddings, mode=mode)
+        retriever = Retriever(docs, passages, embeddings, mode=mode, vector_store=vector_store)
         default = reference_date(ref) if ref is not None else None
         return cls({d.doc_id: d for d in docs}, passages, retriever, default, list(findings or []))
 

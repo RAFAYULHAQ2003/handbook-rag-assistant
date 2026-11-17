@@ -1,0 +1,51 @@
+# One file for both laptop and server.
+#   Local:   docker compose up --build              -> http://localhost:8000
+#   Server:  docker compose --profile https up -d   -> https://$DOMAIN (Caddy gets the certificate)
+# Settings and secrets come from .env (see .env.example).
+
+services:
+  chroma:
+    image: chromadb/chroma:1.5.9  # keep equal to chromadb-client in requirements.txt
+    volumes:
+      - chroma_data:/data
+    ports:
+      - "127.0.0.1:8001:8000"  # this machine only (for evals and debugging); Chroma has no login
+    restart: unless-stopped
+
+  web:
+    build: .
+    env_file: .env
+    environment:
+      VECTOR_STORE: chroma
+      CHROMA_URL: http://chroma:8000
+    volumes:
+      - uploads:/app/media/uploads
+      - llm_cache:/app/.cache/llm
+    ports:
+      - "${WEB_PORT:-127.0.0.1:8000}:8000"  # behind Caddy on a server, only Caddy needs to reach it
+    depends_on:
+      - chroma
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.10
+    profiles: ["https"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}  # set DOMAIN in .env on the server, e.g. 203-0-113-7.sslip.io
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  chroma_data:
+  uploads:
+  llm_cache:
+  caddy_data:
+  caddy_config:

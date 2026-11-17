@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from bs4 import BeautifulSoup, Comment, NavigableString
@@ -14,6 +15,13 @@ _HEADINGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 _UNITS = _HEADINGS | {"p", "li", "tr", "dt", "dd", "pre", "blockquote", "caption", "figcaption",
                       "div", "section", "article", "main", "header", "footer", "aside", "td", "th", "body"}
 _DROP = ["script", "style", "noscript", "template", "head"]
+
+
+_HIDDEN_STYLE = re.compile(r"(display\s*:\s*none|visibility\s*:\s*hidden)", re.IGNORECASE)
+
+
+def _is_hidden(tag) -> bool:
+    return tag.has_attr("hidden") or bool(_HIDDEN_STYLE.search(tag.get("style", "")))
 
 
 def _unit(string: NavigableString):
@@ -34,6 +42,9 @@ def load(path: Path) -> ParsedFile:
     if soup.title and soup.title.string:
         parsed.title = clean_inline(soup.title.string)
     for tag in soup(_DROP):
+        tag.decompose()
+    # text a reader never sees is not part of the document (and is a classic place to hide instructions)
+    for tag in soup.find_all(_is_hidden):
         tag.decompose()
 
     # group text by its unit, keeping document order

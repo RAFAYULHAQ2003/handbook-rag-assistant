@@ -17,7 +17,7 @@ _BULLET_PREFIX = re.compile(r"^(?:[\x7f•●▪◦‣]\s*|[-–*]\s+)(.+)$")
 _NUMBER_ONLY = re.compile(r"^\d+[.)]?$")
 _PAGE_NUMBER = re.compile(r"^(?:page\s+)?\d+(?:\s*(?:of|/)\s*\d+)?$", re.IGNORECASE)
 # "2. Annual leave", "4.2 Hotels": numbered, short, no full stop
-_HEADING = re.compile(r"^(\d+(?:\.\d+)*)\.?\s+([A-Z][^.]{0,60})$")
+_HEADING = re.compile(r"^(\d{1,3}(?:\.\d{1,3})*)\.?\s+([A-Z][^.]{0,60})$")  # "2025 Survey" is not section 2025
 _SENTENCE_END = (".", ":", "!", "?")
 
 
@@ -74,8 +74,10 @@ def _join(lines: list[str]) -> str:
     """Join wrapped lines; re-attach words hyphenated across a line break."""
     text = ""
     for line in lines:
-        if text.endswith("-") and line[:1].islower() and len(text) > 1 and text[-2].isalpha():
-            text = text[:-1] + line
+        # a line ending in a hyphen continues straight on; the hyphen is kept, since
+        # "pro-" + "rata" is "pro-rata", and dropping it would invent "prorata"
+        if text.endswith("-") and len(text) > 1 and text[-2].isalnum():
+            text = text + line
         else:
             text = f"{text} {line}" if text else line
     return clean_inline(text)
@@ -104,7 +106,9 @@ def lines_to_blocks(lines: list[str]) -> list[RawBlock]:
             kind = "list_item"
             current.append(m.group(1).strip())
             continue
-        if m := _HEADING.match(line):
+        # a numbered line is a heading only where a new block can start, not mid-sentence
+        mid_sentence = bool(current) and not current[-1].endswith(_SENTENCE_END)
+        if not mid_sentence and (m := _HEADING.match(line)):
             flush()
             blocks.append(RawBlock("heading", clean_inline(line), level=m.group(1).count(".") + 1))
             continue

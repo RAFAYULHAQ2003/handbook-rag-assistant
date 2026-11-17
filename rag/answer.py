@@ -35,7 +35,7 @@ Rules:
 4. Before answering, check every provided document for rules on the same point. When documents disagree (for example different time limits, amounts or approvers), state both and cite each, even in a short answer. If one document states a specific exception to a general rule, the exception applies, even if the general rule is newer. If you cannot tell which applies, say so.
 5. If the question could mean several people or things, set "needs_clarification" to true and list every match the documents give.
 6. If the documents answer only part of the question, answer that part and say what the handbook does not cover. If a document refers to another document that is not provided, say it is referenced but not available.
-7. "verdict": for a yes/no question, "yes" or "no": the answer for the person asking, now, even when conditions apply (for example "no, not without written approval"). Use null only for questions that are not yes/no, or when the answer depends on today's date (for example a deploy freeze or a deadline) and the documents do not give the dates needed; then say what the answer depends on. When it depends on today's date, compare today's date with the dates in the documents before deciding.
+7. "verdict": for a yes/no question, "yes" or "no" (the overall answer, even when conditions apply); otherwise null.
 8. Support every fact in your answer with a citation: the document id and a short quote copied exactly, word for word, from that document (one sentence or one table row). Cite only the provided documents. In the answer text, end every sentence that states a fact with a marker like [1], where the number is that citation's position in your "citations" list (1 for the first). Do not write document ids or quotes in the answer text; sources are shown separately.
 9. Write plainly and concisely, usually one to four sentences. Use the date given in the request for anything that depends on today's date.
 """
@@ -245,6 +245,55 @@ def renumber_markers(text: str, mapping: dict[int, int | None]) -> str:
     return _MARKER.sub(fix, text or "")
 
 
+# ---------- leaked reply fields ----------
+
+# Models sometimes write parts of their reply object into the answer text, e.g. (backup model)
+# "... [1]\n\ncitations:\n[1] hr-leave-policy-v2: \"...\"\n\nverdict: null\nanswerable: true\n
+# needs_clarification: false}<the real answer>", or a JSON list: ', "citations": [{"doc_id": ...}]'.
+_FIELD_NAMES = r"citations|sources|verdict|answerable|needs[ _]clarification"
+_FIELD = re.compile(rf'(?im)^[ \t]*"?(?:{_FIELD_NAMES})"?[ \t]*:|"(?:{_FIELD_NAMES})"\s*:')
+_LAST_FIELD = re.compile(r'(?is).*"?(?:needs[ _]clarification|answerable|verdict)"?\s*:\s*'
+                         r'(?:true|false|null|"?yes"?|"?no"?)\s*,?\s*\}?')
+
+
+def tidy_answer(text: str, titles: dict[str, str] | None = None) -> str:
+    """The answer prose without reply fields or document ids the model pasted into it.
+
+    `titles` maps document ids to titles. A normal answer comes back unchanged. If fields leaked,
+    the prose before the first field and the prose after the last one are compared, and the longer
+    is kept (the model often writes a short answer, dumps its fields, then the full answer). Ids in
+    brackets or before a colon are citations and are removed; an id used in a sentence becomes the
+    document's title.
+    """
+    text = (text or "").strip()
+    original = text
+    first = _FIELD.search(text)
+    if first:
+        before = text[:first.start()].strip().rstrip(",{[").strip()
+        tail = _LAST_FIELD.match(text)
+        after = text[tail.end():].strip() if tail else ""
+        if _FIELD.search(after):  # nothing clean after the fields
+            after = ""
+        text = max((before, after), key=len)
+    text = re.sub(r'\s*"?\s*\}\s*$', "", text)  # a closing brace left from the reply object
+    if titles:
+        ids = "|".join(re.escape(d) for d in sorted(titles, key=len, reverse=True))
+        # "(fin-expense-policy; fin-approval-matrix)", "[ref-faq]", "【it-laptop-policy: ..." (closed or not)
+        text = re.sub(rf"[ \t]*[\[(【]\s*(?:{ids})\b[^\])】\n]*[\])】]?", "", text)
+        # "[1] hr-leave-policy-v2:" starting a line of a pasted citation list, or "hr-leave-policy-v2:" anywhere
+        text = re.sub(rf"(?m)^[ \t]*\[\d+\][ \t]*(?=(?:{ids})\b[ \t]*:)", "", text)
+        text = re.sub(rf"\b(?:{ids})\b[ \t]*:[ \t]*", "", text)
+        # an id used as a name in a sentence: show the document's title instead
+        text = re.sub(rf"\b(?:{ids})\b", lambda m: titles[m.group(0)], text)
+    if text == original:
+        return text
+    text = re.sub(r"\(\s*\)|\[\s*\]", "", text)  # brackets left empty
+    text = re.sub(r"[ \t]+([.,;:!?])", r"\1", text)  # "claim ." -> "claim."
+    text = re.sub(r"([.!?])[;,]+(?=\s|$)", r"\1", text)  # "16 weeks.;" -> "16 weeks."
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
 # ---------- the answer step ----------
 
 def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=None,
@@ -308,7 +357,8 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
     verdict = c.get("verdict") if c.get("verdict") in ("yes", "no") else None
     return Answer(
         question=question,
-        answer=renumber_markers(str(c.get("answer") or ""), mapping).strip(),
+        answer=tidy_answer(renumber_markers(str(c.get("answer") or ""), mapping),
+                           {d: doc.meta.title for d, doc in index.docs.items()}),
         verdict=verdict,
         answerable=bool(c.get("answerable")),
         needs_clarification=bool(c.get("needs_clarification")),

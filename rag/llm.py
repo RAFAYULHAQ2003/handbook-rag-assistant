@@ -126,7 +126,7 @@ class OpenAICompatibleClient:
         key = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
         return self.cache_dir / f"{key}.json"
 
-    def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion:
+    def _payload(self, messages: list[dict], schema: dict, max_tokens: int) -> dict:
         payload = {
             **self.extra_body,  # provider extras first, so they can never replace the fields below
             "model": self.model,
@@ -137,6 +137,9 @@ class OpenAICompatibleClient:
         if self.is_openrouter:
             payload["provider"] = {"require_parameters": True}  # only hosts that enforce the format
             payload["usage"] = {"include": True}  # report the cost of each call
+        return payload
+
+    def _from_cache(self, payload: dict) -> Completion | None:
         path = self._cache_path(payload)
         if path is not None and path.exists():
             try:
@@ -144,6 +147,18 @@ class OpenAICompatibleClient:
                 return Completion(**{**saved, "cached": True, "latency_ms": 0.0})
             except (json.JSONDecodeError, TypeError):
                 log.warning("ignoring unreadable cache entry %s", path.name)
+        return None
+
+    def cached(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion | None:
+        """The saved answer for exactly this request, if there is one; never calls the model."""
+        return self._from_cache(self._payload(messages, schema, max_tokens))
+
+    def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion:
+        payload = self._payload(messages, schema, max_tokens)
+        path = self._cache_path(payload)
+        hit = self._from_cache(payload)
+        if hit is not None:
+            return hit
 
         with self._lock:
             if self.max_cost_usd is not None and self.spent_usd >= self.max_cost_usd:
@@ -279,6 +294,12 @@ class FallbackClient:
         return replace(completion, used_fallback=True)
 
     def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion:
+        # an answer either model already gave comes back at once: without this, a question the backup
+        # answered would wait for the main model (and the hedge delay) every time it is asked again
+        for client, is_backup in ((self.primary, False), (self.fallback, True)):
+            hit = client.cached(messages, schema, max_tokens)
+            if hit is not None:
+                return replace(hit, used_fallback=is_backup)
         if self.hedge_after is None:
             try:
                 return self.primary.complete(messages, schema, max_tokens)

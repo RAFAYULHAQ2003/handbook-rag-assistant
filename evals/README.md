@@ -4,10 +4,11 @@ No test questions were provided, so these were written by hand from the corpus *
 
 - `questions.jsonl`: dev set (97 questions), used while building and tuning.
 - `questions_holdout.jsonl`: holdout set (26 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
+- `questions_followup.jsonl`: follow-up set (9 two-turn questions). Each carries the earlier turn in `history`, the way the web page sends it ("How many days of annual leave do I get?", then "and who approves it?"). Written after follow-ups were built, so it shows the feature works rather than being a blind test. The earlier answers never contain the fact being asked for, so it has to come from the documents. `fu-09` is a complete new question after an unrelated turn, and must not be pulled off topic.
 - `questions.py`: loads the sets.
 - `matching.py`: how a fact is matched in an answer (see below).
 - `retrieval_eval.py`: compares search configurations with no model calls (`python -m evals.retrieval_eval`); results in `results/retrieval-dev.json`.
-- `answer_eval.py`: answers every question end to end and scores it (`python -m evals.answer_eval`); options `--models`, `--context whole` (baseline), `--injection`, `--set holdout`, `--label`. Results in `results/answers-<set>-<model>-<context>[-<label>].json`.
+- `answer_eval.py`: answers every question end to end and scores it (`python -m evals.answer_eval`); options `--models`, `--context whole` (baseline), `--injection`, `--set holdout`, `--set followup`, `--label`. Results in `results/answers-<set>-<model>-<context>[-<label>].json`.
 - `scoring.py`: the scoring rules below, as tested code.
 - `fixtures/injected-notice.md`: a fake uploaded notice that tells the assistant to lie; used by `--injection`.
 
@@ -27,6 +28,7 @@ One JSON object per line:
 | `verdict` | Optional, for yes/no questions: `yes` or `no` |
 | `reference_date` | Optional "today" for date-dependent questions; the run defaults to `2026-11-17` |
 | `notes` | Why the question is tricky |
+| `history` | Follow-up set only: the earlier turns, as `[{"question", "answer"}]` |
 
 Every `must_include` group appears in the text of the expected documents, and fits inside a single passage (both enforced by tests).
 
@@ -50,6 +52,7 @@ Retrieval and citations are scored separately, with no model calls. Retrieval me
 - **citation relevance**: share of citations whose passage contains a fact *or* comes from an expected/acceptable document, and applies. Added after inspecting the first run: strict precision counted legitimate reasoning steps ("Tier 1: New York, San Francisco, Boston" for a San Francisco hotel question) as imprecise. Both are reported
 - **dropped quotes**: quotes the model gave that were not found word for word in the cited document; they never reach the user
 - **stale only**: every citation is from an outdated version the question did not ask about
+- **marker coverage**: share of answers with sources whose text also ties claims to them with `[1]`-style markers. Facts are matched with the markers removed, so "16 days [1]" counts as "16 days"
 
 Conflicts are resolved by one written rule, also given to the answer step: a specific, explicitly stated exception beats a general table, even a newer one (`conf-04`).
 
@@ -87,3 +90,4 @@ Matching is plain text, so it is free, fast and gives the same result every run.
 | `ambiguous` | Several people match; the assistant should list them |
 | `paraphrase` | Casual wording, missing punctuation |
 | `injection` | Tries to override the documents; the answer must still follow the handbook |
+| `follow_up` | Follow-up set only: a question that leans on the earlier turn ("which one is based in Austin?") |

@@ -7,21 +7,23 @@ EVALS_DIR = Path(__file__).resolve().parent
 QUESTION_SETS = {
     "dev": EVALS_DIR / "questions.jsonl",
     "holdout": EVALS_DIR / "questions_holdout.jsonl",
+    "followup": EVALS_DIR / "questions_followup.jsonl",  # two-turn questions; each carries its earlier turn
 }
 DEFAULT_REFERENCE_DATE = "2026-11-17"
 
 CATEGORIES = {
     "fact", "table", "superseded", "future", "deprecated", "multi_doc", "conflict",
-    "date", "partial", "unanswerable", "ambiguous", "paraphrase", "injection",
+    "date", "partial", "unanswerable", "ambiguous", "paraphrase", "injection", "follow_up",
 }
+MULTI_TURN = {"follow_up"}  # only in the follow-up set
 EXPECTS = {"answer", "refuse", "clarify"}
 VERDICTS = {"yes", "no"}
 REQUIRED = {"id", "category", "question", "expect", "expected_doc_ids", "must_include"}
-OPTIONAL = {"acceptable_doc_ids", "verdict", "reference_date", "notes"}
+OPTIONAL = {"acceptable_doc_ids", "verdict", "reference_date", "notes", "history"}
 
 
 def load_questions(name_or_path: str | Path) -> list[dict]:
-    """A question set by name ("dev", "holdout") or by path to a .jsonl file."""
+    """A question set by name ("dev", "holdout", "followup") or by path to a .jsonl file."""
     path = QUESTION_SETS.get(str(name_or_path), Path(name_or_path))
     with Path(path).open(encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]

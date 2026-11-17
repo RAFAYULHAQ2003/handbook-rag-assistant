@@ -10,6 +10,7 @@ from evals.matching import contains_fact
 from evals.questions import (
     CATEGORIES,
     EXPECTS,
+    MULTI_TURN,
     OPTIONAL,
     REQUIRED,
     VERDICTS,
@@ -63,11 +64,16 @@ def test_question_is_well_formed(source, q):
         assert "reference_date" in q, "date-dependent questions must pin the date"
     if "reference_date" in q:
         date.fromisoformat(q["reference_date"])
+    if "history" in q:
+        assert q["category"] in MULTI_TURN and q["history"]
+        assert all(set(t) == {"question", "answer"} and t["question"] and t["answer"] for t in q["history"])
+    else:
+        assert q["category"] not in MULTI_TURN
 
 
 def test_every_category_covered_in_dev_set():
     dev = load_questions("dev")
-    assert {q["category"] for q in dev} == CATEGORIES
+    assert {q["category"] for q in dev} == CATEGORIES - MULTI_TURN  # follow-ups have their own set
 
 
 # The FAQ only repeats answers that live in other policies, so a FAQ-only
@@ -94,3 +100,11 @@ def test_expected_facts_are_not_given_away_by_the_question(source, q):
     """A fact the question already contains is passed by an answer that just repeats the question."""
     leaked = [g for g in q["must_include"] if contains_fact(q["question"], g)]
     assert not leaked, f"{q['id']}: {leaked} already appear in the question"
+
+
+def test_follow_up_set_is_recognised_as_follow_ups():
+    """Every follow-up must reach the model with its earlier turn; fu-09 is a new topic and must not."""
+    from rag.answer import is_follow_up
+    standalone = {"fu-09"}
+    for q in load_questions("followup"):
+        assert is_follow_up(q["question"]) == (q["id"] not in standalone), q["id"]

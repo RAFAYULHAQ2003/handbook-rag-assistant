@@ -14,6 +14,7 @@ from math import comb
 from pathlib import Path
 
 from evals.questions import load_questions, reference_date_for
+from rag.answer import is_follow_up
 from rag.index import HandbookIndex
 from rag.manifest import load_corpus
 from rag.retrieval.embeddings import EmbeddingCache, FastEmbedder, cache_path_for
@@ -91,8 +92,10 @@ def run(config: Config, questions: list[dict], docs, cache: dict) -> list[dict]:
     for q in questions:
         ref = reference_date_for(q)
         start = time.perf_counter()
+        history = q.get("history") or []
+        previous = history[-1]["question"] if history and is_follow_up(q["question"]) else None
         retrieval = index.retrieve(q["question"], ref, use_validity=config.use_validity,
-                                   follow_references=config.follow_references)
+                                   follow_references=config.follow_references, follow_up_of=previous)
         row = score_question(q, retrieval, index.statuses(ref))
         row["latency_ms"] = (time.perf_counter() - start) * 1000
         row["context_docs"] = len(retrieval.context)
@@ -131,7 +134,7 @@ def by_category(rows: list[dict], metric: str) -> dict[str, float]:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--set", default="dev", help="question set: dev (default) or holdout")
+    parser.add_argument("--set", default="dev", help="question set: dev (default), holdout or followup")
     parser.add_argument("--configs", nargs="*", help="only these configuration names")
     args = parser.parse_args(argv)
 

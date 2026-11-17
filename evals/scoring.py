@@ -7,6 +7,7 @@ import statistics
 from collections import defaultdict
 
 from evals.matching import contains_fact, facts_matched
+from rag.answer import strip_markers
 from rag.validity import State
 
 STALE = (State.SUPERSEDED, State.DEPRECATED)
@@ -30,7 +31,7 @@ def score_answer(question: dict, answer, statuses, passages_by_doc) -> dict:
     """One row of results: did the answer pass, and how good were its citations."""
     expect = question["expect"]
     groups = question["must_include"]
-    facts = facts_matched(answer.answer, groups) if groups else []
+    facts = facts_matched(strip_markers(answer.answer), groups) if groups else []  # "16 days [1]" -> "16 days"
     facts_ok = all(facts)
     verdict_ok = None if "verdict" not in question else answer.verdict == question["verdict"]
     errored = answer.error is not None and answer.answerable is None
@@ -81,6 +82,7 @@ def score_answer(question: dict, answer, statuses, passages_by_doc) -> dict:
         "citation_precision": citation_precision,
         "citation_relevance": citation_relevance,
         "citations": len(answer.citations),
+        "has_markers": bool(answer.citations) and answer.answer != strip_markers(answer.answer),  # [n] in the text
         "dropped_citations": answer.dropped_citations,
         "unsupported": answer.unsupported,
         "stale_only": stale_only,
@@ -120,6 +122,8 @@ def summarise(rows: list[dict]) -> dict:
                                   for r in rows),
         "citation_precision": _mean(r["citation_precision"] for r in rows),
         "citation_relevance": _mean(r["citation_relevance"] for r in rows),
+        # answers with sources whose text also ties claims to them with [n] markers
+        "marker_coverage": _mean(float(r.get("has_markers", False)) for r in rows if r["citations"]),
         "unsupported_answers": sum(r["unsupported"] for r in rows),
         "dropped_quotes": sum(r["dropped_citations"] for r in rows),
         "stale_only_answers": sum(r["stale_only"] for r in rows),

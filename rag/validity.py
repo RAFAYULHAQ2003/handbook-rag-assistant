@@ -88,6 +88,24 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
         else:
             successors.setdefault(target, []).append(m.doc_id)
 
+    # a supersession cycle has no newest version: drop its edges so both stay in force, and report it
+    def reaches(start: str, goal: str) -> bool:
+        stack, seen = [start], set()
+        while stack:
+            node = stack.pop()
+            if node == goal:
+                return True
+            if node not in seen:
+                seen.add(node)
+                stack.extend(successors.get(node, []))
+        return False
+
+    cyclic = {(p, s) for p, succ in successors.items() for s in succ if reaches(s, p)}
+    for p, s in sorted(cyclic):
+        findings.append(ValidityFinding(p, "supersession_cycle", s))
+    successors = {p: [s for s in succ if (p, s) not in cyclic] for p, succ in successors.items()}
+    successors = {p: succ for p, succ in successors.items() if succ}
+
     def basic_state(m: DocumentMeta) -> State:
         if (m.status or "").lower() in DEPRECATED_STATUSES:
             return State.DEPRECATED
@@ -97,19 +115,22 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
 
     basic = {m.doc_id: basic_state(m) for m in metas}
 
-    def latest_in_force(doc_id: str, seen: frozenset = frozenset()) -> str | None:
-        """Newest in-force document along the supersession chain after `doc_id`.
+    def latest_in_force(doc_id: str) -> str | None:
+        """Newest in-force document anywhere down the supersession chain after `doc_id`.
 
-        Only in-force successors count; when several qualify, the most recently
-        effective one wins.
+        The chain is followed through versions that are not in force themselves,
+        so v1 <- v2 (withdrawn) <- v3 still makes v3 replace v1. When several
+        in-force versions qualify, the most recently effective one wins.
         """
-        candidates = []
-        for s in successors.get(doc_id, []):
-            if s in seen or s == doc_id:
-                findings.append(ValidityFinding(doc_id, "supersession_cycle", s))
+        candidates, stack, seen = [], list(successors.get(doc_id, [])), set()
+        while stack:
+            s = stack.pop()
+            if s in seen:
                 continue
+            seen.add(s)
             if basic[s] is State.IN_FORCE:
-                candidates.append(latest_in_force(s, seen | {doc_id}) or s)
+                candidates.append(s)
+            stack.extend(successors.get(s, []))
         if not candidates:
             return None
         return max(candidates, key=lambda d: (by_id[d].effective_date or date.min, d))
@@ -119,8 +140,9 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
         families.setdefault(family_key(m.title), []).append(m.doc_id)
 
     def newest_in_force_in_family(m: DocumentMeta) -> str | None:
+        # skip versions that are themselves replaced; a version with only a future successor still counts
         candidates = [by_id[d] for d in families[family_key(m.title)]
-                      if d != m.doc_id and basic[d] is State.IN_FORCE and d not in successors]
+                      if d != m.doc_id and basic[d] is State.IN_FORCE and latest_in_force(d) is None]
         candidates.sort(key=lambda c: c.effective_date or date.min, reverse=True)
         return candidates[0].doc_id if candidates else None
 

@@ -1,14 +1,17 @@
 import json
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 
+from evals.questions import all_questions
 from rag.config import reference_date
 from rag.models import DocumentMeta
 from rag.validity import Authority, State, assess, describe, family_key
-from tests.test_eval_set import ALL
 
 TODAY = date(2026, 11, 17)
+
+ALL = all_questions()
 
 
 def meta(doc_id, title=None, effective=None, status="current", supersedes=None, category=None):
@@ -206,7 +209,8 @@ def test_upload_superseding_a_corpus_document(corpus_metas):
 
 def test_reference_date_sources(monkeypatch):
     monkeypatch.delenv("REFERENCE_DATE", raising=False)
-    assert reference_date() == date.today()
+    monkeypatch.delenv("COMPANY_TIMEZONE", raising=False)
+    assert reference_date() == datetime.now(ZoneInfo("America/Chicago")).date()
     monkeypatch.setenv("REFERENCE_DATE", "2026-11-17")
     assert reference_date() == TODAY
     assert reference_date("2027-01-01") == date(2027, 1, 1)
@@ -262,3 +266,54 @@ def test_deprecated_points_to_an_in_force_version_not_another_old_one():
     s, _ = assess(metas, TODAY)
     assert s["rb-2023"].current_version == "rb"
     assert s["rb-draft"].current_version == "rb"
+
+
+
+def test_withdrawn_middle_version_does_not_break_the_chain():
+    metas = [meta("v1", effective=date(2020, 1, 1)),
+             meta("v2", effective=date(2021, 1, 1), status="withdrawn", supersedes="v1"),
+             meta("v3", effective=date(2022, 1, 1), supersedes="v2")]
+    s, _ = assess(metas, TODAY)
+    assert s["v1"].superseded_by == "v3"
+    assert s["v2"].state is State.DEPRECATED and s["v2"].current_version == "v3"
+
+
+def test_deprecated_still_points_to_a_version_with_only_a_future_successor():
+    metas = [meta("rb", title="Runbook", effective=date(2025, 1, 1)),
+             meta("rb-old", title="Runbook (2023)", effective=date(2023, 1, 1), status="deprecated"),
+             meta("rb-next", title="Runbook (2027)", effective=date(2027, 6, 1), supersedes="rb")]
+    s, _ = assess(metas, TODAY)
+    assert s["rb"].in_force and s["rb"].upcoming == ("rb-next",)
+    assert s["rb-old"].current_version == "rb"
+
+
+def test_cycle_leaves_both_documents_in_force():
+    metas = [meta("a", effective=date(2020, 1, 1), supersedes="b"),
+             meta("b", effective=date(2021, 1, 1), supersedes="a")]
+    s, findings = assess(metas, TODAY)
+    assert s["a"].in_force and s["b"].in_force
+    assert {(f.doc_id, f.issue) for f in findings} >= {("a", "supersession_cycle"), ("b", "supersession_cycle")}
+
+
+def test_longer_cycle_does_not_affect_documents_outside_it():
+    metas = [meta("a", supersedes="c"), meta("b", supersedes="a"), meta("c", supersedes="b"),
+             meta("old"), meta("new", effective=date(2022, 1, 1), supersedes="old")]
+    s, _ = assess(metas, TODAY)
+    assert all(s[d].in_force for d in "abc")
+    assert s["old"].superseded_by == "new"
+
+
+def test_today_follows_the_company_time_zone_not_the_server(monkeypatch):
+    monkeypatch.delenv("REFERENCE_DATE", raising=False)
+    monkeypatch.setenv("COMPANY_TIMEZONE", "Pacific/Kiritimati")  # UTC+14 vs UTC-12: 26 hours apart, so always a different day
+    kiritimati = reference_date()
+    monkeypatch.setenv("COMPANY_TIMEZONE", "Etc/GMT+12")
+    assert reference_date() != kiritimati
+    assert kiritimati == datetime.now(ZoneInfo("Pacific/Kiritimati")).date()
+
+
+def test_unknown_time_zone_rejected(monkeypatch):
+    monkeypatch.delenv("REFERENCE_DATE", raising=False)
+    monkeypatch.setenv("COMPANY_TIMEZONE", "Mars/Olympus")
+    with pytest.raises(ValueError, match="COMPANY_TIMEZONE"):
+        reference_date()

@@ -1,7 +1,9 @@
 import pytest
 
 from evals.matching import facts_matched
-from tests.test_eval_set import ALL
+from evals.questions import all_questions
+
+ALL = all_questions()
 
 
 @pytest.mark.parametrize("source,q", ALL, ids=[q["id"] for _, q in ALL])

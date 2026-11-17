@@ -1,9 +1,10 @@
 # Evaluation set
 
-No test questions were provided, so these were written by hand from the corpus **before** building the assistant, to avoid picking questions the system already passes.
+No test questions were provided, so these were written by hand from the corpus **before** building the assistant, to avoid picking questions the system already passes. A few were added later (`conf-03`, `fut-05`, `part-02`, `h-miss-02`, `h-conf-01`, `h-part-01`); they came from re-reading the corpus for traps and filling category gaps, never from the assistant's output.
 
 - `questions.jsonl`: dev set (97 questions), used while building and tuning.
-- `questions_holdout.jsonl`: holdout set (24 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
+- `questions_holdout.jsonl`: holdout set (26 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
+- `questions.py`: loads the sets.
 - `matching.py`: how a fact is matched in an answer (see below).
 
 ## Format
@@ -16,12 +17,32 @@ One JSON object per line:
 | `category` | Which behaviour the question tests (see below) |
 | `question` | What the employee asks |
 | `expect` | `answer`, `refuse` (handbook does not cover it) or `clarify` (ambiguous) |
-| `expected_doc_ids` | Documents that should be retrieved and cited |
+| `expected_doc_ids` | Documents that must be retrieved and cited |
+| `acceptable_doc_ids` | Optional: other documents that also legitimately support the answer; citing them is not an error |
 | `must_include` | Facts the answer must contain: a list of groups; every group must match, any string in a group is enough |
+| `verdict` | Optional, for yes/no questions: `yes` or `no` |
 | `reference_date` | Optional "today" for date-dependent questions; the run defaults to `2026-11-17` |
 | `notes` | Why the question is tricky |
 
-Every `must_include` group was checked to appear in the text of the expected documents.
+Every `must_include` group appears in the text of the expected documents, and fits inside a single passage (both enforced by tests).
+
+## Scoring rules
+
+| Expect | Passes when |
+|---|---|
+| `answer` | The answer is given (not refused), every `must_include` group matches, and, if `verdict` is set, the answer's structured `verdict` field equals it (not its first word: "Not yet" and "Unfortunately, no" are both "no") |
+| `refuse` | The assistant says the handbook does not cover the question, and does not present a fact from it as the answer |
+| `clarify` | The assistant asks which one is meant, or lists every match (`must_include` holds all the names) |
+
+Retrieval and citations are scored separately, with no model calls (planned: computed by the eval runner in Step 8):
+
+- **recall@k**: share of `expected_doc_ids` found in the top k retrieved passages; `acceptable_doc_ids` are not required but not counted against
+- **citation support**: at least one cited passage contains a `must_include` fact (passage-level, so no passage ids are needed as gold)
+- **citation precision**: share of citations whose passage contains a `must_include` fact and is from a document in force (or from a stale version the category asks about). Source lists are never complete, so precision does not depend on them
+
+Conflicts are resolved by one written rule, also given to the answer step: a specific, explicitly stated exception beats a general table, even a newer one (`conf-04`).
+
+Limit: text matching cannot tell "16 days" from "it used to be 12, now 16" (both pass, correctly), and it cannot tell whether a stale value is given *as the answer* or only to explain a change (for example `fut-05`, where a good answer mentions 26 weeks to say why it does not apply). Those categories (`superseded`, `deprecated`, `future`) get a second check from the structured answer fields or an optional model judge.
 
 ## Fact matching
 
@@ -30,8 +51,10 @@ Matching is plain text, so it is free, fast and gives the same result every run.
 ## Rules enforced by `tests/test_eval_set.py`
 
 - ids are unique and no holdout question repeats a dev question
-- every expected document exists in the manifest
+- only known fields; every expected and acceptable document exists in the manifest, and the two lists do not overlap
 - `refuse` questions have no expected facts; all others have facts and documents
+- `verdict` is `yes` or `no`, and only on `answer` questions
+- no `must_include` fact already appears in the question (an answer that repeats the question must not pass)
 - `multi_doc` and `conflict` questions name at least two documents
 - `date` and `future` questions pin a `reference_date`
 - the dev set covers every category, every document (except the FAQ, which only repeats other policies) and every file format

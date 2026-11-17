@@ -1,0 +1,89 @@
+{% extends "handbook/base.html" %}
+{% load static handbook_static %}
+{% block topbar %}
+<span class="status-pill" id="status" role="status" aria-live="polite">
+  <span class="dot"></span><span class="status-text">Connecting…</span>
+</span>
+{% endblock %}
+{% block main_class %}page page-ask{% endblock %}
+{% block content %}
+<section class="intro" id="intro">
+  <h1>Ask the employee handbook</h1>
+  <p>Leave, travel, expenses, IT, engineering runbooks and more. Every answer shows the exact passages it rests on, so you can check it.</p>
+  <div class="examples" aria-label="Example questions">
+    {% for q in examples %}<button type="button" class="chip" data-example="{{ q }}">{{ q }}</button>{% endfor %}
+  </div>
+</section>
+
+<section class="thread" id="thread" aria-live="polite" aria-label="Answers"></section>
+
+<form class="composer" id="ask-form" autocomplete="off">
+  <div class="uploads" id="uploads" aria-label="Uploaded documents" hidden></div>
+  <p class="upload-status" id="upload-status" role="status" aria-live="polite" hidden></p>
+  <div class="composer-box">
+    <button type="button" class="attach" id="upload-btn" aria-label="Upload a document"
+            title="Upload a document ({{ upload_accept }}, up to {{ upload_max_mb }} MB) and ask about it straight away">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <input type="file" id="upload-file" accept="{{ upload_accept }}" hidden>
+    <label class="visually-hidden" for="question">Your question</label>
+    <textarea id="question" name="question" rows="1" maxlength="{{ max_chars }}"
+              placeholder="Ask a question, e.g. How many days of annual leave do I get?"></textarea>
+    <button type="submit" class="send" id="send" aria-label="Ask">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="composer-meta">
+    <span class="hint"><kbd>Enter</kbd> to ask · <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line</span>
+    <button type="button" class="link-button" id="new-chat" hidden>New conversation</button>
+    <details class="as-of">
+      <summary>Answer as of a date</summary>
+      <label for="as-of">Date</label>
+      <input type="date" id="as-of" name="as_of" min="2000-01-01" max="2100-12-31">
+      <button type="button" class="link-button" id="as-of-clear">Today</button>
+    </details>
+  </div>
+</form>
+
+<template id="tpl-turn">
+  <article class="turn">
+    <div class="question"><p></p><time class="as-of-label"></time></div>
+    <div class="answer-card">
+      <div class="progress" aria-hidden="false">
+        <div class="step" data-step="search"><span class="spinner"></span><span>Searching the handbook</span></div>
+        <div class="step" data-step="read"><span class="spinner"></span><span class="read-text">Reading documents</span></div>
+        <div class="step" data-step="write"><span class="spinner"></span><span>Writing the answer and checking quotes</span></div>
+        <ul class="reading"></ul>
+        <p class="slow-note" hidden>The model service is responding slowly right now. Still working…</p>
+        <button type="button" class="link-button cancel">Cancel</button>
+      </div>
+      <div class="result" hidden>
+        <div class="badges"></div>
+        <p class="answer-text"></p>
+        <div class="sources-block" hidden>
+          <h3>Sources</h3>
+          <ol class="sources"></ol>
+        </div>
+        <footer class="meta-row">
+          <span class="meta"></span>
+          <button type="button" class="link-button copy">Copy answer</button>
+        </footer>
+      </div>
+    </div>
+  </article>
+</template>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.HANDBOOK = {
+    ask: "{% url 'handbook:api_ask_stream' %}",
+    health: "{% url 'handbook:api_health' %}",
+    upload: "{% url 'handbook:api_upload' %}",
+    uploads: "{% url 'handbook:api_uploads' %}",
+    uploadDelete: "{% url 'handbook:api_upload_delete' '__id__' %}",
+    uploadMaxMb: {{ upload_max_mb }},
+    maxChars: {{ max_chars }}
+  };
+</script>
+<script src="{% static_v 'handbook/app.js' %}" defer></script>
+{% endblock %}

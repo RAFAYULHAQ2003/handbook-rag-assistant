@@ -141,3 +141,22 @@ CORPUS_DIR = BASE_DIR / "data" / "corpus"
 MEDIA_ROOT = BASE_DIR / "media"  # uploaded documents
 # Date used to decide which policies are in force; pinned for reproducible evals.
 REFERENCE_DATE = os.environ.get("REFERENCE_DATE")  # YYYY-MM-DD, empty = today
+
+# Questions allowed per client address per minute (protects the model provider's quota; 0 = no limit)
+ASK_RATE_LIMIT_PER_MIN = int(os.environ.get("ASK_RATE_LIMIT_PER_MIN", "20") or 0)
+# Uploaded documents (web page "Upload a document"): their own folder, never mixed into the handbook.
+UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "").strip() or MEDIA_ROOT / "uploads")
+UPLOAD_MAX_BYTES = int(os.environ.get("UPLOAD_MAX_MB", "5") or 5) * 1_000_000
+UPLOAD_MAX_DOCUMENTS = int(os.environ.get("UPLOAD_MAX_DOCUMENTS", "50") or 50)
+UPLOAD_RATE_LIMIT_PER_MIN = int(os.environ.get("UPLOAD_RATE_LIMIT_PER_MIN", "10") or 0)
+STATIC_ROOT = BASE_DIR / "staticfiles"  # where collectstatic gathers files for deployment
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {
+        "webapp": {"handlers": ["console"], "level": "INFO"},
+        "rag": {"handlers": ["console"], "level": "WARNING"},
+    },
+}

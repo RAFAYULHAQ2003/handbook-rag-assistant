@@ -1,3 +1,1 @@
-from django.db import models
-
-# Create your models here.
+# No database models: the handbook is read from data/corpus at startup.

@@ -1,0 +1,31 @@
+{% load static handbook_static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Handbook Assistant{% endblock %} · Northgate Robotics</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233f51e5'/%3E%3Cpath d='M9 9h9a5 5 0 0 1 5 5v9H14a5 5 0 0 1-5-5z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{% static_v 'handbook/app.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{% url 'handbook:home' %}" aria-label="Handbook Assistant home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text"><strong>Handbook Assistant</strong><span>Northgate Robotics</span></span>
+      </a>
+      {% block topbar %}{% endblock %}
+    </div>
+  </header>
+  <main id="main" class="{% block main_class %}page{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    Answers come only from the employee handbook, with every quote checked against its source.
+    Always confirm important decisions with People Operations, Finance or IT.
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

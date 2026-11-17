@@ -9,3 +9,4 @@ media/
 evals/results/*.tmp
 .ruff_cache/
 .cache/
+staticfiles/

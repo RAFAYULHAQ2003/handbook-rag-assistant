@@ -1,3 +1,1 @@
-from django.contrib import admin
-
-# Register your models here.
+# Nothing registered: the app has no database models.

@@ -1,0 +1,56 @@
+{% extends "handbook/base.html" %}
+{% block title %}{{ meta.title }}{% endblock %}
+{% block topbar %}<a class="back-link" href="{% url 'handbook:home' %}">← Back to questions</a>{% endblock %}
+{% block main_class %}page page-source{% endblock %}
+{% block content %}
+<article class="document">
+  <header class="doc-header">
+    <p class="doc-kicker">{{ meta.category|default:"Handbook" }} · {{ meta.format|upper }}</p>
+    <h1>{{ meta.title }}</h1>
+    <div class="doc-facts">
+      <span class="state state-{{ state }}">{{ state_label }}</span>
+      {% if meta.effective_date %}<span>Effective {{ meta.effective_date|date:"j M Y" }}</span>{% endif %}
+      {% if meta.owner %}<span>Owner: {{ meta.owner }}</span>{% endif %}
+      <span class="doc-id">{{ meta.doc_id }}</span>
+    </div>
+    {% if uploaded %}
+    <p class="notice notice-uploaded">Uploaded through this site, not part of the official handbook. Check the official policy for binding rules.</p>
+    {% endif %}
+    {% if show_notice %}
+    <p class="notice notice-{{ state }}">{{ status_note }} <span class="muted">(as of {{ reference_date|date:"j M Y" }})</span></p>
+    {% endif %}
+    <div class="doc-actions">
+      {% if highlighted %}<a class="button-secondary" href="#hl">Jump to the cited passage</a>{% endif %}
+      {% if has_file %}<a class="button-secondary" href="{% url 'handbook:source_file' meta.doc_id %}">Open original file ({{ meta.format|upper }})</a>{% endif %}
+    </div>
+  </header>
+
+  <div class="doc-body">
+    {% for piece in blocks %}
+      {% if piece.type == "heading" %}
+        <h{{ piece.level }}>{% for p in piece.parts %}{% if p.mark %}<mark class="hl">{{ p.text }}</mark>{% else %}{{ p.text }}{% endif %}{% endfor %}</h{{ piece.level }}>
+      {% elif piece.type == "paragraph" %}
+        <p>{% for p in piece.parts %}{% if p.mark %}<mark class="hl">{{ p.text }}</mark>{% else %}{{ p.text }}{% endif %}{% endfor %}</p>
+      {% elif piece.type == "list" %}
+        <ul>{% for item in piece.items %}<li{% if item.marked %} class="li-marked"{% endif %}>{% for p in item.parts %}{% if p.mark %}<mark class="hl">{{ p.text }}</mark>{% else %}{{ p.text }}{% endif %}{% endfor %}</li>{% endfor %}</ul>
+      {% elif piece.type == "table" %}
+        <div class="table-wrap"><table>
+          {% if piece.show_headers %}<thead><tr>{% for h in piece.headers %}<th scope="col">{{ h }}</th>{% endfor %}</tr></thead>{% endif %}
+          <tbody>{% for row in piece.rows %}<tr{% if row.marked %} class="row-marked hl"{% endif %}>{% for c in row.cells %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+        </table></div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script>
+  // Give the first highlighted piece an anchor and bring it into view.
+  (function () {
+    var first = document.querySelector(".hl, mark");
+    if (!first) return;
+    if (!document.getElementById("hl")) first.id = "hl";
+    requestAnimationFrame(function () { first.scrollIntoView({ block: "center" }); first.classList.add("pulse"); });
+  })();
+</script>
+{% endblock %}

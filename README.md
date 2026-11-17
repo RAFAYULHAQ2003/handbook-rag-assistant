@@ -41,13 +41,32 @@ python -m evals.answer_eval --label thinking-on     # every dev question answere
 python -m evals.answer_eval --context whole         # baseline: send the whole handbook instead of searching
 python -m evals.answer_eval --injection             # an uploaded document tries to make the assistant lie
 python -m evals.answer_eval --set holdout           # the blind set; run once, at the end
+python -m evals.answer_eval --set followup          # two-turn questions ("and who approves it?")
 ```
 
 Answers are cached in `.cache/llm/`, so re-running unchanged questions makes no model calls.
 
 ## Run the app
 
+Put a model key in `.env` first (`LLM_API_KEY`, with `LLM_BASE_URL` and `LLM_MODEL`; see `.env.example`). Then:
+
 ```bash
 python manage.py migrate
 python manage.py runserver
 ```
+
+Open http://127.0.0.1:8000. Ask a question; each answer lists its sources, with `[1]`-style markers in the text pointing to the source behind each claim. Opening a source shows the document with the cited passage highlighted, plus a link to the original file. Follow-up questions ("and who approves it?") use the last three turns. A link like `/?q=How+many+days+of+annual+leave+do+I+get%3F` asks straight away.
+
+**Upload a document** (below the question box) adds a `.md`, `.txt`, `.pdf`, `.docx`, `.csv` or `.html` file of up to 5 MB, and you can ask about it at once, without a restart. Uploads are stored in `media/uploads/` (set `UPLOAD_DIR` to change it), apart from the handbook. Answers cite them like any document, but they are always marked "uploaded, not official": they never replace or amend a handbook policy, and when they disagree, the answer gives the official rule. Remove one with the × on its chip.
+
+API (no login, JSON):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/ask -H "Content-Type: application/json" \
+     -d '{"question": "How many days of annual leave do I get?"}'
+curl http://127.0.0.1:8000/api/health
+```
+
+`/api/ask/stream` returns the same answer as newline-delimited JSON: first which documents are being read, then the answer. Add `"as_of": "2027-01-15"` to answer as of another date, and `"history": [{"question": "...", "answer": "..."}]` for a follow-up.
+
+Uploads change state, so they need the CSRF token the page sets: `POST /api/upload` (multipart, field `file`), `GET /api/uploads`, and `POST /api/uploads/<doc_id>/delete`.

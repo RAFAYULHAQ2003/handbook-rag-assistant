@@ -11,6 +11,7 @@ from evals.questions import (
     CATEGORIES,
     EXPECTS,
     MULTI_TURN,
+    OWN_SET,
     OPTIONAL,
     REQUIRED,
     VERDICTS,
@@ -64,6 +65,8 @@ def test_question_is_well_formed(source, q):
         assert "reference_date" in q, "date-dependent questions must pin the date"
     if "reference_date" in q:
         date.fromisoformat(q["reference_date"])
+    if "variant_of" in q:
+        assert q["category"] == "typo" and q["variant_of"] in {d["id"] for d in load_questions("dev")}
     if "history" in q:
         assert q["category"] in MULTI_TURN and q["history"]
         assert all(set(t) == {"question", "answer"} and t["question"] and t["answer"] for t in q["history"])
@@ -73,7 +76,7 @@ def test_question_is_well_formed(source, q):
 
 def test_every_category_covered_in_dev_set():
     dev = load_questions("dev")
-    assert {q["category"] for q in dev} == CATEGORIES - MULTI_TURN  # follow-ups have their own set
+    assert {q["category"] for q in dev} == CATEGORIES - OWN_SET  # follow-ups and typos have their own sets
 
 
 # The FAQ only repeats answers that live in other policies, so a FAQ-only

@@ -231,7 +231,10 @@ STALE_OK = {"superseded", "deprecated", "future"}
 @pytest.mark.parametrize("source,q", ALL, ids=[q["id"] for _, q in ALL])
 def test_eval_answers_rest_on_in_force_documents(corpus_metas, source, q):
     """Outside the stale-version categories, every expected document must be in force on the eval date."""
-    if q["category"] in STALE_OK:
+    category = q["category"]
+    if q.get("variant_of"):  # a misspelled copy keeps the rules of the question it copies
+        category = next(d["category"] for _, d in ALL if d["id"] == q["variant_of"])
+    if category in STALE_OK:
         return
     statuses, _ = assess(corpus_metas, date.fromisoformat(q.get("reference_date", "2026-11-17")))
     stale = [d for d in q["expected_doc_ids"] if not statuses[d].in_force]

@@ -19,7 +19,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 2.4399999529123306,
+        "latency_ms": 2.7449580375105143,
         "context_docs": 7,
         "context_chars": 6016
       },
@@ -33,7 +33,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.56579096801579,
+        "latency_ms": 1.8255839822813869,
         "context_docs": 7,
         "context_chars": 4464
       },
@@ -47,7 +47,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.2200000928714871,
+        "latency_ms": 1.4165829634293914,
         "context_docs": 7,
         "context_chars": 3849
       },
@@ -61,7 +61,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.8689590506255627,
+        "latency_ms": 2.003250061534345,
         "context_docs": 10,
         "context_chars": 5470
       },
@@ -75,7 +75,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 0.9389580227434635,
+        "latency_ms": 1.0121249360963702,
         "context_docs": 6,
         "context_chars": 5949
       },
@@ -89,7 +89,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.6184169799089432,
+        "latency_ms": 1.7308330861851573,
         "context_docs": 8,
         "context_chars": 4237
       },
@@ -103,7 +103,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.3612089678645134,
+        "latency_ms": 1.468332950025797,
         "context_docs": 6,
         "context_chars": 3155
       },
@@ -117,7 +117,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.8669998971745372,
+        "latency_ms": 2.009082934819162,
         "context_docs": 8,
         "context_chars": 4649
       },
@@ -131,7 +131,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.1651659151539207,
+        "latency_ms": 1.2449170462787151,
         "context_docs": 7,
         "context_chars": 4402
       }
@@ -142,7 +142,7 @@
       "mrr": 0.7777777777777778,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 1.56579096801579,
+      "latency_ms_p50": 1.7308330861851573,
       "context_docs_mean": 7.333333333333333,
       "context_chars_mean": 4687.888888888889
     },
@@ -182,7 +182,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 12.748582987114787,
+        "latency_ms": 17.688249936327338,
         "context_docs": 7,
         "context_chars": 6004
       },
@@ -196,7 +196,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 11.231458047404885,
+        "latency_ms": 14.459124999120831,
         "context_docs": 7,
         "context_chars": 6223
       },
@@ -210,7 +210,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 13.496625004336238,
+        "latency_ms": 15.902083017863333,
         "context_docs": 8,
         "context_chars": 5030
       },
@@ -224,7 +224,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 8.818708942271769,
+        "latency_ms": 9.877749951556325,
         "context_docs": 9,
         "context_chars": 5377
       },
@@ -238,7 +238,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 8.703958010300994,
+        "latency_ms": 10.66899998113513,
         "context_docs": 5,
         "context_chars": 5776
       },
@@ -252,7 +252,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 12.138666934333742,
+        "latency_ms": 11.70133298728615,
         "context_docs": 9,
         "context_chars": 4289
       },
@@ -266,7 +266,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 9.33683302719146,
+        "latency_ms": 10.603333939798176,
         "context_docs": 6,
         "context_chars": 3287
       },
@@ -280,7 +280,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 9.28416708484292,
+        "latency_ms": 9.563166066072881,
         "context_docs": 7,
         "context_chars": 3360
       },
@@ -294,7 +294,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 5.040791002102196,
+        "latency_ms": 5.361041985452175,
         "context_docs": 6,
         "context_chars": 4024
       }
@@ -305,7 +305,7 @@
       "mrr": 0.8703703703703703,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 9.33683302719146,
+      "latency_ms_p50": 10.66899998113513,
       "context_docs_mean": 7.111111111111111,
       "context_chars_mean": 4818.888888888889
     },
@@ -345,7 +345,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 16.148457885719836,
+        "latency_ms": 15.844625071622431,
         "context_docs": 6,
         "context_chars": 5011
       },
@@ -359,7 +359,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 11.586874956265092,
+        "latency_ms": 14.51041700784117,
         "context_docs": 8,
         "context_chars": 6617
       },
@@ -373,7 +373,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 12.73387495893985,
+        "latency_ms": 16.034999978728592,
         "context_docs": 8,
         "context_chars": 5030
       },
@@ -387,7 +387,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 11.382666998542845,
+        "latency_ms": 14.420874998904765,
         "context_docs": 9,
         "context_chars": 4037
       },
@@ -401,7 +401,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 12.301916955038905,
+        "latency_ms": 13.800333021208644,
         "context_docs": 6,
         "context_chars": 6099
       },
@@ -415,7 +415,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 15.219332999549806,
+        "latency_ms": 16.90891699399799,
         "context_docs": 9,
         "context_chars": 4549
       },
@@ -429,7 +429,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 13.820166932418942,
+        "latency_ms": 15.311833005398512,
         "context_docs": 6,
         "context_chars": 3287
       },
@@ -443,7 +443,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 12.075333041138947,
+        "latency_ms": 13.236334081739187,
         "context_docs": 7,
         "context_chars": 3290
       },
@@ -457,7 +457,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 6.8188749719411135,
+        "latency_ms": 7.619249983690679,
         "context_docs": 6,
         "context_chars": 4024
       }
@@ -468,7 +468,7 @@
       "mrr": 0.8611111111111112,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 12.301916955038905,
+      "latency_ms_p50": 14.51041700784117,
       "context_docs_mean": 7.222222222222222,
       "context_chars_mean": 4660.444444444444
     },
@@ -508,7 +508,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 8.205417077988386,
+        "latency_ms": 8.137374999932945,
         "context_docs": 7,
         "context_chars": 4194
       },
@@ -522,7 +522,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 6.093624979257584,
+        "latency_ms": 6.019957945682108,
         "context_docs": 6,
         "context_chars": 5943
       },
@@ -536,7 +536,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 9.617207921110094,
+        "latency_ms": 7.469790987670422,
         "context_docs": 6,
         "context_chars": 4024
       },
@@ -550,7 +550,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 5.95391693059355,
+        "latency_ms": 5.67166693508625,
         "context_docs": 8,
         "context_chars": 3848
       },
@@ -564,7 +564,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 4,
         "missing_from_context": [],
-        "latency_ms": 8.323374902829528,
+        "latency_ms": 5.833500064909458,
         "context_docs": 5,
         "context_chars": 5697
       },
@@ -578,7 +578,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 6.43020891584456,
+        "latency_ms": 6.333666038699448,
         "context_docs": 9,
         "context_chars": 4981
       },
@@ -592,7 +592,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 5.3501250222325325,
+        "latency_ms": 5.752332974225283,
         "context_docs": 6,
         "context_chars": 2895
       },
@@ -606,7 +606,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 5.594291957095265,
+        "latency_ms": 6.1356250662356615,
         "context_docs": 7,
         "context_chars": 4487
       },
@@ -620,7 +620,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 3.1653749756515026,
+        "latency_ms": 3.210292081348598,
         "context_docs": 6,
         "context_chars": 3712
       }
@@ -631,7 +631,7 @@
       "mrr": 0.8425925925925926,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 6.093624979257584,
+      "latency_ms_p50": 6.019957945682108,
       "context_docs_mean": 6.666666666666667,
       "context_chars_mean": 4420.111111111111
     },
@@ -671,7 +671,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 19.956332980655134,
+        "latency_ms": 11.73237501643598,
         "context_docs": 11,
         "context_chars": 6843
       },
@@ -685,7 +685,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 8.952250005677342,
+        "latency_ms": 10.259083937853575,
         "context_docs": 8,
         "context_chars": 5213
       },
@@ -699,7 +699,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 10.067000053822994,
+        "latency_ms": 11.479749926365912,
         "context_docs": 7,
         "context_chars": 4229
       },
@@ -713,7 +713,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 8.29345895908773,
+        "latency_ms": 9.814833989366889,
         "context_docs": 7,
         "context_chars": 3409
       },
@@ -727,7 +727,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 8.199417032301426,
+        "latency_ms": 8.754041977226734,
         "context_docs": 6,
         "context_chars": 6099
       },
@@ -741,7 +741,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 10.183874983340502,
+        "latency_ms": 11.325874947942793,
         "context_docs": 10,
         "context_chars": 4893
       },
@@ -755,7 +755,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 8.994083967991173,
+        "latency_ms": 10.62504097353667,
         "context_docs": 6,
         "context_chars": 3287
       },
@@ -769,7 +769,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 8.58312495984137,
+        "latency_ms": 9.731375030241907,
         "context_docs": 7,
         "context_chars": 3772
       },
@@ -783,7 +783,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 4.9757909728214145,
+        "latency_ms": 6.164124934002757,
         "context_docs": 7,
         "context_chars": 4535
       }
@@ -794,7 +794,7 @@
       "mrr": 0.7916666666666666,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 8.952250005677342,
+      "latency_ms_p50": 10.259083937853575,
       "context_docs_mean": 7.666666666666667,
       "context_chars_mean": 4697.777777777777
     },
@@ -834,7 +834,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 13.707500067539513,
+        "latency_ms": 15.037207980640233,
         "context_docs": 8,
         "context_chars": 6837
       },
@@ -848,7 +848,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 11.685292003676295,
+        "latency_ms": 13.54433293454349,
         "context_docs": 8,
         "context_chars": 5119
       },
@@ -862,7 +862,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 12.46804092079401,
+        "latency_ms": 13.693041983060539,
         "context_docs": 7,
         "context_chars": 4229
       },
@@ -876,7 +876,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 10.758916032500565,
+        "latency_ms": 11.68329210486263,
         "context_docs": 8,
         "context_chars": 4136
       },
@@ -890,7 +890,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 10.942750028334558,
+        "latency_ms": 12.12400000076741,
         "context_docs": 6,
         "context_chars": 6099
       },
@@ -904,7 +904,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 13.292749994434416,
+        "latency_ms": 14.247875078581274,
         "context_docs": 10,
         "context_chars": 4867
       },
@@ -918,7 +918,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 11.730208992958069,
+        "latency_ms": 14.436249970458448,
         "context_docs": 6,
         "context_chars": 3123
       },
@@ -932,7 +932,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 12.329332996159792,
+        "latency_ms": 12.26899994071573,
         "context_docs": 7,
         "context_chars": 3698
       },
@@ -946,7 +946,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 6.944208987988532,
+        "latency_ms": 8.032499928958714,
         "context_docs": 6,
         "context_chars": 3948
       }
@@ -957,7 +957,7 @@
       "mrr": 0.8472222222222222,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 11.730208992958069,
+      "latency_ms_p50": 13.54433293454349,
       "context_docs_mean": 7.333333333333333,
       "context_chars_mean": 4672.888888888889
     },
@@ -997,7 +997,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 7.6261250069364905,
+        "latency_ms": 15.899874968454242,
         "context_docs": 12,
         "context_chars": 7294
       },
@@ -1011,7 +1011,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 5.0264999736100435,
+        "latency_ms": 14.297749963589013,
         "context_docs": 8,
         "context_chars": 5119
       },
@@ -1025,7 +1025,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 5.779874976724386,
+        "latency_ms": 7.607000065036118,
         "context_docs": 7,
         "context_chars": 4433
       },
@@ -1039,7 +1039,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 4.6409579226747155,
+        "latency_ms": 6.0725410003215075,
         "context_docs": 8,
         "context_chars": 3848
       },
@@ -1053,7 +1053,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 4.629582981579006,
+        "latency_ms": 5.974374944344163,
         "context_docs": 5,
         "context_chars": 5853
       },
@@ -1067,7 +1067,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 5.822957959026098,
+        "latency_ms": 6.919332896359265,
         "context_docs": 9,
         "context_chars": 4781
       },
@@ -1081,7 +1081,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 4.747165949083865,
+        "latency_ms": 7.044333033263683,
         "context_docs": 6,
         "context_chars": 3123
       },
@@ -1095,7 +1095,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 4.779084003530443,
+        "latency_ms": 6.507999962195754,
         "context_docs": 6,
         "context_chars": 3464
       },
@@ -1109,7 +1109,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 2.8353750240057707,
+        "latency_ms": 18.73124996200204,
         "context_docs": 7,
         "context_chars": 4143
       }
@@ -1120,7 +1120,7 @@
       "mrr": 0.8958333333333334,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 4.779084003530443,
+      "latency_ms_p50": 7.044333033263683,
       "context_docs_mean": 7.555555555555555,
       "context_chars_mean": 4673.111111111111
     },
@@ -1160,7 +1160,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 10.389250004664063,
+        "latency_ms": 12.154208030551672,
         "context_docs": 10,
         "context_chars": 6829
       },
@@ -1174,7 +1174,7 @@
         "stale_first": 1.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 7.883250014856458,
+        "latency_ms": 10.69295802153647,
         "context_docs": 6,
         "context_chars": 4081
       },
@@ -1188,7 +1188,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 8.677749894559383,
+        "latency_ms": 11.227625072933733,
         "context_docs": 6,
         "context_chars": 4361
       },
@@ -1202,7 +1202,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 7.392542087472975,
+        "latency_ms": 9.758666972629726,
         "context_docs": 9,
         "context_chars": 5078
       },
@@ -1216,7 +1216,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 7.368416991084814,
+        "latency_ms": 9.726750082336366,
         "context_docs": 6,
         "context_chars": 6099
       },
@@ -1230,7 +1230,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 9.484624955803156,
+        "latency_ms": 11.100291972979903,
         "context_docs": 10,
         "context_chars": 4893
       },
@@ -1244,7 +1244,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 8.42083408497274,
+        "latency_ms": 11.456290958449244,
         "context_docs": 5,
         "context_chars": 3200
       },
@@ -1258,7 +1258,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 7.698666071519256,
+        "latency_ms": 9.486708091571927,
         "context_docs": 7,
         "context_chars": 3772
       },
@@ -1272,7 +1272,7 @@
         "stale_first": 1.0,
         "distinct_docs_in_top8": 5,
         "missing_from_context": [],
-        "latency_ms": 4.4492080342024565,
+        "latency_ms": 5.134499981068075,
         "context_docs": 6,
         "context_chars": 4473
       }
@@ -1283,7 +1283,7 @@
       "mrr": 0.6790123456790124,
       "context_recall": 1.0,
       "stale_first": 0.2222222222222222,
-      "latency_ms_p50": 7.883250014856458,
+      "latency_ms_p50": 10.69295802153647,
       "context_docs_mean": 7.222222222222222,
       "context_chars_mean": 4754
     },
@@ -1323,7 +1323,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 8.124792017042637,
+        "latency_ms": 10.163708007894456,
         "context_docs": 7,
         "context_chars": 5028
       },
@@ -1337,7 +1337,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 7.390292012132704,
+        "latency_ms": 8.876083069480956,
         "context_docs": 8,
         "context_chars": 5213
       },
@@ -1351,7 +1351,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 8.263792027719319,
+        "latency_ms": 11.958249961026013,
         "context_docs": 7,
         "context_chars": 4229
       },
@@ -1365,7 +1365,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 6.685291999019682,
+        "latency_ms": 9.454249986447394,
         "context_docs": 6,
         "context_chars": 3149
       },
@@ -1379,7 +1379,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 7.10300006903708,
+        "latency_ms": 8.607750060036778,
         "context_docs": 6,
         "context_chars": 6099
       },
@@ -1393,7 +1393,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 8,
         "missing_from_context": [],
-        "latency_ms": 8.033290971070528,
+        "latency_ms": 9.847083943895996,
         "context_docs": 8,
         "context_chars": 4073
       },
@@ -1407,7 +1407,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 7.56950001232326,
+        "latency_ms": 12.494750088080764,
         "context_docs": 6,
         "context_chars": 3287
       },
@@ -1421,7 +1421,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 6.986792082898319,
+        "latency_ms": 8.87512497138232,
         "context_docs": 7,
         "context_chars": 3772
       },
@@ -1435,7 +1435,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 4.0137500036507845,
+        "latency_ms": 4.707416985183954,
         "context_docs": 6,
         "context_chars": 3948
       }
@@ -1446,7 +1446,7 @@
       "mrr": 0.7916666666666666,
       "context_recall": 1.0,
       "stale_first": 0.0,
-      "latency_ms_p50": 7.390292012132704,
+      "latency_ms_p50": 9.454249986447394,
       "context_docs_mean": 6.777777777777778,
       "context_chars_mean": 4310.888888888889
     },
@@ -1486,7 +1486,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.9434590358287096,
+        "latency_ms": 2.1877919789403677,
         "context_docs": 7,
         "context_chars": 6603
       },
@@ -1500,7 +1500,7 @@
         "stale_first": 1.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.3059170451015234,
+        "latency_ms": 1.391333993524313,
         "context_docs": 7,
         "context_chars": 4668
       },
@@ -1514,7 +1514,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.1162079172208905,
+        "latency_ms": 1.1777079198509455,
         "context_docs": 6,
         "context_chars": 3945
       },
@@ -1528,7 +1528,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.8006250029429793,
+        "latency_ms": 1.8758749356493354,
         "context_docs": 11,
         "context_chars": 6521
       },
@@ -1542,7 +1542,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 0.8532080100849271,
+        "latency_ms": 0.9098750306293368,
         "context_docs": 6,
         "context_chars": 5949
       },
@@ -1556,7 +1556,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.5505830524489284,
+        "latency_ms": 1.6033330466598272,
         "context_docs": 8,
         "context_chars": 4237
       },
@@ -1570,7 +1570,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 7,
         "missing_from_context": [],
-        "latency_ms": 1.3989589642733335,
+        "latency_ms": 1.4321659691631794,
         "context_docs": 7,
         "context_chars": 3855
       },
@@ -1584,7 +1584,7 @@
         "stale_first": 0.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 1.8033749656751752,
+        "latency_ms": 1.8656660104170442,
         "context_docs": 8,
         "context_chars": 4649
       },
@@ -1598,7 +1598,7 @@
         "stale_first": 1.0,
         "distinct_docs_in_top8": 6,
         "missing_from_context": [],
-        "latency_ms": 0.8109159534797072,
+        "latency_ms": 0.8572080405429006,
         "context_docs": 6,
         "context_chars": 3999
       }
@@ -1609,7 +1609,7 @@
       "mrr": 0.6666666666666666,
       "context_recall": 1.0,
       "stale_first": 0.2222222222222222,
-      "latency_ms_p50": 1.3989589642733335,
+      "latency_ms_p50": 1.4321659691631794,
       "context_docs_mean": 7.333333333333333,
       "context_chars_mean": 4936.222222222223
     },

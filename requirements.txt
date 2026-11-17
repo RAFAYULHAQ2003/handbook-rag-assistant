@@ -12,6 +12,7 @@ PyYAML==6.0.3
 # search
 numpy==2.5.5
 fastembed==0.9.1  # local ONNX embedding model, no PyTorch
+symspellpy==6.10.2  # typo correction for search (MIT); bundles an 82k-word English dictionary
 chromadb-client==1.5.9  # HTTP client for the ChromaDB server; keep equal to the server image in docker-compose.yml
 
 # serving

@@ -18,6 +18,7 @@ from rag.retrieval.search import (
     Retriever,
     build_context,
 )
+from rag.retrieval.spelling import SpellFixer
 from rag.retrieval.vector_store import ChromaStore, VectorStoreError, store_from_env
 from rag.validity import DocStatus, ValidityFinding, assess
 
@@ -71,6 +72,7 @@ class Retrieval:
     pool: list[Hit]  # the full ranking, for metrics and debugging
     top_bm25: float | None
     top_cosine: float | None
+    corrections: list[tuple[str, str]] = field(default_factory=list)  # typos also searched as (typed, meant)
 
 
 @dataclass
@@ -92,6 +94,7 @@ class HandbookIndex:
             self.passages_by_doc[p.doc_id].append(p)
         self._statuses: dict[date, tuple[dict[str, DocStatus], list[ValidityFinding]]] = {}
         self.schedules = schedule_subjects(official)
+        self.spelling = SpellFixer(d.text for d in self.docs.values())  # uploads' words count too
 
     @property
     def mode(self) -> str:
@@ -154,10 +157,13 @@ class HandbookIndex:
         day = self.date_for(ref)
         statuses = self.statuses(day)
         states = statuses if use_validity else None
-        result = self.retriever.search(question, k=k, statuses=states)
+        corrections = self.spelling.corrections(question)
+        query = self.spelling.expand(question)  # "anual leves" is also searched as "annual leave"
+        result = self.retriever.search(query, k=k, statuses=states)
         hits = result.hits
         if follow_up_of and follow_up_of.strip():
-            combined = self.retriever.search(f"{follow_up_of.strip()} {question}", k=k, statuses=states)
+            combined = self.retriever.search(f"{self.spelling.expand(follow_up_of.strip())} {query}", k=k,
+                                             statuses=states)
             hits = _interleave(result.hits, combined.hits, k)
         schedules = []
         if follow_references and DATED_QUESTION.search(question):
@@ -165,7 +171,7 @@ class HandbookIndex:
             schedules = [d for d, subject in self.schedules.items() if subject.search(top)]
         context = build_context(hits, self.docs, statuses, result.pool, self.passages_by_doc,
                                 self.references if follow_references else None, schedules=schedules)
-        return Retrieval(question, day, hits, context, result.pool, result.top_bm25, result.top_cosine)
+        return Retrieval(question, day, hits, context, result.pool, result.top_bm25, result.top_cosine, corrections)
 
 
 def _interleave(first: list[Hit], second: list[Hit], k: int, max_per_doc: int = 2) -> list[Hit]:

@@ -426,3 +426,11 @@ def test_rate_limit_uses_the_proxy_address_only_when_trusted(web, app, monkeypat
 
 def test_health_reports_the_vector_store(web, app):
     assert web.get("/api/health").json()["vector_store"] == "none (keyword search only)"
+
+
+def test_answer_says_which_corrected_words_were_also_searched(web, app):
+    body = ask(web, "ohw mny anual leves do i get?").json()
+    assert body["search_corrections"] == [{"typed": "anual", "searched": "annual"}, {"typed": "leves", "searched": "leave"}]
+    assert body["question"] == "ohw mny anual leves do i get?"
+    js = open("webapp/handbook/static/handbook/app.js").read()
+    assert "also searched for" in js

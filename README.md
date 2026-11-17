@@ -77,6 +77,10 @@ curl -X POST http://127.0.0.1:8000/api/ask -H "Content-Type: application/json" \
 curl http://127.0.0.1:8000/api/health
 ```
 
+**Typos:** a question word that is neither a handbook word nor a known English word is also searched as the closest handbook word ("anual leves" → "annual leave"), using SymSpell (`symspellpy`) over the handbook's vocabulary, with its 82,000-word English dictionary keeping real words such as "dental" unchanged. The original words are kept, the model sees the question as typed, and the answer says what was also searched for.
+
+**Repeated questions** come back instantly from the answer cache, whichever model (main or backup) gave the answer first.
+
 **Vectors:** passages are embedded locally with `BAAI/bge-small-en-v1.5` and stored in ChromaDB (one collection per embedding model). Every web worker searches the same collection; uploads are added to it and removed from it at once. Keyword search (BM25), rank fusion and the document-state rules stay in the app. If ChromaDB cannot be reached, search uses an in-memory copy of the vectors and `/api/health` says so. Through ChromaDB, all 132 eval questions get exactly the same context as with in-memory search.
 
 **Deploy on a server** with Docker: point a domain at it, or use `<ip-with-dashes>.sslip.io`. Set the server lines at the end of `.env.example`, then run:

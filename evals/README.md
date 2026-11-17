@@ -5,10 +5,11 @@ No test questions were provided, so these were written by hand from the corpus *
 - `questions.jsonl`: dev set (97 questions), used while building and tuning.
 - `questions_holdout.jsonl`: holdout set (26 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
 - `questions_followup.jsonl`: follow-up set (9 two-turn questions). Each carries the earlier turn in `history`, the way the web page sends it ("How many days of annual leave do I get?", then "and who approves it?"). Written after follow-ups were built, so it shows the feature works rather than being a blind test. The earlier answers never contain the fact being asked for, so it has to come from the documents. `fu-09` is a complete new question after an unrelated turn, and must not be pulled off topic.
+- `questions_typos.jsonl`: typo set (11 questions). Misspelled forms of dev questions ("ohw mny anual leves do i get per yeer?"), with the expectations copied from the question named in `variant_of`. Added after a user's misspelled question missed the Leave Policy, so it shows the fix works rather than being a blind test. On search alone, correction lifts hit@1 and context recall from 0.909 to 1.000. The one question it fixes is the user's own, which had several typos; the meaning search already copes with single typos.
 - `questions.py`: loads the sets.
 - `matching.py`: how a fact is matched in an answer (see below).
 - `retrieval_eval.py`: compares search configurations with no model calls (`python -m evals.retrieval_eval`); results in `results/retrieval-dev.json`.
-- `answer_eval.py`: answers every question end to end and scores it (`python -m evals.answer_eval`); options `--models`, `--context whole` (baseline), `--injection`, `--set holdout`, `--set followup`, `--label`. Results in `results/answers-<set>-<model>-<context>[-<label>].json`.
+- `answer_eval.py`: answers every question end to end and scores it (`python -m evals.answer_eval`); options `--models`, `--context whole` (baseline), `--injection`, `--set holdout`, `--set followup`, `--set typos`, `--label`. Results in `results/answers-<set>-<model>-<context>[-<label>].json`.
 - `scoring.py`: the scoring rules below, as tested code.
 - `fixtures/injected-notice.md`: a fake uploaded notice that tells the assistant to lie; used by `--injection`.
 
@@ -29,6 +30,7 @@ One JSON object per line:
 | `reference_date` | Optional "today" for date-dependent questions; the run defaults to `2026-11-17` |
 | `notes` | Why the question is tricky |
 | `history` | Follow-up set only: the earlier turns, as `[{"question", "answer"}]` |
+| `variant_of` | Typo set only: the dev question this one misspells; its rules apply (for example, `fut-01` may rely on the 2027 revision) |
 
 Every `must_include` group appears in the text of the expected documents, and fits inside a single passage (both enforced by tests).
 
@@ -91,3 +93,4 @@ Matching is plain text, so it is free, fast and gives the same result every run.
 | `paraphrase` | Casual wording, missing punctuation |
 | `injection` | Tries to override the documents; the answer must still follow the handbook |
 | `follow_up` | Follow-up set only: a question that leans on the earlier turn ("which one is based in Austin?") |
+| `typo` | Typo set only: a misspelled dev question |

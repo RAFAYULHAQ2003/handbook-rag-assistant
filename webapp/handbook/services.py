@@ -111,6 +111,7 @@ def answer_json(a: Answer, source_url) -> dict:
         ],
         "dropped_citations": a.dropped_citations,
         "reference_date": a.retrieval.reference_date.isoformat() if a.retrieval else None,
+        "search_corrections": [{"typed": t, "searched": f} for t, f in a.retrieval.corrections] if a.retrieval else [],
         "context": context_json(a.retrieval.context) if a.retrieval else [],
         "model": a.model,
         "cached": a.cached,

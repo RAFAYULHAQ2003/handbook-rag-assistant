@@ -343,6 +343,9 @@
     var docs = a.context.length;
     var parts = ["Searched " + docs + " document" + (docs === 1 ? "" : "s")];
     if (a.reference_date) parts.push("as of " + prettyDate(a.reference_date));
+    if (a.search_corrections && a.search_corrections.length) {
+      parts.push("also searched for " + a.search_corrections.map(function (c) { return "\u201c" + c.searched + "\u201d"; }).join(", "));
+    }
     if (elapsedMs === null) parts.push("earlier");
     else parts.push(a.cached ? "instant (cached)" : (elapsedMs / 1000).toFixed(1) + "s");
     if (a.used_fallback) parts.push("answered by the backup model (main model busy)");

@@ -168,32 +168,52 @@ class Retriever:
 _GENERIC_TITLE_WORDS = {"policy", "guide", "guidelines", "process", "procedure", "runbook", "rules", "overview"}
 
 
-class ReferenceFinder:
-    """Find the documents a piece of text names ("see the VPN Guide", "after the introductory period").
+# a version marker at the end of a title: "Leave Policy v2", "Production Deploy Runbook (2023)",
+# "Parental Leave Policy (2027 revision)"; documents refer to them without it ("see the Leave Policy")
+_TITLE_VERSION = re.compile(r"\s+(?:v\d+(?:\.\d+)*|\([^)]*(?:\d{4}|revision|draft|v\d)[^)]*\))$", re.IGNORECASE)
 
-    A title matches in full, or without a trailing generic word when at least two
-    words remain ("introductory period" for the Introductory Period Policy), so a
-    one-word remainder like "travel" never links on its own.
+
+def _title_phrases(title: str) -> set[str]:
+    """Ways a document names this one: its title, without a version marker, without a generic last word."""
+    phrases = {title}
+    plain = _TITLE_VERSION.sub("", title)
+    if plain != title and len(plain.split()) >= 2:
+        phrases.add(plain)
+    for phrase in list(phrases):
+        words = phrase.split()
+        if len(words) >= 3 and words[-1].lower() in _GENERIC_TITLE_WORDS:
+            phrases.add(" ".join(words[:-1]))
+    return phrases
+
+
+class ReferenceFinder:
+    """Find the documents a piece of text names ("see the Leave Policy", "after the introductory period").
+
+    A title matches in full, without its version marker ("Leave Policy" for Leave Policy v2; every
+    version matches, and the caller keeps only the one in force), or without a trailing generic word
+    when at least two words remain ("introductory period" for the Introductory Period Policy), so a
+    one-word remainder like "travel" never links on its own. Where names overlap, the longest wins:
+    "Parental Leave Policy" does not also count as a mention of the Leave Policy.
     """
 
     def __init__(self, docs: list[Document]):
         self.patterns = {}
         for doc in docs:
-            title = doc.meta.title
-            phrases = {title}
-            words = title.split()
-            if len(words) >= 3 and words[-1].lower() in _GENERIC_TITLE_WORDS:
-                phrases.add(" ".join(words[:-1]))
+            phrases = _title_phrases(doc.meta.title)
             alternatives = "|".join(re.escape(p) for p in sorted(phrases, key=len, reverse=True))
             self.patterns[doc.doc_id] = re.compile(rf"(?<![\w-])(?:{alternatives})(?![\w-])", re.IGNORECASE)
 
     def find(self, text: str, exclude: str | None = None) -> list[str]:
         """Named documents, in the order they first appear in the text."""
-        found = []
-        for doc_id, pattern in self.patterns.items():
-            if doc_id != exclude and (m := pattern.search(text)):
-                found.append((m.start(), doc_id))
-        return [doc_id for _, doc_id in sorted(found)]
+        matches = [(m.start(), m.end(), doc_id) for doc_id, pattern in self.patterns.items() if doc_id != exclude
+                   for m in pattern.finditer(text)]
+        # drop a match that sits inside a longer one ("Leave Policy" within "Parental Leave Policy")
+        kept = [(s, e, d) for s, e, d in matches
+                if not any(s2 <= s and e <= e2 and (e2 - s2) > (e - s) for s2, e2, _ in matches)]
+        first: dict[str, int] = {}
+        for s, _, d in kept:
+            first[d] = min(first.get(d, s), s)
+        return sorted(first, key=first.get)
 
 
 def _merge(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:

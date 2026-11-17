@@ -2,8 +2,8 @@
 
 No test questions were provided, so these were written by hand from the corpus **before** building the assistant, to avoid picking questions the system already passes.
 
-- `questions.jsonl`: dev set (94 questions), used while building and tuning.
-- `questions_holdout.jsonl`: holdout set (23 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
+- `questions.jsonl`: dev set (97 questions), used while building and tuning.
+- `questions_holdout.jsonl`: holdout set (24 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
 - `matching.py`: how a fact is matched in an answer (see below).
 
 ## Format

@@ -1,3 +1,4 @@
+import hashlib
 import re
 from dataclasses import dataclass
 
@@ -7,11 +8,20 @@ MAX_CHARS = 1000  # prose passage limit, roughly 200-250 tokens
 TABLE_MAX_CHARS = 2000  # whole-table passage limit; bigger tables become groups of rows
 
 _SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'(])")
+# a full stop after these is not the end of a sentence ("U.S. Office", "No. 5", "e.g. Finance")
+_ABBREVIATIONS = {"e.g.", "i.e.", "etc.", "vs.", "no.", "nos.", "approx.", "dept.", "inc.", "ltd.", "co.",
+                  "mr.", "mrs.", "ms.", "dr.", "prof.", "st.", "jr.", "sr.", "fig.", "sec.", "art."}
+
+
+def _is_abbreviation(text: str) -> bool:
+    """True if `text` ends with an abbreviation or an initial such as 'U.S.' or 'J.'."""
+    word = text.rsplit(None, 1)[-1].lower() if text.strip() else ""
+    return word in _ABBREVIATIONS or re.fullmatch(r"(?:[a-z]\.)+", word) is not None
 
 
 @dataclass(frozen=True)
 class Passage:
-    passage_id: str  # "<doc_id>#<n>", stable for the same document text
+    passage_id: str  # "<doc_id>:<content hash>", unchanged when other passages move
     doc_id: str
     kind: str  # "text" | "row" | "table"
     section: tuple[str, ...]
@@ -19,6 +29,21 @@ class Passage:
     start: int
     end: int
     search_text: str  # title and section path + text, used for indexing
+
+
+def _passage_id(doc_id: str, kind: str, text: str, existing: list["Passage"]) -> str:
+    """'<doc_id>:<hash of kind and text>' stays the same when other passages are added or renumbered.
+
+    A repeated identical passage in the same document gets a '-2', '-3' suffix.
+    """
+    base = f"{doc_id}:{hashlib.sha1(f'{kind}\n{text}'.encode()).hexdigest()[:10]}"
+    taken = {p.passage_id for p in existing}
+    if base not in taken:
+        return base
+    n = 2
+    while f"{base}-{n}" in taken:
+        n += 1
+    return f"{base}-{n}"
 
 
 def _context(doc: Document, section: tuple[str, ...]) -> str:
@@ -41,7 +66,8 @@ def _spans_by_size(blocks: list[Block], limit: int) -> list[list[Block]]:
 
 def _sentence_spans(block: Block, limit: int) -> list[tuple[int, int]]:
     """Split one over-long block into (start, end) spans at sentence boundaries."""
-    cuts = [block.start] + [block.start + m.end() for m in _SENTENCE_BREAK.finditer(block.text)] + [block.end]
+    breaks = [m for m in _SENTENCE_BREAK.finditer(block.text) if not _is_abbreviation(block.text[:m.start()])]
+    cuts = [block.start] + [block.start + m.end() for m in breaks] + [block.end]
     spans: list[tuple[int, int]] = []
     span_start = cuts[0]
     for prev, cut in zip(cuts, cuts[1:], strict=False):
@@ -83,7 +109,7 @@ def chunk_document(doc: Document) -> list[Passage]:
             return
         text = doc.text[start:end]
         passages.append(Passage(
-            passage_id=f"{doc.doc_id}#{len(passages)}",
+            passage_id=_passage_id(doc.doc_id, kind, text, passages),
             doc_id=doc.doc_id,
             kind=kind,
             section=section,
@@ -111,7 +137,9 @@ def chunk_document(doc: Document) -> list[Passage]:
         prev = runs[i - 1] if i > 0 else None
         lead = prev[1][-1] if prev and prev[0] == "prose" and prev[1][-1].section == section else None
         for g, rows in enumerate(_spans_by_size(blocks, TABLE_MAX_CHARS)):
-            start = lead.start if lead is not None and g == 0 else rows[0].start
+            # the lead sentence counts toward the limit; if it does not fit it stays in its own passage
+            with_lead = lead is not None and g == 0 and rows[-1].end - lead.start <= TABLE_MAX_CHARS
+            start = lead.start if with_lead else rows[0].start
             add("table", section, start, rows[-1].end)
     return passages
 

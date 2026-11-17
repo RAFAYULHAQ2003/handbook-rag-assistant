@@ -1,10 +1,12 @@
 import pytest
 
 from evals.matching import contains_fact
+from evals.questions import all_questions
 from rag.chunking import MAX_CHARS, TABLE_MAX_CHARS, chunk_document, chunk_documents
 from rag.loaders import RawBlock, build_text
 from rag.models import Document, DocumentMeta
-from tests.test_eval_set import ALL
+
+ALL = all_questions()
 
 
 def make_doc(raw_blocks, doc_id="doc", title="Doc"):
@@ -153,3 +155,41 @@ def test_every_passage_lies_within_one_section(docs, passages):
     for p in passages:
         inside = [b for b in docs[p.doc_id].blocks if p.start <= b.start and b.end <= p.end]
         assert inside and {b.section for b in inside} == {p.section}, p.passage_id
+
+
+
+def test_table_limit_counts_the_lead_paragraph():
+    rows = [RawBlock("table_row", f"a: {i} | b: " + "x" * 80) for i in range(21)]
+    doc = make_doc([RawBlock("paragraph", "Lead " + "L" * 900 + "."), *rows])
+    tables = [p for p in chunk_document(doc) if p.kind == "table"]
+    assert all(len(t.text) <= TABLE_MAX_CHARS for t in tables)
+    # the lead did not fit, so it stays in its own prose passage and is not lost
+    assert any(p.kind == "text" and p.text.startswith("Lead ") for p in chunk_document(doc))
+
+
+def test_passage_ids_survive_edits_elsewhere_in_the_document():
+    before = make_doc([RawBlock("heading", "A", level=1), RawBlock("paragraph", "Alpha."),
+                       RawBlock("heading", "B", level=1), RawBlock("paragraph", "Beta.")])
+    after = make_doc([RawBlock("paragraph", "A new opening paragraph."),
+                      RawBlock("heading", "A", level=1), RawBlock("paragraph", "Alpha."),
+                      RawBlock("heading", "B", level=1), RawBlock("paragraph", "Beta.")])
+    ids_before = {p.text: p.passage_id for p in chunk_document(before)}
+    ids_after = {p.text: p.passage_id for p in chunk_document(after)}
+    assert ids_after["Beta."] == ids_before["Beta."]
+
+
+def test_repeated_identical_passages_get_distinct_ids():
+    doc = make_doc([RawBlock("heading", "A", level=1), RawBlock("paragraph", "Same."),
+                    RawBlock("heading", "B", level=1), RawBlock("paragraph", "Same.")])
+    ids = [p.passage_id for p in chunk_document(doc)]
+    assert len(ids) == len(set(ids)) == 2
+    assert ids[1] == ids[0] + "-2"
+
+
+@pytest.mark.parametrize("text", ["We hire in the U.S. Office staff follow it.", "See No. 5 for details.",
+                                  "Teams, e.g. Finance, comply.", "Ask Dr. Ali first."])
+def test_sentence_splitter_ignores_abbreviations(text):
+    from rag.chunking import _sentence_spans
+    from rag.models import Block
+    block = Block("paragraph", text, (), 0, len(text))
+    assert _sentence_spans(block, 10) == [(0, len(text))]

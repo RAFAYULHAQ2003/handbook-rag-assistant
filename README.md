@@ -16,6 +16,8 @@ An assistant that answers Northgate Robotics employees' questions from the compa
 
 ## Setup
 
+Requires **Python 3.12 or newer** (Django 6.1 needs it).
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate

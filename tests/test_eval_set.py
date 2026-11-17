@@ -66,3 +66,22 @@ def test_question_is_well_formed(source, q):
 def test_every_category_covered_in_dev_set():
     dev = load(EVAL_FILES[0])
     assert {q["category"] for q in dev} == CATEGORIES
+
+
+# The FAQ only repeats answers that live in other policies, so a FAQ-only
+# question would wrongly penalise retrieval for finding the original policy.
+COVERAGE_EXEMPT = {"ref-faq"}
+
+
+def test_every_document_has_a_dev_question():
+    dev = load(EVAL_FILES[0])
+    asked = {d for q in dev for d in q["expected_doc_ids"]}
+    assert DOC_IDS - COVERAGE_EXEMPT - asked == set()
+
+
+def test_every_file_format_has_a_dev_question():
+    docs = json.loads(MANIFEST.read_text())["documents"]
+    ext = {d["doc_id"]: Path(d["path"]).suffix for d in docs}
+    dev = load(EVAL_FILES[0])
+    asked_formats = {ext[d] for q in dev for d in q["expected_doc_ids"]}
+    assert asked_formats == set(ext.values())

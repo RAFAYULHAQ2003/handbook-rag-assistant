@@ -2,8 +2,8 @@
 
 No test questions were provided, so these were written by hand from the corpus **before** building the assistant, to avoid picking questions the system already passes.
 
-- `questions.jsonl`: dev set (64 questions), used while building and tuning.
-- `questions_holdout.jsonl`: holdout set (20 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
+- `questions.jsonl`: dev set (94 questions), used while building and tuning.
+- `questions_holdout.jsonl`: holdout set (23 questions), not looked at while tuning; run at the end to check the dev score is not inflated.
 - `matching.py`: how a fact is matched in an answer (see below).
 
 ## Format
@@ -34,7 +34,7 @@ Matching is plain text, so it is free, fast and gives the same result every run.
 - `refuse` questions have no expected facts; all others have facts and documents
 - `multi_doc` and `conflict` questions name at least two documents
 - `date` and `future` questions pin a `reference_date`
-- the dev set covers every category
+- the dev set covers every category, every document (except the FAQ, which only repeats other policies) and every file format
 
 ## Categories
 

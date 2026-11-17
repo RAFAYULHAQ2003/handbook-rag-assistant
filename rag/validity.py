@@ -58,6 +58,12 @@ def family_key(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", key).strip()
 
 
+def _family(meta: DocumentMeta) -> str:
+    """An uploaded document is its own family: a user's "Leave Policy v3" must never replace or amend
+    the official Leave Policy, so it is linked to no other version."""
+    return f"uploaded {meta.doc_id}" if meta.uploaded else family_key(meta.title)
+
+
 def _authority(meta: DocumentMeta) -> Authority:
     category = (meta.category or "").strip().lower()
     return Authority.INFORMAL if category in INFORMAL_CATEGORIES else Authority.POLICY
@@ -78,7 +84,7 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
     # explicit supersession edges, predecessor -> successors
     successors: dict[str, list[str]] = {}
     for m in metas:
-        target = m.supersedes
+        target = None if m.uploaded else m.supersedes
         if not target:
             continue
         if target == m.doc_id:
@@ -137,11 +143,11 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
 
     families: dict[str, list[str]] = {}
     for m in metas:
-        families.setdefault(family_key(m.title), []).append(m.doc_id)
+        families.setdefault(_family(m), []).append(m.doc_id)
 
     def newest_in_force_in_family(m: DocumentMeta) -> str | None:
         # skip versions that are themselves replaced; a version with only a future successor still counts
-        candidates = [by_id[d] for d in families[family_key(m.title)]
+        candidates = [by_id[d] for d in families[_family(m)]
                       if d != m.doc_id and basic[d] is State.IN_FORCE and latest_in_force(d) is None]
         candidates.sort(key=lambda c: c.effective_date or date.min, reverse=True)
         return candidates[0].doc_id if candidates else None
@@ -163,12 +169,12 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
             current_version = target if target and basic[target] is State.IN_FORCE else newest_in_force_in_family(m)
 
         upcoming = tuple(sorted(
-            d for d in set(successors.get(m.doc_id, [])) | set(families[family_key(m.title)])
+            d for d in set(successors.get(m.doc_id, [])) | set(families[_family(m)])
             if d != m.doc_id and basic[d] is State.NOT_YET_EFFECTIVE
         )) if state is State.IN_FORCE else ()
 
         amended_by = tuple(sorted(
-            d for d in families[family_key(m.title)]
+            d for d in families[_family(m)]
             if d != m.doc_id and basic[d] is State.IN_FORCE and d not in successors.get(m.doc_id, [])
             and m.doc_id not in successors.get(d, [])
             and (by_id[d].effective_date or date.min) > (m.effective_date or date.min)
@@ -180,7 +186,7 @@ def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], 
             authority=_authority(m),
             reference_date=ref,
             effective_date=m.effective_date,
-            family=family_key(m.title),
+            family=_family(m),
             current_version=current_version,
             superseded_by=superseded_by,
             upcoming=upcoming,

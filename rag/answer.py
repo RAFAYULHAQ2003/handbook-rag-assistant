@@ -29,11 +29,12 @@ Rules:
    - "superseded" or "deprecated": outdated. Do not answer from them unless the question asks about that old version; then answer from it, say it is outdated, and give the current rule.
    - "not yet in force": a future change. Give the rule that applies now first, then the change and the date it takes effect. If the question is about an event on or after that date (for example a birth or a trip), apply the rule the way the document defines it, such as by the date of the birth, not by today's date.
    - Meeting notes are informal. They can answer questions about decisions, but say the answer comes from meeting notes.
+   - Documents with origin="uploaded" were added by a user and are not official policy. Use them for questions about them. When one disagrees with an official document, give the official rule and point out the difference.
 4. Before answering, check every provided document for rules on the same point. When documents disagree (for example different time limits, amounts or approvers), state both and cite each. If one document states a specific exception to a general rule, the exception applies, even if the general rule is newer. If you cannot tell which applies, say so.
 5. If the question could mean several people or things, set "needs_clarification" to true and list every match the documents give.
 6. If the documents answer only part of the question, answer that part and say what the handbook does not cover. If a document refers to another document that is not provided, say it is referenced but not available.
-7. "verdict": for a yes/no question, "yes" or "no" (the overall answer, even when conditions apply); otherwise null.
-8. Support every fact in your answer with a citation: the document id and a short quote copied exactly, word for word, from that document (one sentence or one table row). Cite only the provided documents.
+7. "verdict": for a yes/no question, "yes" or "no" (the overall answer, even when conditions apply); otherwise null. If the answer depends on dates (a freeze, a deadline, a schedule), compare today's date with the dates in the documents before deciding. If the documents do not give the dates needed, set "verdict" to null and say what the answer depends on.
+8. Support every fact in your answer with a citation: the document id and a short quote copied exactly, word for word, from that document (one sentence or one table row). Cite only the provided documents. In the answer text, put a marker like [1] right after each fact, where the number is that citation's position in your "citations" list (1 for the first).
 9. Write plainly and concisely, usually one to four sentences. Use the date given in the request for anything that depends on today's date.
 """
 
@@ -82,6 +83,8 @@ class Answer:
     model: str | None = None
     llm_calls: int = 0
     cached: bool = False
+    used_fallback: bool = False  # answered by the backup model
+    small_talk: bool = False  # a greeting or thanks, answered without searching or calling the model
     prompt_tokens: int = 0
     completion_tokens: int = 0
     cost_usd: float = 0.0
@@ -91,17 +94,60 @@ class Answer:
     @property
     def unsupported(self) -> bool:
         """An answer was given but no quote backing it could be verified."""
-        return bool(self.answerable) and not self.needs_clarification and not self.citations
+        return bool(self.answerable) and not self.needs_clarification and not self.citations and not self.small_talk
 
 
 # ---------- prompt ----------
 
 def _safe(text: str) -> str:
-    """Stop document or question text from closing the tags that frame it."""
-    return re.sub(r"</?\s*(documents?|question)\b", lambda m: m.group(0).replace("<", "‹"), text, flags=re.IGNORECASE)
+    """Stop document, question or conversation text from closing the tags that frame it."""
+    return re.sub(r"</?\s*(documents?|question|conversation)\b", lambda m: m.group(0).replace("<", "‹"), text,
+                  flags=re.IGNORECASE)
 
 
-def build_messages(question: str, retrieval: Retrieval, index: HandbookIndex) -> list[dict]:
+MAX_HISTORY_TURNS = 3
+
+# A question that refers back to the conversation ("which one lives in Austin?", "what about interns?").
+# Only these get the earlier turns: a complete question is answered on its own, so it reads the same
+# every time (and is served from the cache) and old turns cannot pull it off topic.
+_FOLLOW_UP = re.compile(
+    r"\b(he|she|him|her|his|hers|they|them|their|theirs|it|its|that|this|those|these|which one|"
+    r"which of|what about|how about|and for|same|also|instead|former|latter|above)\b"
+    r"|^\s*(and|but|so|or|what if|then)\b"
+    r"|^\s*which\s+(one|ones|of|is|are|was|were|has|have|do|does|did|can|\w+s)\b",  # "which lives in Austin?"
+    re.IGNORECASE)
+SMALL_TALK = re.compile(
+    r"^\s*(hi|hello|hey|hiya|good (morning|afternoon|evening)|thanks?( you)?|thank you|thx|ok(ay)?|cool|great|"
+    r"bye|goodbye|what can you do|who are you|help)\s*[.!?]*\s*$",
+    re.IGNORECASE)
+SMALL_TALK_REPLY = ("Hi! Ask me anything about the Northgate Robotics employee handbook: leave, travel and expenses, "
+                    "IT and security, engineering runbooks, teams and more. Every answer shows the exact passages "
+                    "it comes from.")
+
+
+def is_follow_up(question: str) -> bool:
+    """Does the question lean on earlier turns? Short fragments ("and interns?") count too."""
+    words = re.findall(r"[a-z0-9']+", question.lower())
+    return bool(_FOLLOW_UP.search(question)) or len(words) <= 3
+
+
+CONVERSATION_NOTE = ("Earlier in this conversation. Use it only to understand what the latest question refers to "
+                     "(for example \"which one lives in Austin?\" after a question about Maya). Answer only the latest "
+                     "question, and take every fact from the documents, not from earlier answers.")
+
+
+def clean_history(history) -> list[dict]:
+    """The last few turns as {"question", "answer"} strings; anything malformed is dropped."""
+    turns = []
+    for item in history or []:
+        if isinstance(item, dict) and isinstance(item.get("question"), str) and item["question"].strip():
+            answer = item.get("answer") if isinstance(item.get("answer"), str) else ""
+            turns.append({"question": item["question"].strip()[:500], "answer": strip_markers(answer).strip()[:1200]})
+    return turns[-MAX_HISTORY_TURNS:]
+
+
+def build_messages(question: str, retrieval: Retrieval, index: HandbookIndex,
+                   history: list[dict] | None = None) -> list[dict]:
     parts = [f"Today's date: {retrieval.reference_date.isoformat()} (company time zone: Central Time).", "", "<documents>"]
     for c in retrieval.context:
         doc = index.docs[c.doc_id]
@@ -109,8 +155,16 @@ def build_messages(question: str, retrieval: Retrieval, index: HandbookIndex) ->
         attrs = (f'id="{c.doc_id}" title="{_safe(c.title)}" state="{STATE_LABEL[c.state]}" '
                  f'effective="{meta.effective_date.isoformat() if meta.effective_date else "unknown"}" '
                  f'category="{meta.category or "unknown"}" included="{c.reason}"')
+        if meta.uploaded:
+            attrs += ' origin="uploaded"'
         parts += [f"<document {attrs}>", f"Status: {c.status_note}", _safe(c.text(doc)), "</document>"]
-    parts += ["</documents>", "", f"<question>{_safe(question)}</question>"]
+    parts += ["</documents>", ""]
+    if history:
+        parts += ["<conversation>", CONVERSATION_NOTE]
+        for turn in history:
+            parts += [f"Question: {_safe(turn['question'])}", f"Answer: {_safe(turn['answer'])}"]
+        parts += ["</conversation>", ""]
+    parts += [f"<question>{_safe(question)}</question>"]
     return [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": "\n".join(parts)}]
 
 
@@ -163,14 +217,41 @@ def locate_quote(quote: str, text: str) -> tuple[int, int] | None:
     return start, end
 
 
+# ---------- citation markers ----------
+
+_MARKER = re.compile(r"([ \t]*)((?:\[\d{1,2}(?:\s*,\s*\d{1,2})*\])+)")  # "[1]", "[1, 2]", "[1][3]"
+
+
+def strip_markers(text: str) -> str:
+    """The answer without its [n] markers (for scoring, and for history sent back to the model)."""
+    return _MARKER.sub("", text or "")
+
+
+def renumber_markers(text: str, mapping: dict[int, int | None]) -> str:
+    """Point each [n] at the verified citation it now is, so a marker never shows an unchecked source.
+
+    `mapping` takes the model's citation position (1-based) to the final number, or None when that
+    quote was dropped. Markers for dropped or unknown citations disappear; "[2, 2]" becomes "[2]".
+    """
+    def fix(m):
+        numbers = []
+        for part in re.findall(r"\d+", m.group(2)):
+            n = mapping.get(int(part))
+            if n is not None and n not in numbers:
+                numbers.append(n)
+        return m.group(1) + "".join(f"[{n}]" for n in numbers) if numbers else ""
+    return _MARKER.sub(fix, text or "")
+
+
 # ---------- the answer step ----------
 
 def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=None,
-                    retrieval: Retrieval | None = None) -> Answer:
+                    retrieval: Retrieval | None = None, history: list[dict] | None = None) -> Answer:
     """Retrieve, ask the model, and verify every citation against the source text.
 
     Pass `retrieval` to answer from a prepared context instead of searching (used by the
-    eval's "send the whole handbook" baseline).
+    eval's "send the whole handbook" baseline). Pass `history` (earlier {"question", "answer"}
+    turns) to answer follow-up questions; without it, behaviour is exactly as before.
     """
     question = (question or "").strip()
     if not question:
@@ -178,16 +259,19 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
     if len(question) > MAX_QUESTION_CHARS:
         return Answer(question[:MAX_QUESTION_CHARS], f"Please keep questions under {MAX_QUESTION_CHARS} characters.",
                       answerable=False, error="question too long")
+    if SMALL_TALK.match(question):
+        return Answer(question, SMALL_TALK_REPLY, answerable=None, small_talk=True)
+    history = clean_history(history) if is_follow_up(question) else []
 
     start = time.perf_counter()
     if retrieval is None:
-        retrieval = index.retrieve(question, ref)
+        retrieval = index.retrieve(question, ref, follow_up_of=history[-1]["question"] if history else None)
     if not retrieval.context:
         return Answer(question, "The handbook does not cover this.", answerable=False, retrieval=retrieval,
                       latency_ms=(time.perf_counter() - start) * 1000)
 
     try:
-        completion = client.complete(build_messages(question, retrieval, index), ANSWER_SCHEMA)
+        completion = client.complete(build_messages(question, retrieval, index, history), ANSWER_SCHEMA)
     except LLMError as exc:
         log.warning("answer failed: %s", exc)
         return Answer(question, "Sorry, the assistant could not answer right now. Please try again in a moment.",
@@ -196,8 +280,13 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
 
     c = completion.content
     in_context = {doc.doc_id: doc for doc in retrieval.context}
-    citations, dropped, seen = [], 0, set()
-    for item in c.get("citations") or []:
+    citations, dropped, number_of = [], 0, {}
+    mapping: dict[int, int | None] = {}  # the model's citation position -> verified citation number
+    for position, item in enumerate(c.get("citations") or [], 1):
+        mapping[position] = None
+        if not isinstance(item, dict):
+            dropped += 1
+            continue
         doc_id, quote = str(item.get("doc_id", "")), str(item.get("quote", ""))
         if doc_id not in in_context:
             dropped += 1
@@ -206,17 +295,17 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
         if span is None:
             dropped += 1
             continue
-        if (doc_id, span) in seen:
-            continue
-        seen.add((doc_id, span))
-        text = index.docs[doc_id].text
-        citations.append(Citation(doc_id, in_context[doc_id].title, text[span[0]:span[1]], span[0], span[1],
-                                  in_context[doc_id].state))
+        if (doc_id, span) not in number_of:
+            text = index.docs[doc_id].text
+            citations.append(Citation(doc_id, in_context[doc_id].title, text[span[0]:span[1]], span[0], span[1],
+                                      in_context[doc_id].state))
+            number_of[(doc_id, span)] = len(citations)
+        mapping[position] = number_of[(doc_id, span)]
 
     verdict = c.get("verdict") if c.get("verdict") in ("yes", "no") else None
     return Answer(
         question=question,
-        answer=str(c.get("answer") or "").strip(),
+        answer=renumber_markers(str(c.get("answer") or ""), mapping).strip(),
         verdict=verdict,
         answerable=bool(c.get("answerable")),
         needs_clarification=bool(c.get("needs_clarification")),
@@ -225,6 +314,7 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
         model=completion.model,
         llm_calls=0 if completion.cached else 1,
         cached=completion.cached,
+        used_fallback=completion.used_fallback,
         prompt_tokens=completion.prompt_tokens,
         completion_tokens=completion.completion_tokens,
         cost_usd=completion.cost_usd,

@@ -7,7 +7,9 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError as FutureTimeout
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Protocol
 
@@ -36,6 +38,7 @@ class Completion:
     cost_usd: float
     latency_ms: float
     cached: bool
+    used_fallback: bool = False  # answered by the backup model because the main one was unavailable
 
 
 class LLMClient(Protocol):
@@ -63,9 +66,9 @@ class OpenAICompatibleClient:
     max_tokens is generous because hidden reasoning can count toward it; a 1,200 cap cut answers off.
     """
 
-    def __init__(self, api_key: str, model: str, base_url: str, timeout: float = 120.0, max_retries: int = 4,
+    def __init__(self, api_key: str, model: str, base_url: str, timeout: float = 60.0, max_retries: int = 2,
                  cache_dir: Path | None = DEFAULT_CACHE_DIR, max_cost_usd: float | None = None,
-                 extra_body: dict | None = None):
+                 extra_body: dict | None = None, deadline: float | None = 90.0):
         missing = [name for name, value in (("LLM_API_KEY", api_key), ("LLM_MODEL", model),
                                             ("LLM_BASE_URL", base_url)) if not value]
         if missing:
@@ -75,8 +78,10 @@ class OpenAICompatibleClient:
         self.base_url = base_url.rstrip("/")
         self.extra_body = dict(extra_body or {})
         self.is_openrouter = "openrouter.ai" in self.base_url
-        self.timeout = timeout
+        self.timeout = timeout  # per attempt
         self.max_retries = max_retries
+        # total time for one answer, retries and waits included; None = no limit (batch evals)
+        self.deadline = deadline
         self.cache_dir = cache_dir
         self.max_cost_usd = max_cost_usd
         self.spent_usd = 0.0
@@ -108,6 +113,9 @@ class OpenAICompatibleClient:
             "base_url": os.environ.get("LLM_BASE_URL", "").strip(),
             "max_cost_usd": max_cost,
             "extra_body": extra_body,
+            "timeout": _env_number("LLM_TIMEOUT_SECONDS", 60.0),
+            "max_retries": int(_env_number("LLM_MAX_RETRIES", 2)),
+            "deadline": _env_number("LLM_DEADLINE_SECONDS", 90.0) or None,
         }
         settings.update(overrides)
         return cls(**settings)
@@ -176,12 +184,24 @@ class OpenAICompatibleClient:
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
         last_error = "no attempt made"
         wait = 0.0
+        started = time.monotonic()
         for attempt in range(self.max_retries + 1):
             if attempt:
-                time.sleep(wait or min(2 ** attempt, 16))
+                pause = wait or min(2 ** attempt, 16)
+                if self.deadline is not None and time.monotonic() - started + pause >= self.deadline:
+                    last_error += " (gave up: the model service is too slow right now)"
+                    break
+                time.sleep(pause)
+            timeout = self.timeout
+            if self.deadline is not None:
+                remaining = self.deadline - (time.monotonic() - started)
+                if remaining <= 1:
+                    last_error += " (gave up: the model service is too slow right now)"
+                    break
+                timeout = min(timeout, remaining)
             request = urllib.request.Request(f"{self.base_url}/chat/completions", data=body, headers=headers, method="POST")
             try:
-                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                with urllib.request.urlopen(request, timeout=timeout) as response:
                     return json.load(response)
             except urllib.error.HTTPError as exc:
                 detail = exc.read().decode(errors="replace")[:300]
@@ -201,7 +221,7 @@ class OpenAICompatibleClient:
 
     def _save(self, path: Path, completion: Completion) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        record = {k: v for k, v in completion.__dict__.items() if k not in ("cached", "latency_ms")}
+        record = {k: v for k, v in completion.__dict__.items() if k not in ("cached", "latency_ms", "used_fallback")}
         fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
         try:
             with os.fdopen(fd, "w") as f:
@@ -218,3 +238,114 @@ def _retry_after(headers) -> float:
         return min(max(float((headers or {}).get("Retry-After", 0)), 0.0), 60.0)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _env_number(name: str, default: float) -> float:
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return default
+    try:
+        return float(raw)
+    except ValueError as exc:
+        raise LLMError(f"{name} must be a number, got {raw!r}") from exc
+
+
+# Shared threads for hedged requests; a slower call that lost the race finishes in the background.
+_HEDGE_POOL = ThreadPoolExecutor(max_workers=16, thread_name_prefix="llm-hedge")
+
+
+class FallbackClient:
+    """Ask the main model; use a backup model when the main one is unavailable or slow.
+
+    Hedging: if the main model has not answered after `hedge_after` seconds, the backup is asked
+    in parallel and the first good answer wins, so a slow spell on a free tier costs roughly the
+    backup's speed instead of a long wait. If the main model fails outright, the backup is asked
+    at once. A reached spending cap is never worked around. On paid providers a hedged question
+    can be billed twice; set LLM_HEDGE_AFTER_SECONDS=0 to only fall back after a failure.
+    """
+
+    def __init__(self, primary: OpenAICompatibleClient, fallback: OpenAICompatibleClient,
+                 hedge_after: float | None = 12.0):
+        self.primary, self.fallback = primary, fallback
+        self.model = primary.model
+        self.hedge_after = hedge_after or None
+
+    def _backup(self, messages, schema, max_tokens, primary_error: Exception) -> Completion:
+        log.warning("main model unavailable (%s); asking the backup model %s", primary_error, self.fallback.model)
+        try:
+            completion = self.fallback.complete(messages, schema, max_tokens)
+        except LLMError as fallback_error:
+            raise LLMError(f"main model: {primary_error}; backup model: {fallback_error}") from fallback_error
+        return replace(completion, used_fallback=True)
+
+    def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion:
+        if self.hedge_after is None:
+            try:
+                return self.primary.complete(messages, schema, max_tokens)
+            except BudgetExceeded:
+                raise
+            except LLMError as primary_error:
+                return self._backup(messages, schema, max_tokens, primary_error)
+
+        main = _HEDGE_POOL.submit(self.primary.complete, messages, schema, max_tokens)
+        try:
+            return main.result(timeout=self.hedge_after)  # the normal case: the main model is quick
+        except FutureTimeout:
+            pass  # still thinking: race the backup against it
+        except BudgetExceeded:
+            raise
+        except LLMError as primary_error:
+            return self._backup(messages, schema, max_tokens, primary_error)
+
+        log.info("main model slow after %.0fs; asking the backup model %s in parallel",
+                 self.hedge_after, self.fallback.model)
+        backup = _HEDGE_POOL.submit(self.fallback.complete, messages, schema, max_tokens)
+        errors: dict[str, Exception] = {}
+        for future in as_completed([main, backup]):
+            try:
+                completion = future.result()
+            except BudgetExceeded:
+                raise
+            except LLMError as exc:
+                errors["main model" if future is main else "backup model"] = exc
+                continue
+            return replace(completion, used_fallback=future is backup)
+        raise LLMError("; ".join(f"{name}: {exc}" for name, exc in errors.items()))
+
+    @property
+    def spent_usd(self) -> float:
+        return self.primary.spent_usd + self.fallback.spent_usd
+
+    @property
+    def calls(self) -> int:
+        return self.primary.calls + self.fallback.calls
+
+    @property
+    def max_cost_usd(self) -> float | None:
+        return self.primary.max_cost_usd
+
+
+def client_from_env() -> "OpenAICompatibleClient | FallbackClient":
+    """The web app's client: the main model, plus a backup if LLM_FALLBACK_MODEL is set.
+
+    With a backup, the main model may use the whole deadline (one retry), the backup is asked after
+    LLM_HEDGE_AFTER_SECONDS (or at once if the main model fails), and the first good answer wins;
+    the user never waits longer than LLM_DEADLINE_SECONDS.
+    """
+    fallback_model = os.environ.get("LLM_FALLBACK_MODEL", "").strip()
+    if not fallback_model:
+        return OpenAICompatibleClient.from_env()
+    deadline = _env_number("LLM_DEADLINE_SECONDS", 90.0) or 90.0
+    hedge_after = _env_number("LLM_HEDGE_AFTER_SECONDS", 12.0)
+    primary = OpenAICompatibleClient.from_env(max_retries=1, deadline=deadline, timeout=min(60.0, deadline))
+    extra = os.environ.get("LLM_FALLBACK_EXTRA_BODY", "").strip()
+    try:
+        fallback_extra = json.loads(extra) if extra else None
+    except json.JSONDecodeError as exc:
+        raise LLMError(f"LLM_FALLBACK_EXTRA_BODY must be a JSON object, got {extra!r}") from exc
+    if fallback_extra is not None and not isinstance(fallback_extra, dict):
+        raise LLMError("LLM_FALLBACK_EXTRA_BODY must be a JSON object")
+    backup_time = max(deadline - (hedge_after or 0), 10.0)
+    fallback = OpenAICompatibleClient.from_env(model=fallback_model, extra_body=fallback_extra,
+                                               max_retries=1, deadline=backup_time, timeout=min(60.0, backup_time))
+    return FallbackClient(primary, fallback, hedge_after=hedge_after or None)

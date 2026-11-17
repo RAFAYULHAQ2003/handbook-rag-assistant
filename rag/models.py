@@ -29,6 +29,7 @@ class DocumentMeta:
     status: str | None = None  # as declared by the manifest or file; see rag.validity for the real state
     supersedes: str | None = None
     in_manifest: bool = False
+    uploaded: bool = False  # added through the web page: never official, never replaces a handbook document
 
 
 @dataclass

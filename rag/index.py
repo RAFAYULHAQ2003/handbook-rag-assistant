@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
@@ -26,6 +27,30 @@ log = logging.getLogger(__name__)
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 DEFAULT_MODE = "hybrid"
 TOP_K = 8
+
+# Questions whose answer depends on the date ("Can I deploy today?", "Is there a freeze on December 15?").
+DATED_QUESTION = re.compile(
+    r"\b(today|tonight|tomorrow|yesterday|now|right now|currently|this (week|weekend|month|year|quarter)|"
+    r"next (week|month|year)|upcoming|soon)\b"
+    r"|\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}\b|\b20\d\d-\d\d-\d\d\b",
+    re.IGNORECASE)
+_ISO_DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
+_SCHEDULE_WORDS = {"calendar", "schedule", "schedules", "rota", "roster", "timetable", "dates", "plan", "list"}
+SCHEDULE_HITS = 3  # like cross-references: only the top passages can bring a schedule in
+
+
+def schedule_subjects(docs: list[Document]) -> dict[str, re.Pattern]:
+    """Dated schedules (most table rows carry a date) and what they list, from the title:
+    the Release Calendar lists releases. Used to answer "today" questions from rules like
+    "a freeze starts 72 hours before every scheduled release", which never name the calendar."""
+    out = {}
+    for doc in docs:
+        rows = [b for b in doc.blocks if b.kind == "table_row"]
+        dated = sum(bool(_ISO_DATE.search(b.text)) for b in rows)
+        words = [w for w in re.findall(r"[a-z]+", doc.meta.title.lower()) if w not in _SCHEDULE_WORDS and len(w) >= 4]
+        if dated >= 3 and dated * 2 >= len(rows) and words:
+            out[doc.doc_id] = re.compile(r"\b(" + "|".join(re.escape(w) for w in words) + r")s?\b", re.IGNORECASE)
+    return out
 
 
 def load_embeddings(model_name: str | None = None) -> EmbeddingCache:
@@ -58,11 +83,14 @@ class HandbookIndex:
     findings: list[MetadataFinding] = field(default_factory=list)
 
     def __post_init__(self):
-        self.references = ReferenceFinder(list(self.docs.values()))
+        # links between documents (cross-references, schedules) only ever lead to official ones
+        official = [d for d in self.docs.values() if not d.meta.uploaded]
+        self.references = ReferenceFinder(official)
         self.passages_by_doc: dict[str, list[Passage]] = defaultdict(list)
         for p in self.passages:
             self.passages_by_doc[p.doc_id].append(p)
         self._statuses: dict[date, tuple[dict[str, DocStatus], list[ValidityFinding]]] = {}
+        self.schedules = schedule_subjects(official)
 
     @property
     def mode(self) -> str:
@@ -107,10 +135,43 @@ class HandbookIndex:
         return cls.build(docs, ref, mode, embeddings, findings)
 
     def retrieve(self, question: str, ref: date | str | None = None, k: int = TOP_K,
-                 use_validity: bool = True, follow_references: bool = True) -> Retrieval:
+                 use_validity: bool = True, follow_references: bool = True,
+                 follow_up_of: str | None = None) -> Retrieval:
+        """Search for `question`. For a follow-up ("which one lives in Austin?"), pass the previous
+        question as `follow_up_of`: results for the question alone and for both together are merged,
+        so the follow-up finds what it refers to while a new topic is not swamped by the old one."""
         day = self.date_for(ref)
         statuses = self.statuses(day)
-        result = self.retriever.search(question, k=k, statuses=statuses if use_validity else None)
-        context = build_context(result.hits, self.docs, statuses, result.pool, self.passages_by_doc,
-                                self.references if follow_references else None)
-        return Retrieval(question, day, result.hits, context, result.pool, result.top_bm25, result.top_cosine)
+        states = statuses if use_validity else None
+        result = self.retriever.search(question, k=k, statuses=states)
+        hits = result.hits
+        if follow_up_of and follow_up_of.strip():
+            combined = self.retriever.search(f"{follow_up_of.strip()} {question}", k=k, statuses=states)
+            hits = _interleave(result.hits, combined.hits, k)
+        schedules = []
+        if follow_references and DATED_QUESTION.search(question):
+            top = " ".join(h.passage.text for h in hits[:SCHEDULE_HITS])
+            schedules = [d for d, subject in self.schedules.items() if subject.search(top)]
+        context = build_context(hits, self.docs, statuses, result.pool, self.passages_by_doc,
+                                self.references if follow_references else None, schedules=schedules)
+        return Retrieval(question, day, hits, context, result.pool, result.top_bm25, result.top_cosine)
+
+
+def _interleave(first: list[Hit], second: list[Hit], k: int, max_per_doc: int = 2) -> list[Hit]:
+    """Alternate two rankings (first, second, first, ...), skipping repeats, at most `max_per_doc` per document."""
+    merged, seen, per_doc = [], set(), {}
+    for pair in zip(first, second, strict=False):
+        for hit in pair:
+            pid, doc = hit.passage.passage_id, hit.passage.doc_id
+            if pid in seen or per_doc.get(doc, 0) >= max_per_doc:
+                continue
+            seen.add(pid)
+            per_doc[doc] = per_doc.get(doc, 0) + 1
+            merged.append(hit)
+    for hit in first[len(second):] + second[len(first):]:  # leftovers when one list is longer
+        pid, doc = hit.passage.passage_id, hit.passage.doc_id
+        if pid not in seen and per_doc.get(doc, 0) < max_per_doc:
+            seen.add(pid)
+            per_doc[doc] = per_doc.get(doc, 0) + 1
+            merged.append(hit)
+    return merged[:k]

@@ -176,7 +176,8 @@ def _merge(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:
 def build_context(hits: list[Hit], docs: dict[str, Document], statuses: dict[str, DocStatus],
                   pool: list[Hit] | None = None, passages_by_doc: dict[str, list[Passage]] | None = None,
                   references: ReferenceFinder | None = None, reference_hits: int = REFERENCE_HITS,
-                  small_doc_chars: int = SMALL_DOC_CHARS, budget: int = CONTEXT_BUDGET_CHARS) -> list[ContextDoc]:
+                  small_doc_chars: int = SMALL_DOC_CHARS, budget: int = CONTEXT_BUDGET_CHARS,
+                  schedules: list[str] | None = None) -> list[ContextDoc]:
     """Turn ranked passages into the documents and spans the answer step sees.
 
     - small documents are sent whole, so facts split across sections (city tier in
@@ -186,6 +187,8 @@ def build_context(hits: list[Hit], docs: dict[str, Document], statuses: dict[str
       upcoming revision and amendments; each says why it was added
     - documents named in one of the top `reference_hits` passages ("after the
       introductory period") are added after all retrieved ones, if in force and within budget
+    - `schedules`: dated schedules a date question needs (the Release Calendar for "can I deploy today?"),
+      added last, if in force and within budget
     - a related large document contributes its best-ranked passage for this question
     - stops once the text budget is used, always keeping the top-ranked document
     """
@@ -248,4 +251,8 @@ def build_context(hits: list[Hit], docs: dict[str, Document], statuses: dict[str
                 status = statuses.get(doc_id)
                 if doc_id not in out and (status is None or status.in_force):
                     add(doc_id, best_span(doc_id), f"referenced by {titles.get(source, source)}")
+    for doc_id in schedules or []:
+        status = statuses.get(doc_id)
+        if doc_id not in out and (status is None or status.in_force):
+            add(doc_id, best_span(doc_id), "dated schedule for a question about a date")
     return list(out.values())

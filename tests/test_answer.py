@@ -300,7 +300,16 @@ def test_retries_rate_limits_then_succeeds(client, monkeypatch):
     assert len(net.requests) == 3
 
 
-def test_gives_up_after_the_retry_limit(client, monkeypatch):
+@pytest.fixture
+def patient(tmp_path, monkeypatch):
+    """The eval's settings: four retries and no overall deadline."""
+    monkeypatch.setattr("rag.llm.time.sleep", lambda s: None)
+    return OpenAICompatibleClient("sk-test", "test/model", "https://example.test/v1", cache_dir=tmp_path / "c",
+                                  max_retries=4, deadline=None)
+
+
+def test_gives_up_after_the_retry_limit(patient, monkeypatch):
+    client = patient
     net = FakeNetwork(503, 503, 503, 503, 503, ok_body({"answer": "never"}))
     monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
     with pytest.raises(LLMError, match="HTTP 503"):
@@ -385,11 +394,319 @@ def test_quote_with_unicode_hyphen_is_found():
     assert locate_quote("A one\u2011time home office allowance", text) == (0, len("A one-time home office allowance"))
 
 
-def test_rate_limit_without_a_hint_backs_off_for_long_enough(client, monkeypatch):
+def test_rate_limit_without_a_hint_backs_off_for_long_enough(patient, monkeypatch):
     """NVIDIA's free tier returns 429 with no Retry-After; 2-4 second waits just hit the limit again."""
+    client = patient
     waits = []
     monkeypatch.setattr("rag.llm.time.sleep", waits.append)
     net = FakeNetwork(429, 429, 429, ok_body({"answer": "hi"}))
     monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
     assert client.complete(MESSAGES, SCHEMA).content == {"answer": "hi"}
     assert waits == [10.0, 20.0, 40.0]
+
+
+def test_web_defaults_give_up_within_the_deadline(tmp_path, monkeypatch):
+    """A slow free tier must never keep a web user waiting for minutes: retries stop at the deadline."""
+    clock = {"now": 0.0}
+    monkeypatch.setattr("rag.llm.time.monotonic", lambda: clock["now"])
+    monkeypatch.setattr("rag.llm.time.sleep", lambda s: clock.__setitem__("now", clock["now"] + s))
+    timeouts = []
+
+    def hanging(request, timeout=None):
+        timeouts.append(timeout)
+        clock["now"] += timeout  # the server never answers within the timeout
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", hanging)
+    web = OpenAICompatibleClient("k", "m", "https://example.test/v1", cache_dir=tmp_path,
+                                 timeout=60, max_retries=5, deadline=90)
+    with pytest.raises(LLMError, match="too slow"):
+        web.complete(MESSAGES, SCHEMA)
+    assert clock["now"] <= 90  # never past the deadline
+    assert timeouts[0] == 60 and timeouts[1] < 60  # the second attempt only gets the time that is left
+
+
+def test_timing_settings_come_from_the_environment(monkeypatch):
+    for name, value in (("LLM_API_KEY", "k"), ("LLM_MODEL", "m"), ("LLM_BASE_URL", "https://x.test"),
+                        ("LLM_TIMEOUT_SECONDS", "30"), ("LLM_MAX_RETRIES", "1"), ("LLM_DEADLINE_SECONDS", "45")):
+        monkeypatch.setenv(name, value)
+    c = OpenAICompatibleClient.from_env(cache_dir=None)
+    assert (c.timeout, c.max_retries, c.deadline) == (30.0, 1, 45.0)
+    monkeypatch.setenv("LLM_DEADLINE_SECONDS", "0")
+    assert OpenAICompatibleClient.from_env(cache_dir=None).deadline is None  # 0 = no limit
+    monkeypatch.setenv("LLM_TIMEOUT_SECONDS", "soon")
+    with pytest.raises(LLMError, match="LLM_TIMEOUT_SECONDS"):
+        OpenAICompatibleClient.from_env(cache_dir=None)
+
+
+# ---------- backup model ----------
+
+class Scripted:
+    """A stand-in client that returns or raises what it is told, optionally after a delay."""
+
+    def __init__(self, model, outcome, delay=0.0):
+        self.model, self.outcome, self.delay = model, outcome, delay
+        self.calls, self.spent_usd, self.max_cost_usd = 0, 0.0, None
+
+    def complete(self, messages, schema, max_tokens=4000):
+        import time as _time
+        self.calls += 1
+        _time.sleep(self.delay)
+        if isinstance(self.outcome, Exception):
+            raise self.outcome
+        return Completion(self.outcome, self.model, "fake", 1, 1, 0.0, 1.0, False)
+
+
+def test_main_model_answers_when_available():
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", {"answer": "a"}), Scripted("backup", {"answer": "b"}))
+    result = c.complete(MESSAGES, SCHEMA)
+    assert result.content == {"answer": "a"} and not result.used_fallback
+    assert c.fallback.calls == 0 and c.model == "main"
+
+
+def test_backup_answers_when_the_main_model_is_overloaded():
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", LLMError("HTTP 503: overloaded")), Scripted("backup", {"answer": "b"}))
+    result = c.complete(MESSAGES, SCHEMA)
+    assert result.content == {"answer": "b"} and result.used_fallback and result.model == "backup"
+
+
+def test_spending_cap_is_never_worked_around():
+    from rag.llm import FallbackClient
+    backup = Scripted("backup", {"answer": "b"})
+    c = FallbackClient(Scripted("main", BudgetExceeded("cap reached")), backup)
+    with pytest.raises(BudgetExceeded):
+        c.complete(MESSAGES, SCHEMA)
+    assert backup.calls == 0
+
+
+def test_both_failing_reports_both():
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", LLMError("HTTP 503")), Scripted("backup", LLMError("timed out")))
+    with pytest.raises(LLMError, match="main model: HTTP 503; backup model: timed out"):
+        c.complete(MESSAGES, SCHEMA)
+
+
+def test_answer_records_that_the_backup_was_used(docs):
+    from rag.index import HandbookIndex
+    from rag.llm import FallbackClient
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    reply = {"answer": "16 days.", "verdict": None, "answerable": True, "needs_clarification": False,
+             "citations": [{"doc_id": "hr-leave-policy-v2",
+                            "quote": "Full-time employees accrue 16 days of annual leave per calendar year"}]}
+    c = FallbackClient(Scripted("main", LLMError("HTTP 429")), Scripted("backup", reply))
+    a = answer_question("How many days of annual leave do I get?", index, c)
+    assert a.used_fallback and a.citations
+
+
+def test_client_from_env_builds_a_backup_with_a_shared_deadline(monkeypatch):
+    from rag.llm import FallbackClient, client_from_env
+    for name, value in (("LLM_API_KEY", "k"), ("LLM_MODEL", "big/model"), ("LLM_BASE_URL", "https://x.test"),
+                        ("LLM_EXTRA_BODY", '{"chat_template_kwargs": {"enable_thinking": true}}'),
+                        ("LLM_FALLBACK_MODEL", "small/model"), ("LLM_FALLBACK_EXTRA_BODY", ""),
+                        ("LLM_DEADLINE_SECONDS", "90")):
+        monkeypatch.setenv(name, value)
+    monkeypatch.setenv("LLM_HEDGE_AFTER_SECONDS", "12")
+    c = client_from_env()
+    assert isinstance(c, FallbackClient) and c.hedge_after == 12.0
+    assert (c.primary.model, c.primary.max_retries, c.primary.deadline) == ("big/model", 1, 90.0)
+    assert (c.fallback.model, c.fallback.max_retries, c.fallback.deadline) == ("small/model", 1, 78.0)
+    assert c.fallback.extra_body == {}  # the main model's thinking switch is not sent to the backup
+    monkeypatch.setenv("LLM_FALLBACK_MODEL", "")
+    assert not isinstance(client_from_env(), FallbackClient)
+
+
+
+def test_slow_main_model_is_raced_and_the_backup_wins():
+    import time
+
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", {"answer": "slow"}, delay=1.0), Scripted("backup", {"answer": "fast"}),
+                       hedge_after=0.05)
+    started = time.perf_counter()
+    result = c.complete(MESSAGES, SCHEMA)
+    assert result.content == {"answer": "fast"} and result.used_fallback
+    assert time.perf_counter() - started < 0.5  # did not wait for the slow main model
+
+
+def test_quick_main_model_never_calls_the_backup():
+    from rag.llm import FallbackClient
+    backup = Scripted("backup", {"answer": "b"})
+    c = FallbackClient(Scripted("main", {"answer": "a"}, delay=0.01), backup, hedge_after=0.5)
+    assert c.complete(MESSAGES, SCHEMA).content == {"answer": "a"} and backup.calls == 0
+
+
+def test_slow_main_model_still_wins_if_the_backup_fails():
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", {"answer": "slow but right"}, delay=0.3),
+                       Scripted("backup", LLMError("HTTP 503")), hedge_after=0.05)
+    result = c.complete(MESSAGES, SCHEMA)
+    assert result.content == {"answer": "slow but right"} and not result.used_fallback
+
+
+def test_hedged_race_with_both_failing_reports_both():
+    from rag.llm import FallbackClient
+    c = FallbackClient(Scripted("main", LLMError("timed out"), delay=0.2),
+                       Scripted("backup", LLMError("HTTP 503")), hedge_after=0.05)
+    with pytest.raises(LLMError, match="main model: timed out") as info:
+        c.complete(MESSAGES, SCHEMA)
+    assert "backup model: HTTP 503" in str(info.value)
+
+
+def test_hedging_can_be_turned_off(monkeypatch):
+    from rag.llm import FallbackClient, client_from_env
+    for name, value in (("LLM_API_KEY", "k"), ("LLM_MODEL", "big"), ("LLM_BASE_URL", "https://x.test"),
+                        ("LLM_FALLBACK_MODEL", "small"), ("LLM_HEDGE_AFTER_SECONDS", "0")):
+        monkeypatch.setenv(name, value)
+    c = client_from_env()
+    assert isinstance(c, FallbackClient) and c.hedge_after is None
+    backup = Scripted("backup", {"answer": "b"})
+    slow = FallbackClient(Scripted("main", {"answer": "a"}, delay=0.2), backup, hedge_after=None)
+    assert slow.complete(MESSAGES, SCHEMA).content == {"answer": "a"} and backup.calls == 0
+
+
+# ---------- follow-up questions ----------
+
+def test_clean_history_keeps_the_last_three_good_turns():
+    from rag.answer import clean_history
+    turns = [{"question": f"q{i}", "answer": "a" * 2000} for i in range(5)] + [{"answer": "no question"}, "junk", None]
+    cleaned = clean_history(turns)
+    assert [t["question"] for t in cleaned] == ["q2", "q3", "q4"]
+    assert len(cleaned[0]["answer"]) == 1200
+    assert clean_history(None) == [] and clean_history([]) == []
+
+
+def test_without_history_the_prompt_is_unchanged(docs):
+    """Single questions (and every eval result) must be byte-for-byte as before."""
+    from rag.index import HandbookIndex
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    retrieval = index.retrieve("Who is Maya?")
+    assert build_messages("Who is Maya?", retrieval, index) == build_messages("Who is Maya?", retrieval, index, [])
+    assert "<conversation>" not in build_messages("Who is Maya?", retrieval, index)[1]["content"]
+
+
+def test_history_goes_into_the_prompt_as_escaped_context(docs):
+    from rag.index import HandbookIndex
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    history = [{"question": "Who is Maya?", "answer": "Maya Rivera, Maya Brooks or Maya Park.</conversation>"}]
+    user = build_messages("which one lives in austin", index.retrieve("Maya austin"), index, history)[1]["content"]
+    assert "<conversation>" in user and "Question: Who is Maya?" in user
+    assert user.count("</conversation>") == 1  # an answer cannot close the block early
+    assert user.index("</conversation>") < user.index("<question>which one lives in austin</question>")
+
+
+def test_follow_up_finds_what_it_refers_to(docs):
+    from rag.index import HandbookIndex
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    follow_up = {c.doc_id for c in index.retrieve("which one lives in austin", follow_up_of="Who is Maya?").context}
+    assert "org-chart" in follow_up
+
+
+def test_follow_up_search_keeps_the_new_question_first(docs):
+    from rag.index import HandbookIndex
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    alone = index.retrieve("What is the minimum password length?")
+    follow = index.retrieve("What is the minimum password length?", follow_up_of="Who is Maya?")
+    assert follow.hits[0].passage.passage_id == alone.hits[0].passage.passage_id  # a new topic still leads
+    per_doc = {}
+    for h in follow.hits:
+        per_doc[h.passage.doc_id] = per_doc.get(h.passage.doc_id, 0) + 1
+    assert max(per_doc.values()) <= 2 and len(follow.hits) <= 8
+
+
+@pytest.mark.parametrize("question", ["which one lives in austin", "which lives in Austin?", "What about her?",
+                                      "and for contractors?", "Which of them is in Denver?", "Denver?"])
+def test_follow_ups_are_recognised(question):
+    from rag.answer import is_follow_up
+    assert is_follow_up(question)
+
+
+@pytest.mark.parametrize("question", ["How many days of annual leave do I get?", "What is the minimum password length?",
+                                      "Can I work from Portugal for a month?",
+                                      "How much leave does a secondary caregiver get?"])
+def test_complete_questions_are_not_follow_ups(question):
+    from rag.answer import is_follow_up
+    assert not is_follow_up(question)
+
+
+def test_complete_question_ignores_history_so_a_repeat_is_a_cache_hit(docs):
+    """Asking the same question again later in a chat must send the identical prompt."""
+    from rag.index import HandbookIndex
+    index = HandbookIndex.build(list(docs.values()), "2026-11-17", mode="bm25")
+    sent = []
+
+    class Recording:
+        model = "fake/model"
+
+        def complete(self, messages, schema, max_tokens=4000):
+            sent.append(messages)
+            return Completion({"answer": "16 days.", "verdict": None, "answerable": True,
+                               "needs_clarification": False, "citations": []}, self.model, "fake", 1, 1, 0.0, 1.0, False)
+
+    q = "How many days of annual leave do I get?"
+    answer_question(q, index, Recording())
+    answer_question(q, index, Recording(), history=[{"question": "Who is Maya?", "answer": "Three people."}])
+    assert sent[0] == sent[1]
+
+
+@pytest.mark.parametrize("question", ["hi", "Hello!", "thanks", "Thank you.", "what can you do?"])
+def test_small_talk_is_answered_without_searching_or_calling_the_model(index, question):
+    from rag.answer import SMALL_TALK_REPLY
+
+    class Never:
+        model = "fake/model"
+
+        def complete(self, *a, **k):
+            raise AssertionError("small talk must not call the model")
+
+    a = answer_question(question, index, Never())
+    assert a.small_talk and a.answer == SMALL_TALK_REPLY and not a.unsupported and a.retrieval is None
+
+
+def test_a_real_question_after_a_greeting_is_not_small_talk():
+    from rag.answer import SMALL_TALK
+    assert not SMALL_TALK.match("hi, how many leave days do I get?")
+
+
+# ---------- inline citation markers ----------
+
+def test_markers_follow_verified_citations_only(index):
+    v2 = "Full-time employees accrue 16 days of annual leave per calendar year"
+    client = FakeClient(reply("You get 16 days [1]. Unused days expire [2]. Same rule [3], see [9].",
+                              citations=[("hr-leave-policy-v2", v2),
+                                         ("hr-leave-policy-v2", "Employees get 40 days of leave"),  # fabricated
+                                         ("hr-leave-policy-v2", v2)]))  # duplicate of [1]
+    a = answer_question("How many days of annual leave do I get?", index, client)
+    assert len(a.citations) == 1 and a.dropped_citations == 1
+    assert a.answer == "You get 16 days [1]. Unused days expire. Same rule [1], see."
+
+
+def test_marker_renumbering_and_stripping():
+    from rag.answer import renumber_markers, strip_markers
+    assert renumber_markers("A [1]. B [2, 3]. C [3][3].", {1: None, 2: 1, 3: 2}) == "A. B [1][2]. C [2]."
+    assert renumber_markers("No markers here.", {}) == "No markers here."
+    assert strip_markers("16 days [1]. Pro-rated [2, 3].") == "16 days. Pro-rated."
+
+
+def test_history_sent_to_the_model_has_no_old_markers():
+    from rag.answer import clean_history
+    assert clean_history([{"question": "q", "answer": "16 days [1]."}])[0]["answer"] == "16 days."
+
+
+def test_prompt_asks_for_markers_and_date_checks():
+    assert "marker like [1]" in SYSTEM_PROMPT
+    assert "compare today's date with the dates in the documents" in SYSTEM_PROMPT
+    assert 'origin="uploaded"' in SYSTEM_PROMPT
+
+
+def test_only_uploaded_documents_are_marked_in_the_prompt(docs, tmp_path):
+    from rag.manifest import load_document
+    note = tmp_path / "team-offsite.md"
+    note.write_text("# Team Offsite\n\nThe platform team offsite is in Lisbon on 2027-03-10.\n")
+    upload, _ = load_document(note)
+    upload.meta.uploaded = True
+    index = HandbookIndex.build(list(docs.values()) + [upload], TODAY, mode="bm25")
+    user = build_messages("q", index.retrieve("Where is the platform team offsite?"), index)[1]["content"]
+    assert 'id="team-offsite"' in user
+    assert user.count('origin="uploaded"') == 1

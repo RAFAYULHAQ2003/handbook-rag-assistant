@@ -317,3 +317,13 @@ def test_unknown_time_zone_rejected(monkeypatch):
     monkeypatch.setenv("COMPANY_TIMEZONE", "Mars/Olympus")
     with pytest.raises(ValueError, match="COMPANY_TIMEZONE"):
         reference_date()
+
+
+def test_an_upload_never_replaces_or_amends_an_official_document():
+    official = meta("hr-leave-policy-v2", "Leave Policy v2", date(2026, 1, 1))
+    upload = meta("upload-leave", "Leave Policy v3", date(2026, 6, 1), supersedes="hr-leave-policy-v2")
+    upload.uploaded = True
+    statuses, _ = assess([official, upload], date(2026, 11, 17))
+    assert statuses["hr-leave-policy-v2"].state is State.IN_FORCE
+    assert statuses["hr-leave-policy-v2"].amended_by == () and statuses["hr-leave-policy-v2"].upcoming == ()
+    assert statuses["upload-leave"].state is State.IN_FORCE

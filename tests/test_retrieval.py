@@ -359,3 +359,24 @@ def test_save_never_touches_another_workers_temp_file(tmp_path):
     EmbeddingCache(FakeEmbedder(), path).get(["alpha"])
     assert other.read_bytes() == b"in progress"
     assert len(EmbeddingCache(FakeEmbedder(), path)._vectors) == 1
+
+
+# ---------- dated schedules for date questions ----------
+
+def test_deploy_today_brings_in_the_release_calendar(index):
+    """The runbook says a freeze starts 72 hours before every scheduled release but never names the
+    calendar; a question about today needs the calendar's dates to answer yes or no."""
+    context = {c.doc_id: c for c in index.retrieve("Can I deploy to production today?").context}
+    assert "eng-deploy-runbook" in context and "eng-release-calendar" in context
+    assert context["eng-release-calendar"].reason == "dated schedule for a question about a date"
+
+
+def test_schedules_are_added_only_for_date_questions_about_them(index):
+    assert "eng-release-calendar" not in {c.doc_id for c in index.retrieve("How do I deploy to production?").context}
+    assert "eng-release-calendar" not in {
+        c.doc_id for c in index.retrieve("How many days of annual leave do I get this year?").context}
+
+
+def test_schedule_detection(index):
+    assert set(index.schedules) == {"eng-release-calendar"}
+    assert index.schedules["eng-release-calendar"].search("every scheduled release")

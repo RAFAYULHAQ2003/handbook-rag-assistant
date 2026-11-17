@@ -7,6 +7,9 @@ No test questions were provided, so these were written by hand from the corpus *
 - `questions.py`: loads the sets.
 - `matching.py`: how a fact is matched in an answer (see below).
 - `retrieval_eval.py`: compares search configurations with no model calls (`python -m evals.retrieval_eval`); results in `results/retrieval-dev.json`.
+- `answer_eval.py`: answers every question end to end and scores it (`python -m evals.answer_eval`); options `--models`, `--context whole` (baseline), `--injection`, `--set holdout`, `--label`. Results in `results/answers-<set>-<model>-<context>[-<label>].json`.
+- `scoring.py`: the scoring rules below, as tested code.
+- `fixtures/injected-notice.md`: a fake uploaded notice that tells the assistant to lie; used by `--injection`.
 
 ## Format
 
@@ -35,7 +38,7 @@ Every `must_include` group appears in the text of the expected documents, and fi
 | `refuse` | The assistant says the handbook does not cover the question, and does not present a fact from it as the answer |
 | `clarify` | The assistant asks which one is meant, or lists every match (`must_include` holds all the names) |
 
-Retrieval and citations are scored separately, with no model calls. Retrieval metrics are computed by `retrieval_eval.py`; citation metrics are planned for the answer eval runner (Step 8):
+Retrieval and citations are scored separately, with no model calls. Retrieval metrics are computed by `retrieval_eval.py`; citation metrics by `answer_eval.py` (`scoring.py`):
 
 - **recall@5**: share of `expected_doc_ids` among the top 5 distinct documents of the ranking; `acceptable_doc_ids` are not required but not counted against
 - **hit@1 / MRR**: the first retrieved document is expected or acceptable / 1 ÷ rank of the first such document
@@ -43,7 +46,10 @@ Retrieval and citations are scored separately, with no model calls. Retrieval me
 - **stale first**: a superseded or deprecated document ranked first, unless the question's expected documents include that old version
 - **vs bm25**: questions won and lost against the keyword-only baseline, with a sign test; small differences on 92 questions are reported as counts, not as proof
 - **citation support**: at least one cited passage contains a `must_include` fact (passage-level, so no passage ids are needed as gold)
-- **citation precision**: share of citations whose passage contains a `must_include` fact and is from a document in force (or from a stale version the category asks about). Source lists are never complete, so precision does not depend on them
+- **citation precision (strict)**: share of citations whose passage contains a `must_include` fact and is from a document in force (or from a stale version the question asks about)
+- **citation relevance**: share of citations whose passage contains a fact *or* comes from an expected/acceptable document, and applies. Added after inspecting the first run: strict precision counted legitimate reasoning steps ("Tier 1: New York, San Francisco, Boston" for a San Francisco hotel question) as imprecise. Both are reported
+- **dropped quotes**: quotes the model gave that were not found word for word in the cited document; they never reach the user
+- **stale only**: every citation is from an outdated version the question did not ask about
 
 Conflicts are resolved by one written rule, also given to the answer step: a specific, explicitly stated exception beats a general table, even a newer one (`conf-04`).
 

@@ -33,11 +33,17 @@ pytest
 
 The first run of the app downloads the local embedding model (about 70 MB) into `.cache/models`. Until it is downloaded, the hybrid-search quality test is skipped and search falls back to keyword-only (BM25).
 
-## Evaluate search
+## Evaluate
 
 ```bash
-python -m evals.retrieval_eval        # compares search configurations on the dev set, no model calls
+python -m evals.retrieval_eval                      # search configurations on the dev set, no model calls
+python -m evals.answer_eval --label thinking-on     # every dev question answered and scored (uses LLM_* in .env)
+python -m evals.answer_eval --context whole         # baseline: send the whole handbook instead of searching
+python -m evals.answer_eval --injection             # an uploaded document tries to make the assistant lie
+python -m evals.answer_eval --set holdout           # the blind set; run once, at the end
 ```
+
+Answers are cached in `.cache/llm/`, so re-running unchanged questions makes no model calls.
 
 ## Run the app
 

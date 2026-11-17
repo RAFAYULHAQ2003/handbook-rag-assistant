@@ -2,7 +2,7 @@
 
 A fact matches only as a whole token, so "2" does not match "$2,500", "2026"
 or "12", and "VP" does not match "VPN". Thousands separators are ignored, so
-"$3,000" and "$3000" are the same.
+"$3,000" and "$3000" are the same, as are "5 %" and "5%".
 """
 
 import re
@@ -15,6 +15,7 @@ _DASHES = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": 
 def normalize(text: str) -> str:
     text = text.translate(_DASHES).lower()
     text = re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)  # 3,000 -> 3000
+    text = re.sub(r"(?<=\d)[ \u00a0\u202f]+%", "%", text)  # "5 %" -> "5%" (some models space the sign)
     text = re.sub(r"[*_`]", "", text)  # markdown emphasis
     return re.sub(r"\s+", " ", text).strip()
 

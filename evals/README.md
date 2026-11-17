@@ -60,7 +60,7 @@ Limit: text matching cannot tell "16 days" from "it used to be 12, now 16" (both
 
 ## Fact matching
 
-Matching is plain text, so it is free, fast and gives the same result every run. It is case-insensitive and ignores thousands separators (`$3,000` = `$3000`). A fact must match as a whole token: `2` does not match `$2,500`, `12`, `2.5` or the day in `2026-11-02`, and `VP` does not match `VPN`.
+Matching is plain text, so it is free, fast and gives the same result every run. It is case-insensitive and ignores thousands separators (`$3,000` = `$3000`) and a space before a percent sign (`5 %` = `5%`, added after a correct answer failed on it, like the non-breaking hyphen before). A fact must match as a whole token: `2` does not match `$2,500`, `12`, `2.5` or the day in `2026-11-02`, and `VP` does not match `VPN`.
 
 ## Rules enforced by `tests/test_eval_set.py`
 

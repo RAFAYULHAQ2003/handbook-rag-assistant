@@ -47,3 +47,9 @@ def test_facts_matched_one_result_per_group():
 ])
 def test_unicode_hyphens_match(text, alts):
     assert contains_fact(text, alts)
+
+
+def test_space_before_percent_sign_is_ignored():
+    assert contains_fact("routes 5 % of traffic", ["5%"])
+    assert contains_fact("routes 5 % of traffic", ["5%"])
+    assert not contains_fact("routes 15 % of traffic", ["5%"])

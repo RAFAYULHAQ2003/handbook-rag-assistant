@@ -1,0 +1,401 @@
+{
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "set": "followup",
+  "context": "search",
+  "label": "thinking-on",
+  "extra_body": "{\"chat_template_kwargs\": {\"enable_thinking\": true}}",
+  "summary": {
+    "questions": 9,
+    "accuracy": 0.8888888888888888,
+    "accuracy_by_expect": {
+      "answer": 0.8888888888888888
+    },
+    "verdict_accuracy": 0.5,
+    "false_refusals": 0,
+    "citation_support": 1.0,
+    "citation_precision": 0.9444444444444444,
+    "citation_relevance": 1.0,
+    "marker_coverage": 0.3333333333333333,
+    "unsupported_answers": 0,
+    "dropped_quotes": 0,
+    "stale_only_answers": 0,
+    "errors": 0,
+    "model_calls": 9,
+    "cached_answers": 0,
+    "prompt_tokens": 21794,
+    "completion_tokens": 2142,
+    "cost_usd_this_run": 0.0,
+    "cost_usd_full_run": 0.0,
+    "latency_ms_p50": 7254.250625032,
+    "latency_ms_p95": 77643.61749996897,
+    "wall_clock_s": 161.80617029196583
+  },
+  "by_category": {
+    "follow_up": {
+      "n": 9,
+      "accuracy": 0.8888888888888888
+    }
+  },
+  "questions": [
+    {
+      "id": "fu-01",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2973,
+      "completion_tokens": 293,
+      "cost_usd": 0.0,
+      "latency_ms": 10304.77108398918,
+      "context_docs": 11,
+      "answer": "Annual leave is approved by your direct manager in the HR portal. For absences longer than ten consecutive working days, the department head's approval is also required.",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Leave is approved by the employee's direct manager in the HR portal. Leave of more than ten consecutive working days also needs the department head's approval"
+        }
+      ]
+    },
+    {
+      "id": "fu-02",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": false,
+      "facts": [
+        true,
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": "yes",
+      "verdict": null,
+      "verdict_ok": false,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2586,
+      "completion_tokens": 311,
+      "cost_usd": 0.0,
+      "latency_ms": 41280.71874997113,
+      "context_docs": 8,
+      "answer": "Yes, you can carry over up to 8 unused annual leave days into the next calendar year, but they must be used by March 31 or they lapse.",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Up to 8 unused annual leave days may be carried into the next calendar year. Carried days must be used by March 31 or they lapse"
+        }
+      ]
+    },
+    {
+      "id": "fu-03",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2248,
+      "completion_tokens": 150,
+      "cost_usd": 0.0,
+      "latency_ms": 2785.927666001953,
+      "context_docs": 7,
+      "answer": "Part-time employees accrue annual leave on a pro rata basis.",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Part-time employees accrue pro rata"
+        }
+      ]
+    },
+    {
+      "id": "fu-04",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2070,
+      "completion_tokens": 194,
+      "cost_usd": 0.0,
+      "latency_ms": 4889.918291941285,
+      "context_docs": 7,
+      "answer": "Maya Brooks is based in Austin. She is the Engineering Manager for the Platform Team. The other two Mayas \u2014 Maya Rivera and Maya Park \u2014 are both listed in Denver. [1]",
+      "cited": [
+        {
+          "doc_id": "org-chart",
+          "quote": "name: Maya Brooks | role: Engineering Manager | team: Platform Team | location: Austin"
+        }
+      ]
+    },
+    {
+      "id": "fu-05",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2823,
+      "completion_tokens": 298,
+      "cost_usd": 0.0,
+      "latency_ms": 5874.344834010117,
+      "context_docs": 6,
+      "answer": "Chicago is a Tier 2 city, so the maximum hotel room rate is $200 per night, excluding taxes. [1] [2]",
+      "cited": [
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "City tier: Tier 2 | Maximum room rate per night: $200"
+        },
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "Tier 2: Chicago, Seattle, Los Angeles, Washington DC"
+        }
+      ]
+    },
+    {
+      "id": "fu-06",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2453,
+      "completion_tokens": 128,
+      "cost_usd": 0.0,
+      "latency_ms": 3578.183582983911,
+      "context_docs": 10,
+      "answer": "If the VPN client shows \"certificate expired\", run Self Service > Renew VPN Certificate. Contact IT if that fails.",
+      "cited": [
+        {
+          "doc_id": "it-vpn-guide",
+          "quote": "If the client shows \"certificate expired\", run Self Service > Renew VPN Certificate. Contact IT if that fails"
+        }
+      ]
+    },
+    {
+      "id": "fu-07",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": "yes",
+      "verdict": "yes",
+      "verdict_ok": true,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2143,
+      "completion_tokens": 324,
+      "cost_usd": 0.0,
+      "latency_ms": 77643.61749996897,
+      "context_docs": 6,
+      "answer": "Yes. A deploy freeze starts 72 hours before every scheduled release, and the next release (2026.22 on 2026\u201111\u201119) has a freeze that begins 72 hours before that date.",
+      "cited": [
+        {
+          "doc_id": "eng-deploy-runbook",
+          "quote": "A deploy freeze starts 72 hours before every scheduled release and during declared incidents"
+        },
+        {
+          "doc_id": "eng-release-calendar",
+          "quote": "release: 2026.22 | date: 2026-11-19 | freeze_starts: 72 hours before | owner: Maya Park"
+        }
+      ]
+    },
+    {
+      "id": "fu-08",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2153,
+      "completion_tokens": 157,
+      "cost_usd": 0.0,
+      "latency_ms": 8185.205791029148,
+      "context_docs": 7,
+      "answer": "Tyler Martinez works in Denver. The other two Tylers \u2014 Tyler Anderson and Tyler Rodriguez \u2014 are based in Austin.",
+      "cited": [
+        {
+          "doc_id": "org-chart",
+          "quote": "name: Tyler Martinez | role: IT Lead | team: IT Operations | location: Denver"
+        }
+      ]
+    },
+    {
+      "id": "fu-09",
+      "category": "follow_up",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2345,
+      "completion_tokens": 287,
+      "cost_usd": 0.0,
+      "latency_ms": 7254.250625032,
+      "context_docs": 7,
+      "answer": "You receive 8 days of sick leave per year. A doctor's note is required for absences of three or more consecutive days. [1]",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Employees receive 8 days of sick leave per year. A doctor's note is required for absences of three or more consecutive days"
+        }
+      ]
+    }
+  ]
+}

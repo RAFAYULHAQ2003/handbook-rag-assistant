@@ -31,6 +31,14 @@ cp .env.example .env
 pytest
 ```
 
+The first run of the app downloads the local embedding model (about 70 MB) into `.cache/models`. Until it is downloaded, the hybrid-search quality test is skipped and search falls back to keyword-only (BM25).
+
+## Evaluate search
+
+```bash
+python -m evals.retrieval_eval        # compares search configurations on the dev set, no model calls
+```
+
 ## Run the app
 
 ```bash

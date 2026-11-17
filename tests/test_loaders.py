@@ -437,3 +437,15 @@ def test_docx_inline_content_controls_and_tracked_changes(tmp_path):
     path = tmp_path / "template.docx"
     d.save(path)
     assert [b.text for b in parse_file(path).blocks] == ["Limit is $450", "Approval by the VP", "Limit: $275"]
+
+
+def test_docx_cell_with_several_paragraphs_keeps_word_boundaries(tmp_path):
+    d = python_docx.Document()
+    table = d.add_table(rows=2, cols=1)
+    table.rows[0].cells[0].text = "Office"
+    cell = table.rows[1].cells[0]
+    cell.text = "Austin"
+    cell.add_paragraph("HQ")
+    path = tmp_path / "cells.docx"
+    d.save(path)
+    assert [b.text for b in parse_file(path).blocks] == ["Office: Austin HQ"]

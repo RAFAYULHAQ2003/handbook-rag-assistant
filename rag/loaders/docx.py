@@ -40,6 +40,12 @@ def _element_text(element) -> str:
     return "".join(parts)
 
 
+def _cell_text(tc) -> str:
+    """A table cell's paragraphs joined with spaces ("Austin" + "HQ" -> "Austin HQ", not "AustinHQ")."""
+    paragraphs = [_element_text(p) for p in tc.iter(qn("w:p"))]
+    return " ".join(p for p in paragraphs if p.strip())
+
+
 def _paragraph(p: Paragraph, parsed: ParsedFile) -> None:
     text = clean_inline(_element_text(p._p))
     if not text:
@@ -64,7 +70,7 @@ def _row_cells(row) -> list[str]:
         if id(cell._tc) in seen:
             continue
         seen.add(id(cell._tc))
-        cells.append(clean_inline(_element_text(cell._tc)))
+        cells.append(clean_inline(_cell_text(cell._tc)))
     return cells
 
 

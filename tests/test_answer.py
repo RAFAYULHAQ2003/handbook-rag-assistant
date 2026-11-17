@@ -16,7 +16,7 @@ from rag.answer import (
     locate_quote,
 )
 from rag.index import HandbookIndex
-from rag.llm import BudgetExceeded, Completion, LLMError, OpenRouterClient
+from rag.llm import BudgetExceeded, Completion, LLMError, OpenAICompatibleClient
 from rag.validity import State
 
 TODAY = date(2026, 11, 17)
@@ -218,7 +218,7 @@ class FakeNetwork:
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr("rag.llm.time.sleep", lambda s: None)
-    return OpenRouterClient("sk-test", "test/model", "https://example.test/v1", cache_dir=tmp_path / "cache")
+    return OpenAICompatibleClient("sk-test", "test/model", "https://example.test/v1", cache_dir=tmp_path / "cache")
 
 
 SCHEMA = {"type": "object", "properties": {"answer": {"type": "string"}}, "required": ["answer"], "additionalProperties": False}
@@ -231,9 +231,57 @@ def test_request_payload(client, monkeypatch):
     result = client.complete(MESSAGES, SCHEMA)
     sent = net.requests[0]
     assert sent["response_format"]["json_schema"]["strict"] is True
-    assert sent["provider"] == {"require_parameters": True}
-    assert "temperature" not in sent  # the default model rejects it on every host
+    assert "temperature" not in sent
+    # OpenRouter-only fields are never sent to other providers (NVIDIA rejects them)
+    assert "provider" not in sent and "usage" not in sent
     assert result.content == {"answer": "hi"} and result.cost_usd == 0.0002 and not result.cached
+
+
+def test_openrouter_gets_its_routing_and_cost_fields(tmp_path, monkeypatch):
+    router = OpenAICompatibleClient("sk-or-test", "anthropic/claude-haiku-5.5", "https://openrouter.ai/api/v1",
+                                    cache_dir=tmp_path)
+    net = FakeNetwork(ok_body({"answer": "hi"}))
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
+    router.complete(MESSAGES, SCHEMA)
+    assert net.requests[0]["provider"] == {"require_parameters": True}
+    assert net.requests[0]["usage"] == {"include": True}
+
+
+def test_extra_body_is_sent_but_cannot_replace_core_fields(tmp_path, monkeypatch):
+    nvidia = OpenAICompatibleClient("nvapi-test", "nvidia/model", "https://integrate.api.nvidia.com/v1",
+                                    cache_dir=tmp_path,
+                                    extra_body={"chat_template_kwargs": {"enable_thinking": False},
+                                                "model": "attacker/model", "messages": []})
+    net = FakeNetwork(ok_body({"answer": "hi"}))
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
+    nvidia.complete(MESSAGES, SCHEMA)
+    sent = net.requests[0]
+    assert sent["chat_template_kwargs"] == {"enable_thinking": False}
+    assert sent["model"] == "nvidia/model" and sent["messages"] == MESSAGES
+
+
+def test_waits_as_long_as_the_server_asks(client, monkeypatch):
+    waits = []
+    monkeypatch.setattr("rag.llm.time.sleep", waits.append)
+
+    class RateLimited(FakeNetwork):
+        def __call__(self, request, timeout=None):
+            self.requests.append(json.loads(request.data))
+            if len(self.requests) == 1:
+                raise urllib.error.HTTPError(request.full_url, 429, "slow down", {"Retry-After": "7"},
+                                             io.BytesIO(b"{}"))
+            return io.BytesIO(json.dumps(ok_body({"answer": "hi"})).encode())
+
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", RateLimited())
+    assert client.complete(MESSAGES, SCHEMA).content == {"answer": "hi"}
+    assert waits == [7.0]
+
+
+def test_provider_without_cost_reporting_counts_as_free(client, monkeypatch):
+    body = ok_body({"answer": "hi"})
+    body["usage"].pop("cost")
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", FakeNetwork(body))
+    assert client.complete(MESSAGES, SCHEMA).cost_usd == 0.0
 
 
 def test_identical_requests_are_served_from_the_cache(client, monkeypatch):
@@ -253,11 +301,11 @@ def test_retries_rate_limits_then_succeeds(client, monkeypatch):
 
 
 def test_gives_up_after_the_retry_limit(client, monkeypatch):
-    net = FakeNetwork(503, 503, 503, ok_body({"answer": "never"}))
+    net = FakeNetwork(503, 503, 503, 503, 503, ok_body({"answer": "never"}))
     monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
     with pytest.raises(LLMError, match="HTTP 503"):
         client.complete(MESSAGES, SCHEMA)
-    assert len(net.requests) == 3  # one try plus two retries
+    assert len(net.requests) == 5  # one try plus four retries
 
 
 def test_does_not_retry_a_bad_key(client, monkeypatch):
@@ -282,7 +330,7 @@ def test_unusable_replies_are_errors_not_answers(client, monkeypatch, body, mess
 
 def test_spending_cap_stops_paid_calls_but_not_cache_hits(tmp_path, monkeypatch):
     monkeypatch.setattr("rag.llm.time.sleep", lambda s: None)
-    capped = OpenRouterClient("sk-test", "test/model", "https://example.test/v1", cache_dir=tmp_path,
+    capped = OpenAICompatibleClient("sk-test", "test/model", "https://example.test/v1", cache_dir=tmp_path,
                               max_cost_usd=0.0003)
     net = FakeNetwork(ok_body({"answer": "a"}, cost=0.0002), ok_body({"answer": "b"}, cost=0.0002))
     monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
@@ -294,28 +342,54 @@ def test_spending_cap_stops_paid_calls_but_not_cache_hits(tmp_path, monkeypatch)
     assert capped.complete([{"role": "user", "content": "one"}], SCHEMA).cached  # already paid for
 
 
-@pytest.mark.parametrize("missing", ["OPENROUTER_API_KEY", "LLM_MODEL", "LLM_BASE_URL"])
+@pytest.mark.parametrize("missing", ["LLM_API_KEY", "LLM_MODEL", "LLM_BASE_URL"])
 def test_every_setting_is_required(monkeypatch, missing):
     """No built-in model or URL: a missing setting must fail loudly, not fall back silently."""
-    for name, value in (("OPENROUTER_API_KEY", "sk-env"), ("LLM_MODEL", "openai/gpt-4o-mini"),
+    for name, value in (("LLM_API_KEY", "sk-env"), ("LLM_MODEL", "openai/gpt-4o-mini"),
                         ("LLM_BASE_URL", "https://example.test/v1")):
         monkeypatch.setenv(name, value)
     monkeypatch.setenv(missing, "  ")
     with pytest.raises(LLMError, match=missing):
-        OpenRouterClient.from_env()
+        OpenAICompatibleClient.from_env()
 
 
 def test_bad_cost_cap_is_a_clear_error(monkeypatch):
     monkeypatch.setenv("LLM_MAX_COST_USD", "five dollars")
     with pytest.raises(LLMError, match="LLM_MAX_COST_USD"):
-        OpenRouterClient.from_env()
+        OpenAICompatibleClient.from_env()
 
 
 def test_settings_come_from_the_environment(monkeypatch):
-    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-env")
+    monkeypatch.setenv("LLM_API_KEY", "sk-env")
     monkeypatch.setenv("LLM_MODEL", "openai/gpt-4o-mini")
     monkeypatch.setenv("LLM_BASE_URL", "https://example.test/v1/")
     monkeypatch.setenv("LLM_MAX_COST_USD", "2.5")
-    c = OpenRouterClient.from_env(cache_dir=None)
+    c = OpenAICompatibleClient.from_env(cache_dir=None)
     assert (c.api_key, c.model, c.base_url, c.max_cost_usd) == \
         ("sk-env", "openai/gpt-4o-mini", "https://example.test/v1", 2.5)
+
+
+def test_bad_extra_body_is_a_clear_error(monkeypatch):
+    for name, value in (("LLM_API_KEY", "k"), ("LLM_MODEL", "m"), ("LLM_BASE_URL", "https://x.test")):
+        monkeypatch.setenv(name, value)
+    monkeypatch.setenv("LLM_EXTRA_BODY", "{not json")
+    with pytest.raises(LLMError, match="LLM_EXTRA_BODY"):
+        OpenAICompatibleClient.from_env()
+    monkeypatch.setenv("LLM_EXTRA_BODY", "[1, 2]")
+    with pytest.raises(LLMError, match="JSON object"):
+        OpenAICompatibleClient.from_env()
+
+
+def test_quote_with_unicode_hyphen_is_found():
+    text = "A one-time home office allowance of $1,000 is available."
+    assert locate_quote("A one\u2011time home office allowance", text) == (0, len("A one-time home office allowance"))
+
+
+def test_rate_limit_without_a_hint_backs_off_for_long_enough(client, monkeypatch):
+    """NVIDIA's free tier returns 429 with no Retry-After; 2-4 second waits just hit the limit again."""
+    waits = []
+    monkeypatch.setattr("rag.llm.time.sleep", waits.append)
+    net = FakeNetwork(429, 429, 429, ok_body({"answer": "hi"}))
+    monkeypatch.setattr("rag.llm.urllib.request.urlopen", net)
+    assert client.complete(MESSAGES, SCHEMA).content == {"answer": "hi"}
+    assert waits == [10.0, 20.0, 40.0]

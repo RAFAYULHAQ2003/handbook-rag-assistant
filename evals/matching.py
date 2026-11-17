@@ -7,7 +7,9 @@ or "12", and "VP" does not match "VPN". Thousands separators are ignored, so
 
 import re
 
-_DASHES = str.maketrans({"–": "-", "—": "-", "’": "'", " ": " "})
+# every dash-like character counts as "-": models write U+2011 (non-breaking hyphen) in "6\u2011month"
+_DASHES = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
+                         "\u2212": "-", "\u2019": "'", "\u00a0": " ", "\u202f": " "})
 
 
 def normalize(text: str) -> str:

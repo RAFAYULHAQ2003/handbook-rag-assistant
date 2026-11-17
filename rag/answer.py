@@ -116,8 +116,10 @@ def build_messages(question: str, retrieval: Retrieval, index: HandbookIndex) ->
 
 # ---------- quote verification ----------
 
-_QUOTE_CHARS = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"',
-                              "–": "-", "—": "-", " ": " "})
+# every dash-like character counts as "-" (models write U+2011, the non-breaking hyphen, in "one\u2011time")
+_QUOTE_CHARS = str.maketrans({"\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"',
+                              "\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
+                              "\u2212": "-", "\u00a0": " ", "\u202f": " "})
 
 
 def _normalise_with_map(text: str) -> tuple[str, list[int]]:
@@ -163,8 +165,13 @@ def locate_quote(quote: str, text: str) -> tuple[int, int] | None:
 
 # ---------- the answer step ----------
 
-def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=None) -> Answer:
-    """Retrieve, ask the model, and verify every citation against the source text."""
+def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=None,
+                    retrieval: Retrieval | None = None) -> Answer:
+    """Retrieve, ask the model, and verify every citation against the source text.
+
+    Pass `retrieval` to answer from a prepared context instead of searching (used by the
+    eval's "send the whole handbook" baseline).
+    """
     question = (question or "").strip()
     if not question:
         return Answer(question, "Please type a question.", answerable=False, error="empty question")
@@ -173,7 +180,8 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
                       answerable=False, error="question too long")
 
     start = time.perf_counter()
-    retrieval = index.retrieve(question, ref)
+    if retrieval is None:
+        retrieval = index.retrieve(question, ref)
     if not retrieval.context:
         return Answer(question, "The handbook does not cover this.", answerable=False, retrieval=retrieval,
                       latency_ms=(time.perf_counter() - start) * 1000)

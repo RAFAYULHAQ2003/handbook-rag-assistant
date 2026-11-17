@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import tempfile
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -14,6 +15,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_CACHE_DIR = Path(__file__).resolve().parents[1] / ".cache" / "llm"
 RETRY_STATUS = {408, 409, 425, 429, 500, 502, 503, 504}
+RATE_LIMIT_BACKOFF = (10.0, 20.0, 40.0, 60.0)  # seconds, for 429s that carry no Retry-After
 
 
 class LLMError(Exception):
@@ -42,38 +44,48 @@ class LLMClient(Protocol):
     def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion: ...
 
 
-class OpenRouterClient:
-    """Chat completions through OpenRouter (OpenAI-compatible), returning parsed JSON.
+class OpenAICompatibleClient:
+    """Chat completions from any OpenAI-compatible API (NVIDIA, OpenRouter, ...), returning parsed JSON.
 
-    - structured output: the reply must match `schema`; only hosts that enforce it are used
+    - structured output: the reply must match `schema` (`response_format: json_schema`)
     - a reply cut off by the token limit, or that is not valid JSON, is an error, never an answer
-    - retries at most `max_retries` times, with a pause, on rate limits, server errors and timeouts
+    - retries rate limits, server errors and timeouts at most `max_retries` times, waiting as long
+      as the server asks (Retry-After) or backing off; never retries a bad key or a bad request
     - identical requests are answered from a disk cache, so re-running an eval costs nothing
-    - `max_cost_usd` stops all further calls once that much has been spent by this client
-    No temperature is sent: the default model does not accept one on any host.
-    max_tokens is generous because the model's hidden reasoning counts toward it (a 90-word
-    answer used ~800 tokens); a lower cap cut answers off mid-JSON.
+    - `max_cost_usd` stops all further calls once that much has been spent by this client, when the
+      provider reports cost (OpenRouter does; NVIDIA's free tier does not, so cost reads as $0)
+      (with parallel workers, calls already in flight may finish, so the cap can be passed slightly)
+    - `extra_body` adds provider-specific fields from LLM_EXTRA_BODY, such as NVIDIA's
+      {"chat_template_kwargs": {"enable_thinking": false}}
+    - OpenRouter-only fields (host routing, cost reporting) are sent only to OpenRouter; other
+      providers reject them
+    No temperature is sent, so each provider's default is used (Claude Haiku on OpenRouter rejects it).
+    max_tokens is generous because hidden reasoning can count toward it; a 1,200 cap cut answers off.
     """
 
-    def __init__(self, api_key: str, model: str, base_url: str, timeout: float = 60.0, max_retries: int = 2, cache_dir: Path | None = DEFAULT_CACHE_DIR,
-                 max_cost_usd: float | None = None):
-        missing = [name for name, value in (("OPENROUTER_API_KEY", api_key), ("LLM_MODEL", model),
+    def __init__(self, api_key: str, model: str, base_url: str, timeout: float = 120.0, max_retries: int = 4,
+                 cache_dir: Path | None = DEFAULT_CACHE_DIR, max_cost_usd: float | None = None,
+                 extra_body: dict | None = None):
+        missing = [name for name, value in (("LLM_API_KEY", api_key), ("LLM_MODEL", model),
                                             ("LLM_BASE_URL", base_url)) if not value]
         if missing:
             raise LLMError(f"missing setting(s): {', '.join(missing)} (see .env.example)")
         self.api_key = api_key
         self.model = model
         self.base_url = base_url.rstrip("/")
+        self.extra_body = dict(extra_body or {})
+        self.is_openrouter = "openrouter.ai" in self.base_url
         self.timeout = timeout
         self.max_retries = max_retries
         self.cache_dir = cache_dir
         self.max_cost_usd = max_cost_usd
         self.spent_usd = 0.0
         self.calls = 0  # paid calls, excluding cache hits
+        self._lock = threading.Lock()  # counters are shared by parallel eval workers and web requests
 
     @classmethod
-    def from_env(cls, **overrides) -> "OpenRouterClient":
-        """Build from OPENROUTER_API_KEY, LLM_MODEL, LLM_BASE_URL and LLM_MAX_COST_USD.
+    def from_env(cls, **overrides) -> "OpenAICompatibleClient":
+        """Build from LLM_API_KEY, LLM_MODEL, LLM_BASE_URL, LLM_EXTRA_BODY and LLM_MAX_COST_USD.
 
         There are no built-in fallbacks: a missing setting is an error, so the app can
         never silently call a model nobody chose.
@@ -83,11 +95,19 @@ class OpenRouterClient:
             max_cost = float(cap) if cap else None
         except ValueError as exc:
             raise LLMError(f"LLM_MAX_COST_USD must be a number, got {cap!r}") from exc
+        extra = os.environ.get("LLM_EXTRA_BODY", "").strip()
+        try:
+            extra_body = json.loads(extra) if extra else None
+        except json.JSONDecodeError as exc:
+            raise LLMError(f"LLM_EXTRA_BODY must be a JSON object, got {extra!r}") from exc
+        if extra_body is not None and not isinstance(extra_body, dict):
+            raise LLMError("LLM_EXTRA_BODY must be a JSON object, e.g. {\"chat_template_kwargs\": {...}}")
         settings = {
-            "api_key": os.environ.get("OPENROUTER_API_KEY", "").strip(),
+            "api_key": os.environ.get("LLM_API_KEY", "").strip(),
             "model": os.environ.get("LLM_MODEL", "").strip(),
             "base_url": os.environ.get("LLM_BASE_URL", "").strip(),
             "max_cost_usd": max_cost,
+            "extra_body": extra_body,
         }
         settings.update(overrides)
         return cls(**settings)
@@ -100,13 +120,15 @@ class OpenRouterClient:
 
     def complete(self, messages: list[dict], schema: dict, max_tokens: int = 4000) -> Completion:
         payload = {
+            **self.extra_body,  # provider extras first, so they can never replace the fields below
             "model": self.model,
             "messages": messages,
             "max_tokens": max_tokens,
             "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "strict": True, "schema": schema}},
-            "provider": {"require_parameters": True},
-            "usage": {"include": True},
         }
+        if self.is_openrouter:
+            payload["provider"] = {"require_parameters": True}  # only hosts that enforce the format
+            payload["usage"] = {"include": True}  # report the cost of each call
         path = self._cache_path(payload)
         if path is not None and path.exists():
             try:
@@ -115,16 +137,18 @@ class OpenRouterClient:
             except (json.JSONDecodeError, TypeError):
                 log.warning("ignoring unreadable cache entry %s", path.name)
 
-        if self.max_cost_usd is not None and self.spent_usd >= self.max_cost_usd:
-            raise BudgetExceeded(f"spending cap of ${self.max_cost_usd:.2f} reached")
+        with self._lock:
+            if self.max_cost_usd is not None and self.spent_usd >= self.max_cost_usd:
+                raise BudgetExceeded(f"spending cap of ${self.max_cost_usd:.2f} reached")
 
         start = time.perf_counter()
         data = self._post(payload)
         latency = (time.perf_counter() - start) * 1000
-        self.calls += 1
         usage = data.get("usage") or {}
         cost = float(usage.get("cost") or 0.0)
-        self.spent_usd += cost
+        with self._lock:
+            self.calls += 1
+            self.spent_usd += cost
 
         try:
             choice = data["choices"][0]
@@ -151,9 +175,10 @@ class OpenRouterClient:
         body = json.dumps(payload).encode()
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
         last_error = "no attempt made"
+        wait = 0.0
         for attempt in range(self.max_retries + 1):
             if attempt:
-                time.sleep(min(2 ** attempt, 8))
+                time.sleep(wait or min(2 ** attempt, 16))
             request = urllib.request.Request(f"{self.base_url}/chat/completions", data=body, headers=headers, method="POST")
             try:
                 with urllib.request.urlopen(request, timeout=self.timeout) as response:
@@ -163,8 +188,13 @@ class OpenRouterClient:
                 last_error = f"HTTP {exc.code}: {detail}"
                 if exc.code not in RETRY_STATUS:
                     break  # bad request, bad key, no credit: retrying will not help
+                wait = _retry_after(exc.headers)
+                if not wait and exc.code == 429:
+                    # rate limited without a hint: free tiers reset per minute, so short waits just fail again
+                    wait = RATE_LIMIT_BACKOFF[min(attempt, len(RATE_LIMIT_BACKOFF) - 1)]
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
                 last_error = f"{type(exc).__name__}: {exc}"
+                wait = 0.0
             except json.JSONDecodeError as exc:
                 last_error = f"response was not JSON: {exc}"
         raise LLMError(f"model call failed: {last_error}")
@@ -180,3 +210,11 @@ class OpenRouterClient:
         except BaseException:
             Path(tmp).unlink(missing_ok=True)
             raise
+
+
+def _retry_after(headers) -> float:
+    """Seconds the server asked us to wait (Retry-After), capped at 60; 0 if it did not say."""
+    try:
+        return min(max(float((headers or {}).get("Retry-After", 0)), 0.0), 60.0)
+    except (TypeError, ValueError):
+        return 0.0

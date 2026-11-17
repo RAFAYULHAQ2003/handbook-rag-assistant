@@ -38,3 +38,12 @@ def test_does_not_match_inside_other_tokens(text, alts):
 def test_facts_matched_one_result_per_group():
     text = "Secondary caregivers get 12 weeks now and 26 weeks from 2027."
     assert facts_matched(text, [["12 weeks"], ["26 weeks"], ["30 weeks"]]) == [True, True, False]
+
+
+@pytest.mark.parametrize("text,alts", [
+    ("A one\u2011time claim", ["one-time"]),  # non-breaking hyphen
+    ("the 6\u2010month period", ["6-month"]),  # hyphen
+    ("a 6\u2011month introductory period", ["6-month", "6 months"]),
+])
+def test_unicode_hyphens_match(text, alts):
+    assert contains_fact(text, alts)

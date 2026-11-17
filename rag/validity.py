@@ -64,7 +64,14 @@ def _authority(meta: DocumentMeta) -> Authority:
 
 
 def assess(metas: list[DocumentMeta], ref: date) -> tuple[dict[str, DocStatus], list[ValidityFinding]]:
-    """Compute the state of every document as of `ref`."""
+    """Compute the state of every document as of `ref`.
+
+    Order: deprecated status, then effective date after `ref`, then superseded
+    by an in-force document, else in force. Only explicit evidence decides a
+    state; title families only link versions. `ref` should be today or later:
+    a manifest effective_date is the latest revision date, not the date a
+    document first applied, so past dates give unreliable states.
+    """
     by_id = {m.doc_id: m for m in metas}
     findings: list[ValidityFinding] = []
 

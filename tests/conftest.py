@@ -6,7 +6,6 @@ from rag.manifest import load_corpus
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS_DIR = ROOT / "data" / "corpus"
-FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 
 @pytest.fixture(scope="session")

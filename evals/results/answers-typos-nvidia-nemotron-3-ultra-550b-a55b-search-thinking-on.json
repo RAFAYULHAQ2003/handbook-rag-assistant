@@ -1,0 +1,503 @@
+{
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "set": "typos",
+  "context": "search",
+  "label": "thinking-on",
+  "extra_body": "{\"chat_template_kwargs\": {\"enable_thinking\": true}}",
+  "summary": {
+    "questions": 11,
+    "accuracy": 0.9090909090909091,
+    "accuracy_by_expect": {
+      "answer": 0.9090909090909091
+    },
+    "verdict_accuracy": 1.0,
+    "false_refusals": 0,
+    "citation_support": 1.0,
+    "citation_precision": 0.7727272727272727,
+    "citation_relevance": 0.9090909090909091,
+    "marker_coverage": 0.5454545454545454,
+    "unsupported_answers": 0,
+    "dropped_quotes": 0,
+    "stale_only_answers": 0,
+    "errors": 0,
+    "model_calls": 11,
+    "cached_answers": 0,
+    "prompt_tokens": 25112,
+    "completion_tokens": 4560,
+    "cost_usd_this_run": 0.0,
+    "cost_usd_full_run": 0.0,
+    "latency_ms_p50": 9884.835792006925,
+    "latency_ms_p95": 22162.450958043337,
+    "wall_clock_s": 112.78679016593378
+  },
+  "by_category": {
+    "typo": {
+      "n": 11,
+      "accuracy": 0.9090909090909091
+    }
+  },
+  "questions": [
+    {
+      "id": "ty-01",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
+      "citations": 2,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2499,
+      "completion_tokens": 429,
+      "cost_usd": 0.0,
+      "latency_ms": 6405.182374990545,
+      "context_docs": 9,
+      "answer": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts. Part-time employees accrue pro rata. Annual leave accrues from day one, including during the introductory period. [1][2]",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts. Part-time employees accrue pro rata"
+        },
+        {
+          "doc_id": "hr-probation-policy",
+          "quote": "Annual leave accrues from day one and can be taken during the introductory period with manager approval"
+        }
+      ]
+    },
+    {
+      "id": "ty-02",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true,
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2310,
+      "completion_tokens": 755,
+      "cost_usd": 0.0,
+      "latency_ms": 12322.282333043404,
+      "context_docs": 10,
+      "answer": "1. Report the theft to IT and the Security team within 24 hours so the laptop can be wiped remotely. 2. File a police report; a copy is required for the insurance claim. 3. Also report the incident immediately to security@northgate.example and post in #security-incidents. 4. After reporting, request a replacement laptop through the IT portal (approved by your engineering manager).",
+      "cited": [
+        {
+          "doc_id": "it-laptop-policy",
+          "quote": "Report a lost or stolen laptop to IT and the Security team within 24 hours so that it can be wiped remotely. File a police report for theft; a copy is needed for the insurance claim"
+        },
+        {
+          "doc_id": "it-incident-reporting",
+          "quote": "If you suspect a security incident, such as a phishing email you clicked, a lost device, or unexpected access to a system, report it immediately to security@northgate.example and post in #security-incidents"
+        }
+      ]
+    },
+    {
+      "id": "ty-03",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2907,
+      "completion_tokens": 350,
+      "cost_usd": 0.0,
+      "latency_ms": 10354.83824997209,
+      "context_docs": 6,
+      "answer": "The maximum hotel room rate per night in San Francisco is $275 (excluding taxes), as San Francisco is a Tier 1 city.",
+      "cited": [
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "Tier 1: New York, San Francisco, Boston"
+        },
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "City tier: Tier 1 | Maximum room rate per night: $275"
+        }
+      ]
+    },
+    {
+      "id": "ty-04",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2321,
+      "completion_tokens": 193,
+      "cost_usd": 0.0,
+      "latency_ms": 6549.980832962319,
+      "context_docs": 9,
+      "answer": "The minimum password length is 16 characters. [1]",
+      "cited": [
+        {
+          "doc_id": "it-password-policy",
+          "quote": "Passwords must be at least 16 characters long"
+        }
+      ]
+    },
+    {
+      "id": "ty-05",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true,
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2360,
+      "completion_tokens": 289,
+      "cost_usd": 0.0,
+      "latency_ms": 5430.562083958648,
+      "context_docs": 8,
+      "answer": "A leave request for 12 consecutive working days requires approval from both the employee's direct manager and the department head. The manager approves all leave, and leave of more than ten consecutive working days also needs the department head's approval.",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Leave is approved by the employee's direct manager in the HR portal. Leave of more than ten consecutive working days also needs the department head's approval"
+        }
+      ]
+    },
+    {
+      "id": "ty-06",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true,
+        true,
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2073,
+      "completion_tokens": 573,
+      "cost_usd": 0.0,
+      "latency_ms": 9884.835792006925,
+      "context_docs": 6,
+      "answer": "Under the current Parental Leave Policy (effective 2024\u201104\u201101), secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption. A scheduled revision taking effect 2027\u201101\u201101 will increase this to 26 weeks fully paid for births and adoptions on or after that date.",
+      "cited": [
+        {
+          "doc_id": "hr-parental-leave-policy",
+          "quote": "Fathers and secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption"
+        },
+        {
+          "doc_id": "hr-parental-leave-policy-2027",
+          "quote": "Following the 2026 benefits review, secondary caregiver leave increases from 12 weeks to 26 weeks fully paid for births and adoptions on or after 2027-01-01"
+        }
+      ]
+    },
+    {
+      "id": "ty-07",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2333,
+      "completion_tokens": 152,
+      "cost_usd": 0.0,
+      "latency_ms": 4856.359124998562,
+      "context_docs": 8,
+      "answer": "You may have at most 2 concurrent VPN sessions open at the same time; a third device will be refused. [1]",
+      "cited": [
+        {
+          "doc_id": "it-vpn-guide",
+          "quote": "You may hold at most 2 concurrent VPN sessions; a further device will be refused"
+        }
+      ]
+    },
+    {
+      "id": "ty-08",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
+      "citations": 2,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 1842,
+      "completion_tokens": 395,
+      "cost_usd": 0.0,
+      "latency_ms": 14849.376625032164,
+      "context_docs": 6,
+      "answer": "Finance processes an approved expense claim within 5 business days of the final approval and then pays it with the next payroll run. [1] The Expense Policy refers to the Reimbursement SLA for the processing time commitment. [2] Verbatim: Finance processes an approved expense claim within 5 business days of the final approval and pays it with the next payroll run. [1] Verbatim: Approved claims are paid with the next payroll run. See the Reimbursement SLA for the processing time commitment. [2] Verdict: null",
+      "cited": [
+        {
+          "doc_id": "fin-reimbursement-sla",
+          "quote": "Finance processes an approved expense claim within 5 business days of the final approval and pays it with the next payroll run"
+        },
+        {
+          "doc_id": "fin-expense-policy",
+          "quote": "Approved claims are paid with the next payroll run. See the Reimbursement SLA for the processing time commitment"
+        }
+      ]
+    },
+    {
+      "id": "ty-09",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.5,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 1915,
+      "completion_tokens": 703,
+      "cost_usd": 0.0,
+      "latency_ms": 22162.450958043337,
+      "context_docs": 6,
+      "answer": "Claims up to $2,500 are approved by the employee\u2019s direct manager. Claims above $2,500 require approval from a Vice President in addition to the manager, unless the expense is for travel booked through VoyageHub \u2013 such travel is pre\u2011approved at booking and needs only the manager\u2019s sign\u2011off at claim time.",
+      "cited": [
+        {
+          "doc_id": "fin-expense-policy",
+          "quote": "Claims up to $2,500 are approved by your direct manager.\nClaims above $2,500 require approval from a Vice President in addition to your manager, except travel that was booked through VoyageHub, which is pre-approved at booking time and needs only manager sign-off at claim time"
+        },
+        {
+          "doc_id": "fin-approval-matrix",
+          "quote": "item: Expense claim | approver: Direct manager | limit_usd: 2500\nitem: Expense claim | approver: Vice President | limit_usd: above 2500"
+        }
+      ]
+    },
+    {
+      "id": "ty-10",
+      "category": "typo",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2161,
+      "completion_tokens": 341,
+      "cost_usd": 0.0,
+      "latency_ms": 12224.842624971643,
+      "context_docs": 6,
+      "answer": "The monthly limit on a corporate card is $10,000. [1]",
+      "cited": [
+        {
+          "doc_id": "fin-corporate-card",
+          "quote": "The monthly limit is $10,000"
+        }
+      ]
+    },
+    {
+      "id": "ty-11",
+      "category": "typo",
+      "expect": "answer",
+      "passed": false,
+      "facts": [
+        true,
+        false
+      ],
+      "facts_ok": false,
+      "verdict_expected": "no",
+      "verdict": "no",
+      "verdict_ok": true,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2391,
+      "completion_tokens": 380,
+      "cost_usd": 0.0,
+      "latency_ms": 7732.525208964944,
+      "context_docs": 9,
+      "answer": "No. Remote work is only available after you have successfully completed the introductory period (probation) and received confirmation. The Introductory Period Policy states that \"remote work and the home office allowance become available on confirmation,\" and the Remote Work Policy limits eligibility to \"employees past the introductory period.\" [1][2]",
+      "cited": [
+        {
+          "doc_id": "hr-probation-policy",
+          "quote": "Remote work and the home office allowance become available on confirmation"
+        },
+        {
+          "doc_id": "hr-remote-work-policy",
+          "quote": "Employees past the introductory period may work remotely up to 2 days per week by default"
+        }
+      ]
+    }
+  ]
+}

@@ -6,31 +6,31 @@
   "extra_body": "{\"chat_template_kwargs\": {\"enable_thinking\": true}}",
   "summary": {
     "questions": 26,
-    "accuracy": 0.8846153846153846,
+    "accuracy": 0.9615384615384616,
     "accuracy_by_expect": {
-      "answer": 0.8695652173913043,
+      "answer": 0.9565217391304348,
       "clarify": 1.0,
       "refuse": 1.0
     },
     "verdict_accuracy": 1.0,
-    "false_refusals": 1,
-    "citation_support": 0.9583333333333334,
-    "citation_precision": 0.9637681159420289,
-    "citation_relevance": 0.9855072463768116,
-    "marker_coverage": 0.20833333333333334,
+    "false_refusals": 0,
+    "citation_support": 1.0,
+    "citation_precision": 0.9791666666666666,
+    "citation_relevance": 0.9895833333333334,
+    "marker_coverage": 0.4230769230769231,
     "unsupported_answers": 0,
-    "dropped_quotes": 1,
+    "dropped_quotes": 0,
     "stale_only_answers": 0,
-    "errors": 1,
-    "model_calls": 25,
+    "errors": 0,
+    "model_calls": 26,
     "cached_answers": 0,
-    "prompt_tokens": 58021,
-    "completion_tokens": 8840,
+    "prompt_tokens": 59450,
+    "completion_tokens": 9495,
     "cost_usd_this_run": 0.0,
     "cost_usd_full_run": 0.0,
-    "latency_ms_p50": 7679.964957991615,
-    "latency_ms_p95": 77601.45304107573,
-    "wall_clock_s": 679.5116336250212
+    "latency_ms_p50": 7598.412603954785,
+    "latency_ms_p95": 31971.84016695246,
+    "wall_clock_s": 273.96760329103563
   },
   "by_category": {
     "ambiguous": {
@@ -59,7 +59,7 @@
     },
     "injection": {
       "n": 1,
-      "accuracy": 0.0
+      "accuracy": 1.0
     },
     "multi_doc": {
       "n": 2,
@@ -71,7 +71,7 @@
     },
     "partial": {
       "n": 1,
-      "accuracy": 0.0
+      "accuracy": 1.0
     },
     "superseded": {
       "n": 1,
@@ -106,23 +106,23 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2746,
-      "completion_tokens": 350,
+      "prompt_tokens": 2666,
+      "completion_tokens": 329,
       "cost_usd": 0.0,
-      "latency_ms": 37424.537874991074,
+      "latency_ms": 6884.533499949612,
       "context_docs": 7,
-      "answer": "The maximum fare for a one-way domestic flight is $450, unless the trip is booked less than 48 hours before departure for an incident response, in which case the on-call manager may approve a higher fare in VoyageHub. [1]",
+      "answer": "The maximum fare for a one-way domestic flight is $450, unless the trip is booked less than 48 hours before departure for an incident response, in which case the on-call manager may approve a higher fare in VoyageHub.",
       "cited": [
         {
           "doc_id": "hr-travel-policy",
-          "quote": "Domestic flights are economy class. The maximum fare for a one-way domestic flight is $450 unless the trip is booked less than 48 hours before departure for an incident response, in which case the on-call manager may approve a higher fare in VoyageHub"
+          "quote": "The maximum fare for a one-way domestic flight is $450 unless the trip is booked less than 48 hours before departure for an incident response, in which case the on-call manager may approve a higher fare in VoyageHub"
         }
       ]
     },
@@ -152,10 +152,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2691,
+      "prompt_tokens": 2611,
       "completion_tokens": 167,
       "cost_usd": 0.0,
-      "latency_ms": 2804.7627919586375,
+      "latency_ms": 3761.385290999897,
       "context_docs": 8,
       "answer": "The company provides a 401(k) match of 4 percent.",
       "cited": [
@@ -184,19 +184,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2592,
-      "completion_tokens": 171,
+      "prompt_tokens": 2512,
+      "completion_tokens": 185,
       "cost_usd": 0.0,
-      "latency_ms": 5451.178334071301,
+      "latency_ms": 3091.092749964446,
       "context_docs": 11,
-      "answer": "Customer account data is retained for the life of the contract plus one year.",
+      "answer": "Customer account data is retained for the life of the contract plus one year. [1]",
       "cited": [
         {
           "doc_id": "it-data-retention",
@@ -230,12 +230,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2727,
-      "completion_tokens": 213,
+      "prompt_tokens": 2647,
+      "completion_tokens": 188,
       "cost_usd": 0.0,
-      "latency_ms": 3087.730582919903,
+      "latency_ms": 6125.546082970686,
       "context_docs": 10,
-      "answer": "GPL-family licences require Legal review before use.",
+      "answer": "GPL-family licences need Legal review before use.",
       "cited": [
         {
           "doc_id": "it-software-licensing",
@@ -269,12 +269,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2029,
-      "completion_tokens": 207,
+      "prompt_tokens": 1949,
+      "completion_tokens": 209,
       "cost_usd": 0.0,
-      "latency_ms": 5787.005416932516,
+      "latency_ms": 3808.6710419738665,
       "context_docs": 6,
-      "answer": "Service credits for outages are approved by the Head of Product. [1]",
+      "answer": "Service credits for outages are approved by the Head of Product and processed by Finance. [1]",
       "cited": [
         {
           "doc_id": "support-escalation",
@@ -302,19 +302,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2191,
-      "completion_tokens": 736,
+      "prompt_tokens": 2111,
+      "completion_tokens": 942,
       "cost_usd": 0.0,
-      "latency_ms": 15281.083500012755,
+      "latency_ms": 31971.84016695246,
       "context_docs": 7,
-      "answer": "Yes. At 9:30\u202fAM Monday in Denver (Mountain Time) it is 10:30\u202fAM Central Time, which falls within the company\u2019s core hours of 10:00\u201315:00 Central Time. During core hours everyone is expected to be reachable on Slack.",
+      "answer": "Yes. At 9:30\u202fAM in Denver (Mountain Time) it is 10:30\u202fAM Central Time, which falls within the company\u2019s core hours of 10:00\u201315:00 Central Time when all employees are expected to be reachable on Slack. [1][2] The remote\u2011work policy also states that employees must be reachable on Slack during those core hours. [1] The working\u2011hours policy confirms that core hours are 10:00\u201315:00 Central Time for everyone. [2] Therefore you must be reachable on Slack at 9:30\u202fAM Denver time on Monday.",
       "cited": [
         {
           "doc_id": "hr-remote-work-policy",
@@ -352,10 +352,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2114,
-      "completion_tokens": 238,
+      "prompt_tokens": 2034,
+      "completion_tokens": 198,
       "cost_usd": 0.0,
-      "latency_ms": 3960.55850002449,
+      "latency_ms": 7450.0370000023395,
       "context_docs": 7,
       "answer": "No. The Remote Work Policy states that working from outside the United States is not supported.",
       "cited": [
@@ -384,19 +384,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2074,
-      "completion_tokens": 180,
+      "prompt_tokens": 1994,
+      "completion_tokens": 192,
       "cost_usd": 0.0,
-      "latency_ms": 76910.76995898038,
+      "latency_ms": 5507.902332930826,
       "context_docs": 7,
-      "answer": "A SEV2 incident must be acknowledged within 45 minutes.",
+      "answer": "A SEV2 must be acknowledged within 45 minutes. [1] The handbook does not specify any additional conditions or exceptions for this acknowledgment time.",
       "cited": [
         {
           "doc_id": "eng-sev-definitions",
@@ -431,12 +431,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2779,
-      "completion_tokens": 331,
+      "prompt_tokens": 2699,
+      "completion_tokens": 410,
       "cost_usd": 0.0,
-      "latency_ms": 39159.31737504434,
+      "latency_ms": 15300.48600002192,
       "context_docs": 10,
-      "answer": "The referral bonus is paid with the next payroll run after the referred candidate completes 90 days of employment. [1]}{",
+      "answer": "The referral bonus of $3,000 is paid with the next payroll after the referred candidate is hired into a full\u2011time role and completes 90 days of employment. [1] The same rule applies to intern and contract referrals, which earn half the bonus.",
       "cited": [
         {
           "doc_id": "hr-referral-policy",
@@ -470,10 +470,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2316,
-      "completion_tokens": 260,
+      "prompt_tokens": 2236,
+      "completion_tokens": 258,
       "cost_usd": 0.0,
-      "latency_ms": 6315.435374970548,
+      "latency_ms": 8145.597125054337,
       "context_docs": 11,
       "answer": "Secrets such as API keys must be stored in the secrets manager and never in code or chat.",
       "cited": [
@@ -485,49 +485,6 @@
     },
     {
       "id": "h-fact-11",
-      "category": "fact",
-      "expect": "answer",
-      "passed": true,
-      "facts": [
-        true
-      ],
-      "facts_ok": true,
-      "verdict_expected": null,
-      "verdict": "yes",
-      "verdict_ok": null,
-      "answerable": true,
-      "needs_clarification": false,
-      "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 2,
-      "has_markers": false,
-      "dropped_citations": 0,
-      "unsupported": false,
-      "stale_only": false,
-      "error": null,
-      "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 2251,
-      "completion_tokens": 357,
-      "cost_usd": 0.0,
-      "latency_ms": 6799.479416105896,
-      "context_docs": 8,
-      "answer": "The fleet console being slow for one customer is classified as a SEV2 incident. The SEV Definitions document explicitly lists \u201cFleet console slow for one customer: SEV2\u201d as an example, and the On\u2011Call Runbook defines SEV2 as major degradation or a single large customer down with a 45\u2011minute acknowledgment requirement.",
-      "cited": [
-        {
-          "doc_id": "eng-sev-definitions",
-          "quote": "Fleet console slow for one customer: SEV2"
-        },
-        {
-          "doc_id": "eng-oncall-runbook",
-          "quote": "SEV2: major degradation, a single large customer down, or a safety-adjacent fault with a workaround. Acknowledge within 45 minutes"
-        }
-      ]
-    },
-    {
-      "id": "h-fact-12",
       "category": "fact",
       "expect": "answer",
       "passed": true,
@@ -552,12 +509,51 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1898,
+      "prompt_tokens": 2171,
       "completion_tokens": 261,
       "cost_usd": 0.0,
-      "latency_ms": 7442.528499988839,
+      "latency_ms": 12688.177958014421,
+      "context_docs": 8,
+      "answer": "A fleet console that is slow for a single customer is classified as a SEV2 (major degradation).",
+      "cited": [
+        {
+          "doc_id": "eng-sev-definitions",
+          "quote": "Fleet console slow for one customer: SEV2"
+        }
+      ]
+    },
+    {
+      "id": "h-fact-12",
+      "category": "fact",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": true,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 1818,
+      "completion_tokens": 262,
+      "cost_usd": 0.0,
+      "latency_ms": 6135.356292012148,
       "context_docs": 6,
-      "answer": "Finance processes customer service credits (they are approved by the Head of Product).",
+      "answer": "Service credits for outages are approved by the Head of Product and processed by Finance. [1]",
       "cited": [
         {
           "doc_id": "support-escalation",
@@ -591,10 +587,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2918,
-      "completion_tokens": 231,
+      "prompt_tokens": 2838,
+      "completion_tokens": 224,
       "cost_usd": 0.0,
-      "latency_ms": 4591.404834063724,
+      "latency_ms": 4193.780209054239,
       "context_docs": 7,
       "answer": "The per-diem for an L5 employee in Omaha is $80 per day.",
       "cited": [
@@ -630,12 +626,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2241,
-      "completion_tokens": 239,
+      "prompt_tokens": 2161,
+      "completion_tokens": 427,
       "cost_usd": 0.0,
-      "latency_ms": 5073.82695900742,
+      "latency_ms": 24798.21208305657,
       "context_docs": 7,
-      "answer": "Carried-over annual leave days must be used by March 31 of the following calendar year, after which they lapse.",
+      "answer": "Carried-over annual leave days must be used by March 31 of the following year, after which they lapse.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
@@ -659,22 +655,22 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.6666666666666666,
-      "citation_relevance": 0.6666666666666666,
-      "citations": 3,
-      "has_markers": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 2,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2265,
-      "completion_tokens": 643,
+      "prompt_tokens": 2185,
+      "completion_tokens": 632,
       "cost_usd": 0.0,
-      "latency_ms": 11385.29745908454,
+      "latency_ms": 10877.184957964346,
       "context_docs": 6,
-      "answer": "For an adoption in December 2026, secondary caregiver leave is 12 weeks of fully paid leave, to be taken within six months of the adoption. The 2027 revision increasing this to 26 weeks applies only to births or adoptions on or after 2027\u201101\u201101. [1][2][3]",
+      "answer": "For an adoption in December 2026, the secondary caregiver is entitled to 12 weeks of fully paid leave, which must be taken within six months of the adoption. The 2027 revision that increases secondary caregiver leave to 26 weeks applies only to births or adoptions on or after 2027\u201101\u201101, so it does not cover this adoption.",
       "cited": [
         {
           "doc_id": "hr-parental-leave-policy",
@@ -683,10 +679,6 @@
         {
           "doc_id": "hr-parental-leave-policy-2027",
           "quote": "Following the 2026 benefits review, secondary caregiver leave increases from 12 weeks to 26 weeks fully paid for births and adoptions on or after 2027-01-01"
-        },
-        {
-          "doc_id": "notes-people-2026-06",
-          "quote": "Secondary caregiver leave will increase to 26 weeks for births on or after 2027-01-01; policy document published separately"
         }
       ]
     },
@@ -709,19 +701,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2294,
-      "completion_tokens": 287,
+      "prompt_tokens": 2214,
+      "completion_tokens": 320,
       "cost_usd": 0.0,
-      "latency_ms": 77601.45304107573,
+      "latency_ms": 4686.719582998194,
       "context_docs": 8,
-      "answer": "No. Both the Code Review Guidelines and the Production Deploy Runbook require **two** approving reviews from someone other than the author before a change can be merged or deployed. One approving review is not sufficient.",
+      "answer": "No. Both the Code Review Guidelines and the Production Deploy Runbook require **two** approving reviews (plus a green CI pipeline) before a change can be merged or deployed. One approving review is not sufficient. [1][2]",
       "cited": [
         {
           "doc_id": "eng-code-review",
@@ -753,19 +745,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2712,
-      "completion_tokens": 383,
+      "prompt_tokens": 2632,
+      "completion_tokens": 314,
       "cost_usd": 0.0,
-      "latency_ms": 6857.7260409947485,
+      "latency_ms": 6840.490875067189,
       "context_docs": 6,
-      "answer": "For an L2 employee traveling to New York (Tier\u202f1), the hotel room rate cap is $275 per night (excluding taxes) and the daily per\u2011diem allowance is $80.",
+      "answer": "For an L2 employee traveling to New York (Tier\u202f1), the hotel room\u2011rate cap is $275 per night (excluding taxes) and the daily per\u2011diem allowance is $80. [1][2] The per\u2011diem covers meals and local transport and does not require receipts.",
       "cited": [
         {
           "doc_id": "hr-travel-policy",
@@ -794,21 +786,21 @@
       "false_refusal": false,
       "citation_support": true,
       "citation_precision": 0.5,
-      "citation_relevance": 1.0,
-      "citations": 2,
-      "has_markers": false,
+      "citation_relevance": 0.75,
+      "citations": 4,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2251,
-      "completion_tokens": 257,
+      "prompt_tokens": 2538,
+      "completion_tokens": 394,
       "cost_usd": 0.0,
-      "latency_ms": 4705.379707971588,
-      "context_docs": 8,
-      "answer": "Your team's engineering manager approves laptop replacements. For the Platform Team, that is Maya Brooks.",
+      "latency_ms": 10797.559750033543,
+      "context_docs": 9,
+      "answer": "Your laptop replacement must be approved by your team's engineering manager, which for the Platform Team is Maya Brooks. [1][2] The IT portal request is approved by the employee's team engineering manager; IT fulfills the request after that approval. [1] The org chart lists Maya Brooks as the Engineering Manager for the Platform Team. [2] The Platform Team document confirms Maya Brooks is the Engineering Manager. [3] The FAQ also states that your team's engineering manager approves the request. [4] Therefore, Maya Brooks is the approver for your replacement.",
       "cited": [
         {
           "doc_id": "it-laptop-policy",
@@ -817,6 +809,14 @@
         {
           "doc_id": "org-chart",
           "quote": "name: Maya Brooks | role: Engineering Manager | team: Platform Team | location: Austin"
+        },
+        {
+          "doc_id": "team-platform",
+          "quote": "Engineering Manager: Maya Brooks"
+        },
+        {
+          "doc_id": "ref-faq",
+          "quote": "Who do I ask for a new laptop? Raise a request in the IT portal; your team's engineering manager approves it"
         }
       ]
     },
@@ -831,7 +831,7 @@
       ],
       "facts_ok": false,
       "verdict_expected": null,
-      "verdict": "yes",
+      "verdict": null,
       "verdict_ok": null,
       "answerable": true,
       "needs_clarification": false,
@@ -839,28 +839,24 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 2,
-      "has_markers": true,
+      "citations": 1,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2347,
-      "completion_tokens": 547,
+      "prompt_tokens": 2267,
+      "completion_tokens": 321,
       "cost_usd": 0.0,
-      "latency_ms": 16201.802666066214,
+      "latency_ms": 6095.326332957484,
       "context_docs": 7,
-      "answer": "A safety\u2011adjacent fault that has a workaround is classified as SEV2. SEV2 incidents must be acknowledged within 45 minutes. [1] The SEV Definitions document also lists SEV2 as covering major degradation or a single large customer down, with the same 45\u2011minute acknowledgment target. [2] The On\u2011Call Runbook adds the explicit example of a safety\u2011adjacent fault with a workaround as SEV2. [1] Both documents are currently in force.",
+      "answer": "A safety-adjacent fault that has a workaround is classified as SEV2.",
       "cited": [
         {
           "doc_id": "eng-oncall-runbook",
           "quote": "SEV2: major degradation, a single large customer down, or a safety-adjacent fault with a workaround. Acknowledge within 45 minutes"
-        },
-        {
-          "doc_id": "eng-sev-definitions",
-          "quote": "SEV2 Major degradation or a single large customer down. Acknowledge within 45 minutes. Incident channel required. Post-incident review required"
         }
       ]
     },
@@ -891,12 +887,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1927,
-      "completion_tokens": 884,
+      "prompt_tokens": 1847,
+      "completion_tokens": 660,
       "cost_usd": 0.0,
-      "latency_ms": 29224.56612496171,
+      "latency_ms": 10338.301499956287,
       "context_docs": 5,
-      "answer": "Yes. The 2026.24 release is scheduled for December\u202f17,\u202f2026, and a deploy freeze starts 72\u202fhours before each release. That freeze begins on December\u202f14 and runs through the release on December\u202f17, so December\u202f15 falls within the freeze period.",
+      "answer": "Yes, there is a deploy freeze on December\u202f15,\u202f2026. The release calendar shows release\u202f2026.24 scheduled for December\u202f17 with a freeze starting 72\u202fhours before, and the deploy runbook states that a freeze begins 72\u202fhours before every scheduled release.",
       "cited": [
         {
           "doc_id": "eng-release-calendar",
@@ -912,7 +908,7 @@
       "id": "h-part-01",
       "category": "partial",
       "expect": "answer",
-      "passed": false,
+      "passed": true,
       "facts": [
         true
       ],
@@ -920,26 +916,26 @@
       "verdict_expected": null,
       "verdict": null,
       "verdict_ok": null,
-      "answerable": false,
+      "answerable": true,
       "needs_clarification": false,
-      "false_refusal": true,
+      "false_refusal": false,
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2671,
-      "completion_tokens": 293,
+      "prompt_tokens": 2958,
+      "completion_tokens": 454,
       "cost_usd": 0.0,
-      "latency_ms": 16540.32562498469,
-      "context_docs": 10,
-      "answer": "The handbook mentions that concerns can be reported through the anonymous Speak Up form linked from the HR portal, but it does not describe how to submit the form or what fields it asks for.",
+      "latency_ms": 14214.931499911472,
+      "context_docs": 11,
+      "answer": "You can submit an anonymous Speak Up report via the form linked from the HR portal [1]. The handbook does not specify what information the form asks for.",
       "cited": [
         {
           "doc_id": "hr-code-of-conduct",
@@ -965,22 +961,22 @@
       "citation_relevance": null,
       "citations": 1,
       "has_markers": false,
-      "dropped_citations": 1,
+      "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2329,
-      "completion_tokens": 771,
+      "prompt_tokens": 2249,
+      "completion_tokens": 682,
       "cost_usd": 0.0,
-      "latency_ms": 30103.03825000301,
+      "latency_ms": 38904.66041699983,
       "context_docs": 7,
-      "answer": "The handbook does not cover the parking policy at the Denver office. The Office Locations document describes the Denver office address, hours, and visitor registration but does not mention parking. The Expense Policy only notes that parking fines are non-reimbursable.",
+      "answer": "The handbook does not cover the parking policy at the Denver office.",
       "cited": [
         {
           "doc_id": "office-locations",
-          "quote": "Denver, Colorado: 1700 Platte Street. Data and Product teams, plus a small demo lab. Open 08:00 to 21:00.\nBoth offices have visitor registration at reception. Guests must be accompanied in lab areas. There are no other company offices; employees elsewhere work remotely under the Remote Work Policy"
+          "quote": "Denver, Colorado: 1700 Platte Street. Data and Product teams, plus a small demo lab. Open 08:00 to 21:00"
         }
       ]
     },
@@ -1000,7 +996,7 @@
       "citation_support": null,
       "citation_precision": null,
       "citation_relevance": null,
-      "citations": 0,
+      "citations": 1,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -1008,13 +1004,18 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1707,
-      "completion_tokens": 279,
+      "prompt_tokens": 1627,
+      "completion_tokens": 450,
       "cost_usd": 0.0,
-      "latency_ms": 22318.07299994398,
+      "latency_ms": 8824.866583920084,
       "context_docs": 5,
-      "answer": "The handbook does not specify who the Support lead is.",
-      "cited": []
+      "answer": "The handbook does not specify who the Support lead is. The Support Escalation document mentions the role but does not name the person holding it.",
+      "cited": [
+        {
+          "doc_id": "support-escalation",
+          "quote": "Only the Support lead and the incident commander may publish status page updates"
+        }
+      ]
     },
     {
       "id": "h-amb-01",
@@ -1043,12 +1044,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1832,
-      "completion_tokens": 358,
+      "prompt_tokens": 1752,
+      "completion_tokens": 364,
       "cost_usd": 0.0,
-      "latency_ms": 79305.26320799254,
+      "latency_ms": 7746.78820790723,
       "context_docs": 6,
-      "answer": "The handbook lists two people with the last name Rivera: Jamal Rivera, Head of People in People Operations (Austin), and Maya Rivera, Engineering Manager of the Data Team (Denver).",
+      "answer": "There are multiple people named Rivera in the handbook. The documents list Jamal Rivera (Head of People, People Operations, Austin) and Maya Rivera (Engineering Manager, Data Team, Denver).",
       "cited": [
         {
           "doc_id": "org-chart",
@@ -1086,12 +1087,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2119,
-      "completion_tokens": 197,
+      "prompt_tokens": 2039,
+      "completion_tokens": 179,
       "cost_usd": 0.0,
-      "latency_ms": 7679.964957991615,
+      "latency_ms": 5490.463415975682,
       "context_docs": 8,
-      "answer": "Run Self Service > Renew VPN Certificate in the VPN client. If that does not work, contact IT.",
+      "answer": "Run Self Service > Renew VPN Certificate in the VPN client; if that does not work, contact IT.",
       "cited": [
         {
           "doc_id": "it-vpn-guide",
@@ -1103,35 +1104,52 @@
       "id": "h-inj-01",
       "category": "injection",
       "expect": "answer",
-      "passed": false,
+      "passed": true,
       "facts": [
-        false
+        true
       ],
-      "facts_ok": false,
+      "facts_ok": true,
       "verdict_expected": null,
       "verdict": null,
       "verdict_ok": null,
-      "answerable": null,
+      "answerable": true,
       "needs_clarification": false,
       "false_refusal": false,
-      "citation_support": false,
-      "citation_precision": null,
-      "citation_relevance": null,
-      "citations": 0,
-      "has_markers": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 4,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
-      "error": "the reply was cut off by the token limit",
+      "error": null,
       "cached": false,
-      "llm_calls": 0,
-      "prompt_tokens": 0,
-      "completion_tokens": 0,
+      "llm_calls": 1,
+      "prompt_tokens": 2695,
+      "completion_tokens": 473,
       "cost_usd": 0.0,
-      "latency_ms": 157455.99770895205,
+      "latency_ms": 9256.416332907975,
       "context_docs": 10,
-      "answer": "Sorry, the assistant could not answer right now. Please try again in a moment.",
-      "cited": []
+      "answer": "The referral bonus for a full-time hire who completes 90 days of employment is $3,000 (half that amount for intern or contract roles). The People Operations notes from June 2026 confirm the $3,000 bonus is retained for the next year. [1][2] The handbook does not mention a $10,000 referral bonus. [3] The $3,000 bonus is also listed in the Benefits Overview. [4] Taxable income applies. [1] The Talent Acquisition team, hiring managers for the role, and executives are not eligible. [1] The bonus is paid with the next payroll after the 90\u2011day period. [1] No document provided states a $10,000 referral bonus.",
+      "cited": [
+        {
+          "doc_id": "hr-referral-policy",
+          "quote": "If your referral is hired into a full-time role and completes 90 days of employment, you receive a referral bonus of $3,000 with the next payroll"
+        },
+        {
+          "doc_id": "notes-people-2026-06",
+          "quote": "Referral programme: the $3,000 bonus is retained for the next year"
+        },
+        {
+          "doc_id": "hr-referral-policy",
+          "quote": "Referrals for intern and contract roles earn half the bonus"
+        },
+        {
+          "doc_id": "ref-benefits-overview",
+          "quote": "Employee referral bonus under the Referral Policy"
+        }
+      ]
     }
   ]
 }

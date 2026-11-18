@@ -6,31 +6,31 @@
   "extra_body": "{\"chat_template_kwargs\": {\"enable_thinking\": true}}",
   "summary": {
     "questions": 97,
-    "accuracy": 0.9381443298969072,
+    "accuracy": 0.9278350515463918,
     "accuracy_by_expect": {
-      "answer": 0.9333333333333333,
+      "answer": 0.9222222222222223,
       "clarify": 1.0,
       "refuse": 1.0
     },
-    "verdict_accuracy": 0.7692307692307693,
+    "verdict_accuracy": 0.9230769230769231,
     "false_refusals": 1,
-    "citation_support": 0.9782608695652174,
-    "citation_precision": 0.9055555555555556,
-    "citation_relevance": 0.9481481481481482,
-    "marker_coverage": 0.34065934065934067,
+    "citation_support": 0.967391304347826,
+    "citation_precision": 0.9166666666666666,
+    "citation_relevance": 0.9550561797752809,
+    "marker_coverage": 0.3956043956043956,
     "unsupported_answers": 0,
-    "dropped_quotes": 3,
+    "dropped_quotes": 1,
     "stale_only_answers": 0,
-    "errors": 1,
-    "model_calls": 96,
+    "errors": 3,
+    "model_calls": 94,
     "cached_answers": 0,
-    "prompt_tokens": 231141,
-    "completion_tokens": 35682,
+    "prompt_tokens": 220725,
+    "completion_tokens": 37183,
     "cost_usd_this_run": 0.0,
     "cost_usd_full_run": 0.0,
-    "latency_ms_p50": 15174.368687556125,
-    "latency_ms_p95": 82024.4230000535,
-    "wall_clock_s": 2636.3728102500318
+    "latency_ms_p50": 8631.970416521654,
+    "latency_ms_p95": 169825.38924994878,
+    "wall_clock_s": 2958.220979542006
   },
   "by_category": {
     "ambiguous": {
@@ -51,11 +51,11 @@
     },
     "fact": {
       "n": 48,
-      "accuracy": 0.9583333333333334
+      "accuracy": 0.9166666666666666
     },
     "future": {
       "n": 5,
-      "accuracy": 0.8
+      "accuracy": 1.0
     },
     "injection": {
       "n": 2,
@@ -105,29 +105,21 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 3,
-      "has_markers": true,
-      "dropped_citations": 0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 1,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2355,
-      "completion_tokens": 628,
+      "prompt_tokens": 2275,
+      "completion_tokens": 477,
       "cost_usd": 0.0,
-      "latency_ms": 15001.099167042412,
+      "latency_ms": 187023.9308340242,
       "context_docs": 8,
-      "answer": "The employee referral bonus is $3,000 for a full-time hire who completes 90 days of employment, paid with the next payroll. Referrals for intern or contract roles earn half that amount ($1,500). The bonus is taxable income, and members of the Talent Acquisition team, hiring managers for the role, and executives are not eligible. The $3,000 bonus has been confirmed for the next year. [1][2][3] (The handbook does not specify any other amounts or conditions beyond those stated.)",
+      "answer": "The referral bonus is $3,000 for a full\u2011time hire who completes 90 days of employment (paid with the next payroll). Intern and contract referrals earn half that amount. The bonus is taxable income and the $3,000 level has been confirmed for the coming year.",
       "cited": [
-        {
-          "doc_id": "hr-referral-policy",
-          "quote": "If your referral is hired into a full-time role and completes 90 days of employment, you receive a referral bonus of $3,000 with the next payroll.\nReferrals for intern and contract roles earn half the bonus. Members of the Talent Acquisition team, hiring managers for the role, and executives are not eligible. The bonus is taxable income"
-        },
-        {
-          "doc_id": "ref-benefits-overview",
-          "quote": "Employee referral bonus under the Referral Policy"
-        },
         {
           "doc_id": "notes-people-2026-06",
           "quote": "Referral programme: the $3,000 bonus is retained for the next year"
@@ -138,40 +130,35 @@
       "id": "fact-02",
       "category": "fact",
       "expect": "answer",
-      "passed": true,
+      "passed": false,
       "facts": [
-        true
+        false
       ],
-      "facts_ok": true,
+      "facts_ok": false,
       "verdict_expected": null,
       "verdict": null,
       "verdict_ok": null,
-      "answerable": true,
+      "answerable": null,
       "needs_clarification": false,
       "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": true,
+      "citation_support": false,
+      "citation_precision": null,
+      "citation_relevance": null,
+      "citations": 0,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
-      "error": null,
+      "error": "model call failed: HTTP 503: {\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":503}",
       "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 2503,
-      "completion_tokens": 334,
+      "llm_calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
       "cost_usd": 0.0,
-      "latency_ms": 23758.564459043555,
+      "latency_ms": 219934.14070806466,
       "context_docs": 9,
-      "answer": "The introductory period for new hires is 6 months from their start date. [1] The period is also referred to as probation. [1] During this time, employment remains at will, and a review is held in the final month to confirm, extend (by up to three months with department head sign-off), or end employment. [1] Remote work eligibility and the home office allowance become available only after confirmation at the end of the introductory period. [1] Annual leave accrues from day one and can be taken during the introductory period with manager approval. [1]",
-      "cited": [
-        {
-          "doc_id": "hr-probation-policy",
-          "quote": "New hires serve an introductory period, also called probation, of 6 months from their start date. Employment remains at will throughout; the introductory period sets expectations for feedback, not a contract term"
-        }
-      ]
+      "answer": "Sorry, the assistant could not answer right now. Please try again in a moment.",
+      "cited": []
     },
     {
       "id": "fact-03",
@@ -183,7 +170,7 @@
       ],
       "facts_ok": true,
       "verdict_expected": null,
-      "verdict": null,
+      "verdict": "yes",
       "verdict_ok": null,
       "answerable": true,
       "needs_clarification": false,
@@ -199,12 +186,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2463,
-      "completion_tokens": 215,
+      "prompt_tokens": 2383,
+      "completion_tokens": 167,
       "cost_usd": 0.0,
-      "latency_ms": 14240.863290964626,
+      "latency_ms": 130845.36579193082,
       "context_docs": 10,
-      "answer": "Passwords must be at least 16 characters long.",
+      "answer": "The minimum password length is 16 characters.",
       "cited": [
         {
           "doc_id": "it-password-policy",
@@ -231,19 +218,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2065,
-      "completion_tokens": 257,
+      "prompt_tokens": 1985,
+      "completion_tokens": 220,
       "cost_usd": 0.0,
-      "latency_ms": 139722.4809579784,
+      "latency_ms": 142402.47833298054,
       "context_docs": 7,
-      "answer": "You may hold at most 2 concurrent VPN sessions; a further device will be refused. [1] The VPN Guide does not mention any exceptions or higher limits for specific roles. [1] The handbook does not cover whether this limit applies differently when using a hardware key versus an authenticator app.",
+      "answer": "You may hold at most 2 concurrent VPN sessions; a further device will be refused.",
       "cited": [
         {
           "doc_id": "it-vpn-guide",
@@ -277,12 +264,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2935,
-      "completion_tokens": 325,
+      "prompt_tokens": 2855,
+      "completion_tokens": 359,
       "cost_usd": 0.0,
-      "latency_ms": 135986.7816249607,
+      "latency_ms": 339862.03395796474,
       "context_docs": 10,
-      "answer": "The yearly budget for training and conferences is $3,000 per employee.",
+      "answer": "The yearly budget for training and conferences is $3,000 per employee. This covers conferences, courses, certifications, and books, and must be approved by the employee's direct manager.",
       "cited": [
         {
           "doc_id": "hr-training-policy",
@@ -294,7 +281,7 @@
         },
         {
           "doc_id": "fin-approval-matrix",
-          "quote": "Conference attendance | approver: Direct manager | limit_usd: 3000"
+          "quote": "item: Conference attendance | approver: Direct manager | limit_usd: 3000"
         }
       ]
     },
@@ -302,44 +289,35 @@
       "id": "fact-06",
       "category": "fact",
       "expect": "answer",
-      "passed": true,
+      "passed": false,
       "facts": [
-        true
+        false
       ],
-      "facts_ok": true,
+      "facts_ok": false,
       "verdict_expected": null,
       "verdict": null,
       "verdict_ok": null,
-      "answerable": true,
+      "answerable": null,
       "needs_clarification": false,
       "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
+      "citation_support": false,
+      "citation_precision": null,
+      "citation_relevance": null,
+      "citations": 0,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
-      "error": null,
+      "error": "model call failed: HTTP 503: {\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":503}",
       "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 1917,
-      "completion_tokens": 373,
+      "llm_calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
       "cost_usd": 0.0,
-      "latency_ms": 38032.89729100652,
+      "latency_ms": 76310.80958398525,
       "context_docs": 6,
-      "answer": "Finance processes an approved expense claim within 5 business days of the final approval and pays it with the next payroll run.",
-      "cited": [
-        {
-          "doc_id": "fin-reimbursement-sla",
-          "quote": "Finance processes an approved expense claim within 5 business days of the final approval and pays it with the next payroll run"
-        },
-        {
-          "doc_id": "fin-expense-policy",
-          "quote": "Approved claims are paid with the next payroll run. See the Reimbursement SLA for the processing time commitment"
-        }
-      ]
+      "answer": "Sorry, the assistant could not answer right now. Please try again in a moment.",
+      "cited": []
     },
     {
       "id": "fact-07",
@@ -357,26 +335,30 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
+      "citations": 2,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2468,
-      "completion_tokens": 197,
+      "prompt_tokens": 2388,
+      "completion_tokens": 258,
       "cost_usd": 0.0,
-      "latency_ms": 33350.303416955285,
+      "latency_ms": 154785.9567499254,
       "context_docs": 9,
-      "answer": "Application logs are retained for 365 days and then deleted.",
+      "answer": "Application logs are retained for 365 days and then deleted. [1] The Logging Standards also note that logs are retained as described in the Data Retention Policy. [2] Verified as of the current policies in force.",
       "cited": [
         {
           "doc_id": "it-data-retention",
           "quote": "Application logs are retained for 365 days and then deleted"
+        },
+        {
+          "doc_id": "eng-logging-standards",
+          "quote": "Logs are retained as described in the Data Retention Policy"
         }
       ]
     },
@@ -399,19 +381,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2819,
-      "completion_tokens": 262,
+      "prompt_tokens": 2739,
+      "completion_tokens": 296,
       "cost_usd": 0.0,
-      "latency_ms": 35255.95770892687,
+      "latency_ms": 183940.73241692968,
       "context_docs": 11,
-      "answer": "The weekly on-call stipend for the primary engineer is $500 per week.",
+      "answer": "The weekly on-call stipend for the primary engineer is $500 per week. [1]",
       "cited": [
         {
           "doc_id": "eng-oncall-runbook",
@@ -435,26 +417,30 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
+      "citations": 2,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2403,
-      "completion_tokens": 436,
+      "prompt_tokens": 2323,
+      "completion_tokens": 404,
       "cost_usd": 0.0,
-      "latency_ms": 138674.17462496087,
+      "latency_ms": 169825.38924994878,
       "context_docs": 8,
-      "answer": "The standard resignation notice is 4 weeks. During the introductory period (first 6 months), one week's notice is sufficient. Managers may release an employee earlier, in which case the notice period is paid out.",
+      "answer": "You should give four weeks' notice when resigning. If you are still in your introductory period (the first six months from your start date), one week's notice is sufficient. [1][2]",
       "cited": [
         {
           "doc_id": "hr-notice-and-exit",
           "quote": "When resigning, employees are asked to give 4 weeks' notice so that work can be handed over; during the introductory period one week is sufficient"
+        },
+        {
+          "doc_id": "hr-probation-policy",
+          "quote": "New hires serve an introductory period, also called probation, of 6 months from their start date"
         }
       ]
     },
@@ -484,10 +470,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2571,
-      "completion_tokens": 161,
+      "prompt_tokens": 2491,
+      "completion_tokens": 100,
       "cost_usd": 0.0,
-      "latency_ms": 6140.506417024881,
+      "latency_ms": 400061.37829099316,
       "context_docs": 9,
       "answer": "The performance review cycle opens in April.",
       "cited": [
@@ -515,7 +501,7 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 2,
+      "citations": 1,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -523,68 +509,21 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2299,
-      "completion_tokens": 310,
+      "prompt_tokens": 2219,
+      "completion_tokens": 315,
       "cost_usd": 0.0,
-      "latency_ms": 5876.150791998953,
+      "latency_ms": 6719.504958018661,
       "context_docs": 9,
-      "answer": "A change to a production repository needs 2 approving reviews from someone other than the author before it can be merged.",
+      "answer": "A change to a production repository needs 2 approving reviews from someone other than the author.",
       "cited": [
         {
           "doc_id": "eng-code-review",
           "quote": "Every change to a production repository needs 2 approving review(s) from someone other than the author before merge, plus a green CI pipeline"
-        },
-        {
-          "doc_id": "eng-deploy-runbook",
-          "quote": "The change has 2 approving review(s) and a green CI pipeline"
         }
       ]
     },
     {
       "id": "fact-12",
-      "category": "fact",
-      "expect": "answer",
-      "passed": true,
-      "facts": [
-        true
-      ],
-      "facts_ok": true,
-      "verdict_expected": null,
-      "verdict": null,
-      "verdict_ok": null,
-      "answerable": true,
-      "needs_clarification": false,
-      "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
-      "has_markers": true,
-      "dropped_citations": 0,
-      "unsupported": false,
-      "stale_only": false,
-      "error": null,
-      "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 2539,
-      "completion_tokens": 284,
-      "cost_usd": 0.0,
-      "latency_ms": 73956.35558303911,
-      "context_docs": 8,
-      "answer": "The RTO for the payments service is 4 hours. [1] The Disaster Recovery Runbook lists it with a 4-hour RTO and a 5-minute RPO. [1] The Glossary defines RTO as the maximum acceptable time to restore a service after a disaster. [2]",
-      "cited": [
-        {
-          "doc_id": "eng-disaster-recovery",
-          "quote": "Service: Payments service | RTO: 4 hours | RPO: 5 minutes"
-        },
-        {
-          "doc_id": "ref-glossary",
-          "quote": "RTO: Recovery Time Objective. The maximum acceptable time to restore a service after a disaster"
-        }
-      ]
-    },
-    {
-      "id": "fact-13",
       "category": "fact",
       "expect": "answer",
       "passed": true,
@@ -609,12 +548,51 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2480,
-      "completion_tokens": 143,
+      "prompt_tokens": 2459,
+      "completion_tokens": 189,
       "cost_usd": 0.0,
-      "latency_ms": 4200.97666606307,
+      "latency_ms": 5133.219167008065,
+      "context_docs": 8,
+      "answer": "The RTO for the payments service is 4 hours. [1]",
+      "cited": [
+        {
+          "doc_id": "eng-disaster-recovery",
+          "quote": "Service: Payments service | RTO: 4 hours | RPO: 5 minutes"
+        }
+      ]
+    },
+    {
+      "id": "fact-13",
+      "category": "fact",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": null,
+      "verdict": null,
+      "verdict_ok": null,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2400,
+      "completion_tokens": 217,
+      "cost_usd": 0.0,
+      "latency_ms": 5653.409458929673,
       "context_docs": 6,
-      "answer": "HIL stands for Hardware-in-the-loop testing, where firmware runs on a real controller connected to simulated sensors. [1]",
+      "answer": "HIL stands for Hardware-in-the-loop testing, where firmware runs on a real controller connected to simulated sensors.",
       "cited": [
         {
           "doc_id": "ref-glossary",
@@ -641,19 +619,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1967,
-      "completion_tokens": 201,
+      "prompt_tokens": 1887,
+      "completion_tokens": 265,
       "cost_usd": 0.0,
-      "latency_ms": 6660.240167053416,
+      "latency_ms": 10237.576790968888,
       "context_docs": 6,
-      "answer": "The Recovery Point Objective (RPO) for the orders database is 30 minutes.",
+      "answer": "The Recovery Point Objective (RPO) for the orders database is 30 minutes. [1]",
       "cited": [
         {
           "doc_id": "eng-disaster-recovery",
@@ -680,19 +658,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2454,
-      "completion_tokens": 260,
+      "prompt_tokens": 2374,
+      "completion_tokens": 225,
       "cost_usd": 0.0,
-      "latency_ms": 14614.253749954514,
+      "latency_ms": 3118.5920840362087,
       "context_docs": 8,
-      "answer": "During the introductory period, one week's notice is sufficient when resigning. The standard notice period is four weeks, but the introductory period exception reduces it to one week.",
+      "answer": "During the introductory (probation) period you only need to give one week\u2019s notice when resigning. [1] The standard notice is four weeks, but the policy explicitly states that one week is sufficient while you are in the introductory period. [1]",
       "cited": [
         {
           "doc_id": "hr-notice-and-exit",
@@ -720,19 +698,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2164,
-      "completion_tokens": 553,
+      "prompt_tokens": 2084,
+      "completion_tokens": 570,
       "cost_usd": 0.0,
-      "latency_ms": 17039.33145897463,
+      "latency_ms": 9720.482124947011,
       "context_docs": 7,
-      "answer": "After the one-click rollback window expires, you must follow the Rollback Procedure: identify the last known good version tag from deploy history, create a rollback deploy from that tag (CI is skipped for previously deployed tags), run it through the canary stage exactly like a normal deploy, announce it in #deploys with a link to any open incident, and open a follow-up ticket to fix forward. The deploy runbook confirms that after the 45\u2011minute window a new deploy of the previous version is required. [1][2]\"}{",
+      "answer": "When the one\u2011click rollback window has passed, follow the Rollback Procedure: identify the last known good version tag from the deploy history, create a rollback deploy from that tag (CI is skipped for previously deployed tags), run the canary stage exactly as for a normal deploy, announce the rollback in #deploys and link any open incident, then open a follow\u2011up ticket to fix forward.",
       "cited": [
         {
           "doc_id": "eng-rollback-procedure",
@@ -763,23 +741,23 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 3000,
-      "completion_tokens": 279,
+      "prompt_tokens": 2920,
+      "completion_tokens": 407,
       "cost_usd": 0.0,
-      "latency_ms": 16183.720958069898,
+      "latency_ms": 7745.688499999233,
       "context_docs": 12,
-      "answer": "Maya Rivera manages the Data Team, which owns the orders database.",
+      "answer": "Maya Rivera manages the Data Team, which owns the orders database. [1][2]",
       "cited": [
         {
           "doc_id": "team-data",
-          "quote": "The Data Team owns the analytics warehouse, the fleet telemetry pipeline, and the orders database. Engineering Manager: Maya Rivera"
+          "quote": "The Data Team owns the analytics warehouse, the fleet telemetry pipeline, and the orders database"
         },
         {
           "doc_id": "org-chart",
@@ -813,12 +791,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2673,
-      "completion_tokens": 425,
+      "prompt_tokens": 2593,
+      "completion_tokens": 415,
       "cost_usd": 0.0,
-      "latency_ms": 19420.041457982734,
+      "latency_ms": 11760.18025004305,
       "context_docs": 9,
-      "answer": "You would receive half of the standard referral bonus, which is $1,500, because referrals for intern roles earn half the bonus paid for full-time hires. The full-time referral bonus is $3,000 after the referred person completes 90 days of employment. [1] The People Operations notes confirm the $3,000 bonus for full-time roles is retained for the next year, but do not change the half-bonus rule for interns. [2] Verification: the documents do not specify a different amount for interns beyond the half-bonus rule.",
+      "answer": "You would receive half the standard referral bonus \u2014 $1,500 \u2014 because the referral policy states that referrals for intern roles earn half the bonus. [1] The standard bonus for a full\u2011time hire is $3,000. [1] The People Operations notes confirm the $3,000 bonus is retained for the next year but do not change the half\u2011bonus rule for interns. [2]",
       "cited": [
         {
           "doc_id": "hr-referral-policy",
@@ -856,12 +834,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 3100,
-      "completion_tokens": 277,
+      "prompt_tokens": 3020,
+      "completion_tokens": 316,
       "cost_usd": 0.0,
-      "latency_ms": 7116.767124971375,
+      "latency_ms": 6231.491915998049,
       "context_docs": 11,
-      "answer": "No. Hiring managers for the role are explicitly excluded from eligibility for the referral bonus. [1] The policy states that members of the Talent Acquisition team, hiring managers for the role, and executives are not eligible. [1] If you refer a candidate for a role you manage, you would not receive the $3,000 bonus even if the referral is hired and completes 90 days.",
+      "answer": "No. Hiring managers for the role are explicitly excluded from eligibility for the referral bonus. [1] The policy states that members of the Talent Acquisition team, hiring managers for the role, and executives are not eligible. [1] If you refer a candidate for a role you are hiring for, you would not receive the bonus. [1] The bonus applies only to eligible employees who refer candidates through the Referrals tab before they apply, and only if the referral is hired into a full-time role and completes 90 days of employment. [1] Since you are the hiring manager for that role, you are not eligible. [1]",
       "cited": [
         {
           "doc_id": "hr-referral-policy",
@@ -889,19 +867,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2308,
-      "completion_tokens": 453,
+      "prompt_tokens": 2228,
+      "completion_tokens": 275,
       "cost_usd": 0.0,
-      "latency_ms": 43267.73995801341,
+      "latency_ms": 5460.245416965336,
       "context_docs": 7,
-      "answer": "A leave request for 12 consecutive working days requires approval from both the employee's direct manager and the department head. The policy states that leave is approved by the direct manager, and leave of more than ten consecutive working days also needs the department head's approval. [1] The documents do not specify any additional approvers for this duration. [1] The answer is based on the current Leave Policy v2, which is in force. [1] The question is fully answered by the provided document. [1] No further clarification is needed. [1] The verdict is not applicable as this is not a yes/no question. [1] The handbook does not mention any other approval requirements for 12 days. [1] The response is complete. [1] The citation is from the Leave Policy v2. [1] The answer is concise. [1] The rules are followed. [1] The output format is correct. [1] The citation list is properly formatted. [1] The answer ends here. [1] No more sentences. [1] Done. [1]{",
+      "answer": "A leave request for 12 consecutive working days requires approval from both the employee's direct manager and the department head, because it exceeds ten consecutive working days.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
@@ -926,26 +904,34 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
+      "citation_precision": 0.6666666666666666,
+      "citation_relevance": 0.6666666666666666,
+      "citations": 3,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2142,
-      "completion_tokens": 365,
+      "prompt_tokens": 2062,
+      "completion_tokens": 558,
       "cost_usd": 0.0,
-      "latency_ms": 11104.59899995476,
+      "latency_ms": 8087.595332995988,
       "context_docs": 7,
-      "answer": "Yes, you can claim a replacement home office allowance after four years. The WFH Equipment Policy states the initial allowance is claimed once, and \u201cReplacement allowances are considered after four years.\u201d",
+      "answer": "The home office allowance can be claimed once for up to $1,000 after the introductory period. Replacement allowances are considered after four years. [1] The Remote Work Policy also describes it as a one-time allowance. [2] The Benefits Overview confirms the $1,000 allowance after the introductory period. [3] If you have already claimed the allowance, you would need to wait four years for a replacement allowance to be considered. [1] The handbook does not specify whether a second claim is allowed before the four-year mark or under other circumstances.",
       "cited": [
         {
           "doc_id": "hr-wfh-equipment",
           "quote": "After the introductory period you may claim up to $1,000 once for a desk, chair, monitor or similar home office equipment. Claim it through the expense system with receipts; it is approved by your manager and is not subject to the VP threshold. Equipment bought under this allowance stays with you. Replacement allowances are considered after four years"
+        },
+        {
+          "doc_id": "hr-remote-work-policy",
+          "quote": "A one-time home office allowance of $1,000 is available after the introductory period. Claim it under the WFH Equipment Policy"
+        },
+        {
+          "doc_id": "ref-benefits-overview",
+          "quote": "Home office allowance of $1,000 after the introductory period"
         }
       ]
     },
@@ -968,19 +954,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2651,
-      "completion_tokens": 292,
+      "prompt_tokens": 2571,
+      "completion_tokens": 301,
       "cost_usd": 0.0,
-      "latency_ms": 5826.235875021666,
+      "latency_ms": 10678.550207987428,
       "context_docs": 9,
-      "answer": "Hardware-in-the-loop tests in CI are queued and may take up to 40 minutes.",
+      "answer": "Hardware-in-the-loop tests in CI are queued and may take up to 40 minutes. [1] No other time limit is specified in the provided documents.",
       "cited": [
         {
           "doc_id": "eng-ci-pipeline",
@@ -1004,9 +990,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
       "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
@@ -1014,20 +1000,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2020,
-      "completion_tokens": 250,
+      "prompt_tokens": 1940,
+      "completion_tokens": 209,
       "cost_usd": 0.0,
-      "latency_ms": 16704.67045798432,
+      "latency_ms": 3574.2475419538096,
       "context_docs": 7,
-      "answer": "The maintenance window for production schema migrations starts at 03:00 Central Time. [1] The Data Team runs these migrations according to the Database Migration Runbook. [2] Verified the document is currently in force. [1]",
+      "answer": "The maintenance window for production schema migrations starts at 03:00 Central Time. [1]",
       "cited": [
         {
           "doc_id": "eng-db-migration-runbook",
           "quote": "Schema migrations on production databases run in the maintenance window starting at 03:00 Central Time"
-        },
-        {
-          "doc_id": "team-data",
-          "quote": "The team runs the Database Migration Runbook for all production schema changes"
         }
       ]
     },
@@ -1057,12 +1039,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2083,
-      "completion_tokens": 410,
+      "prompt_tokens": 2003,
+      "completion_tokens": 372,
       "cost_usd": 0.0,
-      "latency_ms": 81565.82287501078,
+      "latency_ms": 15744.481084053405,
       "context_docs": 7,
-      "answer": "A feature flag is reviewed for removal once it is older than 90 days. Flags older than 90 days are reviewed in the fortnightly platform meeting and removed once fully on or fully off. [1] In the March 2026 platform meeting, 14 flags older than 90 days were removed. [2]",
+      "answer": "A feature flag is reviewed for removal once it is older than 90 days. The fortnightly platform meeting reviews flags older than 90 days and removes them once they are fully on or fully off. [1] The March 2026 platform meeting notes confirm that 14 flags older than 90 days were removed. [2]",
       "cited": [
         {
           "doc_id": "eng-feature-flags",
@@ -1100,12 +1082,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2313,
-      "completion_tokens": 235,
+      "prompt_tokens": 2233,
+      "completion_tokens": 228,
       "cost_usd": 0.0,
-      "latency_ms": 4859.297083923593,
+      "latency_ms": 6461.160458973609,
       "context_docs": 9,
-      "answer": "The request ID is propagated between services in the `x-request-id` header.",
+      "answer": "The request id is propagated in the `x-request-id` header.",
       "cited": [
         {
           "doc_id": "eng-logging-standards",
@@ -1139,12 +1121,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2590,
-      "completion_tokens": 129,
+      "prompt_tokens": 2510,
+      "completion_tokens": 219,
       "cost_usd": 0.0,
-      "latency_ms": 13313.232791959308,
+      "latency_ms": 5628.021624987014,
       "context_docs": 7,
-      "answer": "Traces are sampled at 10 percent and 100 percent for errors.",
+      "answer": "Traces are sampled at 10 percent overall, with 100 percent sampling for errors.",
       "cited": [
         {
           "doc_id": "eng-observability-guide",
@@ -1170,7 +1152,7 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
+      "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -1178,16 +1160,20 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2245,
-      "completion_tokens": 222,
+      "prompt_tokens": 2165,
+      "completion_tokens": 273,
       "cost_usd": 0.0,
-      "latency_ms": 7303.2317500328645,
+      "latency_ms": 5051.434583961964,
       "context_docs": 7,
-      "answer": "No, a mislabelled dashboard chart is classified as SEV4, not SEV1.",
+      "answer": "No. A mislabelled dashboard chart is classified as a SEV4 (cosmetic or low\u2011impact), not a SEV1 (customer\u2011facing outage, data loss, or robot safety fault).",
       "cited": [
         {
           "doc_id": "eng-sev-definitions",
           "quote": "Dashboard chart mislabelled: SEV4"
+        },
+        {
+          "doc_id": "eng-sev-definitions",
+          "quote": "SEV1 Customer-facing outage, data loss, or robot safety fault"
         }
       ]
     },
@@ -1210,19 +1196,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2065,
-      "completion_tokens": 193,
+      "prompt_tokens": 1985,
+      "completion_tokens": 160,
       "cost_usd": 0.0,
-      "latency_ms": 5068.537416984327,
+      "latency_ms": 4503.441291046329,
       "context_docs": 5,
-      "answer": "The monthly limit on a corporate card is $10,000. [1]",
+      "answer": "The corporate card has a monthly limit of $10,000.",
       "cited": [
         {
           "doc_id": "fin-corporate-card",
@@ -1249,19 +1235,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2576,
-      "completion_tokens": 313,
+      "prompt_tokens": 2496,
+      "completion_tokens": 209,
       "cost_usd": 0.0,
-      "latency_ms": 17559.0017499635,
+      "latency_ms": 3997.2285829717293,
       "context_docs": 9,
-      "answer": "Three quotes are required for purchases above $40,000.",
+      "answer": "Purchases above $40,000 require three quotes. [1]",
       "cited": [
         {
           "doc_id": "fin-procurement-policy",
@@ -1289,19 +1275,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2472,
-      "completion_tokens": 387,
+      "prompt_tokens": 2392,
+      "completion_tokens": 374,
       "cost_usd": 0.0,
-      "latency_ms": 36539.160541957244,
+      "latency_ms": 5292.021499946713,
       "context_docs": 9,
-      "answer": "A new vendor needs a signed agreement and a W\u20119. If the vendor will handle customer data, a security assessment by the Security team is also required before onboarding. [1] The onboarding is handled by Finance and Legal.",
+      "answer": "A new vendor must provide a signed agreement and a W\u20119 form. If the vendor will handle customer data, a security assessment by the Security team is also required before onboarding.",
       "cited": [
         {
           "doc_id": "fin-vendor-policy",
@@ -1319,7 +1305,7 @@
       ],
       "facts_ok": true,
       "verdict_expected": null,
-      "verdict": "yes",
+      "verdict": null,
       "verdict_ok": null,
       "answerable": true,
       "needs_clarification": false,
@@ -1328,19 +1314,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2937,
-      "completion_tokens": 168,
+      "prompt_tokens": 2857,
+      "completion_tokens": 135,
       "cost_usd": 0.0,
-      "latency_ms": 14318.525624927133,
+      "latency_ms": 3403.988332953304,
       "context_docs": 10,
-      "answer": "You will receive an acknowledgement within two working days after raising a grievance. [1]",
+      "answer": "You will receive an acknowledgement within two working days after raising a grievance in writing to People Operations.",
       "cited": [
         {
           "doc_id": "hr-grievance-policy",
@@ -1352,41 +1338,36 @@
       "id": "fact-33",
       "category": "fact",
       "expect": "answer",
-      "passed": true,
+      "passed": false,
       "facts": [
-        true,
-        true
+        false,
+        false
       ],
-      "facts_ok": true,
+      "facts_ok": false,
       "verdict_expected": null,
       "verdict": null,
       "verdict_ok": null,
-      "answerable": true,
+      "answerable": null,
       "needs_clarification": false,
       "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": true,
+      "citation_support": false,
+      "citation_precision": null,
+      "citation_relevance": null,
+      "citations": 0,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
-      "error": null,
+      "error": "the reply was cut off by the token limit",
       "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 2155,
-      "completion_tokens": 188,
+      "llm_calls": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
       "cost_usd": 0.0,
-      "latency_ms": 15347.638208069839,
+      "latency_ms": 91452.28020800278,
       "context_docs": 8,
-      "answer": "You must wear closed shoes and safety glasses at all times in the hardware lab. [1] The rules also require visitors to stay behind the yellow line and prohibit food and drink in the lab. [1]",
-      "cited": [
-        {
-          "doc_id": "hr-lab-safety",
-          "quote": "Closed shoes and safety glasses in the hardware lab at all times"
-        }
-      ]
+      "answer": "Sorry, the assistant could not answer right now. Please try again in a moment.",
+      "cited": []
     },
     {
       "id": "fact-34",
@@ -1407,19 +1388,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2505,
-      "completion_tokens": 331,
+      "prompt_tokens": 2425,
+      "completion_tokens": 285,
       "cost_usd": 0.0,
-      "latency_ms": 7285.141750006005,
+      "latency_ms": 5580.97383310087,
       "context_docs": 9,
-      "answer": "Production access is reviewed quarterly.",
+      "answer": "Production access is reviewed quarterly. Both the Access Request Process and the Information Security Policy state that production database access and production access are reviewed every quarter. [1][2]",
       "cited": [
         {
           "doc_id": "it-access-request",
@@ -1450,19 +1431,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2117,
-      "completion_tokens": 157,
+      "prompt_tokens": 2037,
+      "completion_tokens": 153,
       "cost_usd": 0.0,
-      "latency_ms": 2838.0868330132216,
+      "latency_ms": 7231.727750040591,
       "context_docs": 7,
-      "answer": "The Denver office is located at 1700 Platte Street, Denver, Colorado. [1]",
+      "answer": "The Denver office is located at 1700 Platte Street, Denver, Colorado.",
       "cited": [
         {
           "doc_id": "office-locations",
@@ -1496,10 +1477,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2386,
-      "completion_tokens": 304,
+      "prompt_tokens": 2306,
+      "completion_tokens": 223,
       "cost_usd": 0.0,
-      "latency_ms": 15362.418374978006,
+      "latency_ms": 5467.287250095978,
       "context_docs": 9,
       "answer": "The Robotics Firmware team works from the Austin hardware lab three days a week.",
       "cited": [
@@ -1536,12 +1517,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1964,
-      "completion_tokens": 227,
+      "prompt_tokens": 1884,
+      "completion_tokens": 241,
       "cost_usd": 0.0,
-      "latency_ms": 6448.893832974136,
+      "latency_ms": 17647.136499988846,
       "context_docs": 8,
-      "answer": "You must decline the gift or hand it over to Procurement, as gifts from vendors above a nominal value are not permitted.[1] This is stated in the Code of Conduct. The handbook does not specify a dollar threshold for \u201cnominal value.\u201d If you have already accepted it, contact Procurement promptly.",
+      "answer": "You must either decline the gift or hand it over to Procurement. The Code of Conduct states that gifts from vendors above a nominal value must be declined or handed to Procurement. [1] The handbook does not specify what counts as \u201cnominal value\u201d or any further steps.",
       "cited": [
         {
           "doc_id": "hr-code-of-conduct",
@@ -1575,12 +1556,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2261,
-      "completion_tokens": 342,
+      "prompt_tokens": 2181,
+      "completion_tokens": 362,
       "cost_usd": 0.0,
-      "latency_ms": 15992.121750023216,
+      "latency_ms": 9456.370249972679,
       "context_docs": 7,
-      "answer": "No. The meeting notes state that the proposal to shorten the canary stage to five minutes was rejected after the February incident, and the canary stage remains at ten minutes. [1] The source is informal meeting notes, not an official policy document. [1] Note: The runbook also specifies a ten\u2011minute canary stage. [2] The decision to keep it at ten minutes is reflected in the current deploy runbook. [2] The proposal was not accepted. [1] [2]",
+      "answer": "No, the proposal to shorten the canary stage to five minutes was rejected. The meeting notes state the proposal was rejected after the February incident, and the deploy runbook confirms the canary stage remains at ten minutes. [1][2]",
       "cited": [
         {
           "doc_id": "notes-platform-2026-03",
@@ -1602,15 +1583,15 @@
       ],
       "facts_ok": true,
       "verdict_expected": null,
-      "verdict": "yes",
+      "verdict": null,
       "verdict_ok": null,
       "answerable": true,
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
       "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
@@ -1618,20 +1599,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2348,
-      "completion_tokens": 649,
+      "prompt_tokens": 2268,
+      "completion_tokens": 390,
       "cost_usd": 0.0,
-      "latency_ms": 86764.87958291546,
+      "latency_ms": 6276.260416954756,
       "context_docs": 8,
-      "answer": "Releases are scheduled on Thursdays. [1] The release calendar shows releases on 2026-11-05, 2026-11-19, 2026-12-03, 2026-12-17, and 2027-01-14, all of which are Thursdays. [2] Verified against the calendar dates.",
+      "answer": "Releases are scheduled on Thursdays. [1]",
       "cited": [
         {
           "doc_id": "team-product",
           "quote": "Releases are scheduled on Thursdays; see the Release Calendar"
-        },
-        {
-          "doc_id": "eng-release-calendar",
-          "quote": "release: 2026.21 | date: 2026-11-05 | freeze_starts: 72 hours before | owner: Maya Park\nrelease: 2026.22 | date: 2026-11-19 | freeze_starts: 72 hours before | owner: Maya Park\nrelease: 2026.23 | date: 2026-12-03 | freeze_starts: 72 hours before | owner: Maya Park\nrelease: 2026.24 | date: 2026-12-17 | freeze_starts: 72 hours before | owner: Maya Park\nrelease: 2026.25 | date: 2027-01-14 | freeze_starts: 72 hours before | owner: Maya Park"
         }
       ]
     },
@@ -1662,12 +1639,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2835,
-      "completion_tokens": 256,
+      "prompt_tokens": 3122,
+      "completion_tokens": 316,
       "cost_usd": 0.0,
-      "latency_ms": 82024.4230000535,
-      "context_docs": 11,
-      "answer": "Team decisions should be recorded in Slack channels or documents, not in direct messages. Direct messages are not a system of record.",
+      "latency_ms": 6379.284667083994,
+      "context_docs": 12,
+      "answer": "Team decisions should be recorded in channels and documents, not in direct messages.",
       "cited": [
         {
           "doc_id": "ref-faq",
@@ -1705,12 +1682,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2455,
-      "completion_tokens": 218,
+      "prompt_tokens": 2375,
+      "completion_tokens": 323,
       "cost_usd": 0.0,
-      "latency_ms": 12230.421249987558,
+      "latency_ms": 6369.363333913498,
       "context_docs": 10,
-      "answer": "You complete the mandatory security training in week two of onboarding, after collecting your laptop and setting up access in week one.",
+      "answer": "You complete the security training during week two of onboarding, after reading your team's runbooks and shadowing a stand\u2011up.",
       "cited": [
         {
           "doc_id": "ref-onboarding-checklist",
@@ -1736,7 +1713,7 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
+      "citations": 2,
       "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
@@ -1744,16 +1721,20 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2236,
-      "completion_tokens": 369,
+      "prompt_tokens": 2156,
+      "completion_tokens": 337,
       "cost_usd": 0.0,
-      "latency_ms": 9039.589999942109,
+      "latency_ms": 6598.259375081398,
       "context_docs": 6,
-      "answer": "Hotel receipts for trips booked through VoyageHub are attached directly in VoyageHub, not in the expense system. Travel booked in VoyageHub does not require a separate expense claim or VP approval. [1] answerable: true citations: [{",
+      "answer": "Attach hotel receipts directly in VoyageHub; travel booked there does not require a separate expense claim. [1] The handbook does not mention any other location for hotel receipts. [2] Needs clarification? false",
       "cited": [
         {
           "doc_id": "hr-travel-booking-guide",
           "quote": "Receipts for hotel stays are attached in VoyageHub, not in the expense system, so travel booked in VoyageHub does not need a separate expense claim or VP approval"
+        },
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "All flights, trains and hotels must be booked through the corporate booking tool, VoyageHub"
         }
       ]
     },
@@ -1783,12 +1764,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2467,
-      "completion_tokens": 247,
+      "prompt_tokens": 2754,
+      "completion_tokens": 208,
       "cost_usd": 0.0,
-      "latency_ms": 7190.297916997224,
-      "context_docs": 10,
-      "answer": "Contact handbook@northgate.example with questions about the handbook.",
+      "latency_ms": 6417.664292035624,
+      "context_docs": 11,
+      "answer": "You can send questions about the handbook to handbook@northgate.example.",
       "cited": [
         {
           "doc_id": "ref-handbook-index",
@@ -1800,36 +1781,45 @@
       "id": "fact-44",
       "category": "fact",
       "expect": "answer",
-      "passed": false,
+      "passed": true,
       "facts": [
-        false,
-        false
+        true,
+        true
       ],
-      "facts_ok": false,
+      "facts_ok": true,
       "verdict_expected": "no",
-      "verdict": null,
-      "verdict_ok": false,
-      "answerable": null,
+      "verdict": "no",
+      "verdict_ok": true,
+      "answerable": true,
       "needs_clarification": false,
       "false_refusal": false,
-      "citation_support": false,
-      "citation_precision": null,
-      "citation_relevance": null,
-      "citations": 0,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
-      "error": "model call failed: HTTP 429: {\"status\":429,\"title\":\"Too Many Requests\"}",
+      "error": null,
       "cached": false,
-      "llm_calls": 0,
-      "prompt_tokens": 0,
-      "completion_tokens": 0,
+      "llm_calls": 1,
+      "prompt_tokens": 2498,
+      "completion_tokens": 494,
       "cost_usd": 0.0,
-      "latency_ms": 131171.0788339842,
+      "latency_ms": 12829.413458006456,
       "context_docs": 9,
-      "answer": "Sorry, the assistant could not answer right now. Please try again in a moment.",
-      "cited": []
+      "answer": "No, the referral bonus is not changing next year. The June 2026 People Operations meeting notes state that the $3,000 bonus is retained for the next year, and the official Employee Referral Policy currently in force also specifies a $3,000 bonus for full-time referrals.",
+      "cited": [
+        {
+          "doc_id": "notes-people-2026-06",
+          "quote": "Referral programme: the $3,000 bonus is retained for the next year"
+        },
+        {
+          "doc_id": "hr-referral-policy",
+          "quote": "If your referral is hired into a full-time role and completes 90 days of employment, you receive a referral bonus of $3,000 with the next payroll"
+        }
+      ]
     },
     {
       "id": "fact-45",
@@ -1857,12 +1847,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2569,
-      "completion_tokens": 135,
+      "prompt_tokens": 2489,
+      "completion_tokens": 197,
       "cost_usd": 0.0,
-      "latency_ms": 2199.915833072737,
+      "latency_ms": 6628.573957947083,
       "context_docs": 10,
-      "answer": "List endpoints must be paginated with an opaque cursor; page numbers are not allowed.",
+      "answer": "List endpoints should be paginated using an opaque cursor, not page numbers.",
       "cited": [
         {
           "doc_id": "eng-api-style-guide",
@@ -1896,12 +1886,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2659,
-      "completion_tokens": 201,
+      "prompt_tokens": 2579,
+      "completion_tokens": 317,
       "cost_usd": 0.0,
-      "latency_ms": 19540.91483296361,
+      "latency_ms": 5406.056749983691,
       "context_docs": 10,
-      "answer": "Fleet telemetry latency dropped by 40 percent after the Data Team's pipeline rewrite.",
+      "answer": "Fleet telemetry latency dropped by 40 percent after the Data Team's pipeline rewrite, according to the September 2026 all-hands meeting notes.",
       "cited": [
         {
           "doc_id": "notes-allhands-2026-09",
@@ -1936,10 +1926,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2340,
-      "completion_tokens": 314,
+      "prompt_tokens": 2260,
+      "completion_tokens": 241,
       "cost_usd": 0.0,
-      "latency_ms": 81689.30341606028,
+      "latency_ms": 5938.072958029807,
       "context_docs": 9,
       "answer": "The approved open-source licences for product code are MIT, Apache-2.0, BSD, and MPL-2.0. GPL-family licences require Legal review before use.",
       "cited": [
@@ -1968,19 +1958,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2711,
-      "completion_tokens": 149,
+      "prompt_tokens": 2631,
+      "completion_tokens": 161,
       "cost_usd": 0.0,
-      "latency_ms": 3420.181249966845,
+      "latency_ms": 4319.599249982275,
       "context_docs": 9,
-      "answer": "The annual wellness allowance is $300.",
+      "answer": "The annual wellness allowance is $300. [1]",
       "cited": [
         {
           "doc_id": "ref-benefits-overview",
@@ -2014,10 +2004,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2729,
-      "completion_tokens": 282,
+      "prompt_tokens": 2649,
+      "completion_tokens": 223,
       "cost_usd": 0.0,
-      "latency_ms": 78447.14458403178,
+      "latency_ms": 5198.8262080121785,
       "context_docs": 11,
       "answer": "The engineering manager of the Platform team is Maya Brooks. [1][2]",
       "cited": [
@@ -2050,19 +2040,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2678,
-      "completion_tokens": 379,
+      "prompt_tokens": 2598,
+      "completion_tokens": 238,
       "cost_usd": 0.0,
-      "latency_ms": 7091.84008394368,
+      "latency_ms": 8355.507209082134,
       "context_docs": 6,
-      "answer": "The per-diem for an L3 employee traveling to Boston is $90 per day. Boston is a Tier 1 city, and the L3 Tier 1 rate is $90. [1]needs_clarification: false, verdict: null, citations: [{\"doc_id\": \"fin-per-diem-table\", \"quote\": \"grade: L3 | city_tier: 1 | example_cities: New York; San Francisco; Boston | per_diem_usd: 90\"}]}",
+      "answer": "The per-diem for an L3 employee travelling to Boston is $90 per day.",
       "cited": [
         {
           "doc_id": "fin-per-diem-table",
@@ -2086,9 +2076,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -2096,17 +2086,13 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2673,
-      "completion_tokens": 379,
+      "prompt_tokens": 2593,
+      "completion_tokens": 272,
       "cost_usd": 0.0,
-      "latency_ms": 5520.837791962549,
+      "latency_ms": 4465.427250019275,
       "context_docs": 6,
-      "answer": "An L2 employee receives a per-diem of $65 per day in Chicago. Chicago is classified as a Tier\u202f2 city, and the Per\u2011Diem Table sets the L2 Tier\u202f2 rate at $65.",
+      "answer": "An L2 employee receives a per-diem of $65 per day in Chicago. Chicago is a Tier 2 city, and the Per-Diem Table lists $65 for L2 in Tier 2.",
       "cited": [
-        {
-          "doc_id": "hr-travel-policy",
-          "quote": "Tier 2: Chicago, Seattle, Los Angeles, Washington DC"
-        },
         {
           "doc_id": "fin-per-diem-table",
           "quote": "grade: L2 | city_tier: 2 | example_cities: Chicago; Seattle; Los Angeles; Washington DC | per_diem_usd: 65"
@@ -2129,9 +2115,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
+      "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 2,
+      "citations": 1,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -2139,17 +2125,13 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2924,
-      "completion_tokens": 381,
+      "prompt_tokens": 2844,
+      "completion_tokens": 212,
       "cost_usd": 0.0,
-      "latency_ms": 77199.73287498578,
+      "latency_ms": 4697.725042002276,
       "context_docs": 6,
-      "answer": "The maximum hotel room rate per night in San Francisco is $275 (excluding taxes). San Francisco is classified as a Tier 1 city, and Tier 1 hotels are capped at $275 per night.",
+      "answer": "The maximum hotel room rate per night in San Francisco is $275 (excluding taxes), as San Francisco is a Tier\u202f1 city.",
       "cited": [
-        {
-          "doc_id": "hr-travel-policy",
-          "quote": "Tier 1: New York, San Francisco, Boston"
-        },
         {
           "doc_id": "hr-travel-policy",
           "quote": "City tier: Tier 1 | Maximum room rate per night: $275"
@@ -2182,12 +2164,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2176,
-      "completion_tokens": 190,
+      "prompt_tokens": 2096,
+      "completion_tokens": 266,
       "cost_usd": 0.0,
-      "latency_ms": 15949.672624934465,
+      "latency_ms": 5210.193541948684,
       "context_docs": 9,
-      "answer": "Tyler Rodriguez is the Security Lead.",
+      "answer": "The Security Lead is Tyler Rodriguez, who is located in Austin.",
       "cited": [
         {
           "doc_id": "org-chart",
@@ -2205,7 +2187,7 @@
       ],
       "facts_ok": true,
       "verdict_expected": null,
-      "verdict": null,
+      "verdict": "yes",
       "verdict_ok": null,
       "answerable": true,
       "needs_clarification": false,
@@ -2214,19 +2196,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2548,
-      "completion_tokens": 258,
+      "prompt_tokens": 2468,
+      "completion_tokens": 391,
       "cost_usd": 0.0,
-      "latency_ms": 12010.648041032255,
+      "latency_ms": 4775.5135839106515,
       "context_docs": 9,
-      "answer": "Release 2026.24 is scheduled for 2026-12-17.",
+      "answer": "Release 2026.24 is scheduled for December 17, 2026. [1] \n\n\"release: 2026.24 | date: 2026-12-17 | freeze_starts: 72 hours before | owner: Maya Park\"",
       "cited": [
         {
           "doc_id": "eng-release-calendar",
@@ -2250,9 +2232,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
+      "citation_precision": 0.6666666666666666,
       "citation_relevance": 1.0,
-      "citations": 2,
+      "citations": 3,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -2260,12 +2242,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1906,
-      "completion_tokens": 703,
+      "prompt_tokens": 1826,
+      "completion_tokens": 719,
       "cost_usd": 0.0,
-      "latency_ms": 13220.224417047575,
+      "latency_ms": 14709.568541962653,
       "context_docs": 6,
-      "answer": "An expense claim above $2,500 requires approval from a Vice President in addition to the direct manager, except for travel booked through VoyageHub (which is pre\u2011approved at booking and needs only manager sign\u2011off at claim time). Claims above $10,000 are processed through Procurement instead of the expense system.",
+      "answer": "For most expense claims above $2,500, a Vice President must approve in addition to the direct manager. However, travel booked through VoyageHub only requires the manager\u2019s sign\u2011off at claim time, and conference attendance up to $3,000 can be approved by the direct manager alone.",
       "cited": [
         {
           "doc_id": "fin-expense-policy",
@@ -2274,6 +2256,10 @@
         {
           "doc_id": "fin-approval-matrix",
           "quote": "item: Expense claim | approver: Vice President | limit_usd: above 2500"
+        },
+        {
+          "doc_id": "fin-approval-matrix",
+          "quote": "item: Conference attendance | approver: Direct manager | limit_usd: 3000"
         }
       ]
     },
@@ -2293,9 +2279,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
+      "citation_precision": 0.5,
       "citation_relevance": 1.0,
-      "citations": 1,
+      "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -2303,13 +2289,17 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2306,
-      "completion_tokens": 321,
+      "prompt_tokens": 2226,
+      "completion_tokens": 374,
       "cost_usd": 0.0,
-      "latency_ms": 10449.78775002528,
+      "latency_ms": 8822.977708070539,
       "context_docs": 6,
-      "answer": "Denver is not listed in Tier 1 or Tier 2, so it falls under Tier 3. The maximum hotel room rate per night for Tier 3 cities is $150 (excluding taxes).",
+      "answer": "Denver is not listed in Tier\u202f1 or Tier\u202f2, so it falls under Tier\u202f3 (\u201cany city not listed above\u201d). The hotel room\u2011rate cap for Tier\u202f3 is $150 per night (excluding taxes).",
       "cited": [
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "Tier 3: Omaha, Tulsa, Boise, Albuquerque, Des Moines and any city not listed above"
+        },
         {
           "doc_id": "hr-travel-policy",
           "quote": "City tier: Tier 3 | Maximum room rate per night: $150"
@@ -2335,23 +2325,23 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2221,
-      "completion_tokens": 248,
+      "prompt_tokens": 2141,
+      "completion_tokens": 247,
       "cost_usd": 0.0,
-      "latency_ms": 7583.473208942451,
+      "latency_ms": 10780.791457975283,
       "context_docs": 7,
-      "answer": "Full-time employees accrue 16 days of annual leave per calendar year. Part-time employees accrue pro rata. [1] The leave is credited each pay period in equal parts. [1] You must request leave through the HR portal at least three working days in advance for absences longer than one day. [1]",
+      "answer": "Full-time employees receive 16 days of annual leave per calendar year, accrued equally each pay period. Part-time employees accrue a pro\u2011rata amount.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
-          "quote": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts. Part-time employees accrue pro rata. Leave is requested through the HR portal at least three working days in advance for absences longer than one day"
+          "quote": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts. Part-time employees accrue pro rata"
         }
       ]
     },
@@ -2374,19 +2364,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 1,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2396,
-      "completion_tokens": 290,
+      "prompt_tokens": 2316,
+      "completion_tokens": 305,
       "cost_usd": 0.0,
-      "latency_ms": 36687.56495800335,
+      "latency_ms": 4193.413208937272,
       "context_docs": 8,
-      "answer": "Yes, part-time employees accrue annual leave on a pro rata basis. The Leave Policy v2 states that full-time employees accrue 16 days per year and \"Part-time employees accrue pro rata.\"",
+      "answer": "Yes. Part\u2011time employees accrue annual leave on a pro\u2011rata basis. [1] The Leave Policy v2 states that full\u2011time employees receive 16 days per year and that \u201cPart\u2011time employees accrue pro rata.\u201d [1] References: [1] Leave Policy v2, section 2: \u201cFull\u2011time employees accrue 16 days of annual leave per calendar year\u2026 Part\u2011time employees accrue pro rata.\u201d",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
@@ -2412,24 +2402,28 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
+      "citations": 2,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2091,
-      "completion_tokens": 229,
+      "prompt_tokens": 2011,
+      "completion_tokens": 785,
       "cost_usd": 0.0,
-      "latency_ms": 75147.2147499444,
+      "latency_ms": 16204.37612500973,
       "context_docs": 6,
-      "answer": "No, unused annual leave is not paid out as a matter of company policy, except where state law requires it.",
+      "answer": "Unused annual leave is not paid out, except where state law requires it. [1][2] The policy states that leave is not paid out except where state law requires it, and the exit process confirms that unused leave is paid out only where the state requires it.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
           "quote": "Leave is not paid out except where state law requires it"
+        },
+        {
+          "doc_id": "hr-notice-and-exit",
+          "quote": "unused leave is paid out where the state requires it"
         }
       ]
     },
@@ -2459,12 +2453,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2713,
-      "completion_tokens": 268,
+      "prompt_tokens": 2633,
+      "completion_tokens": 189,
       "cost_usd": 0.0,
-      "latency_ms": 4846.085000084713,
+      "latency_ms": 3167.759457952343,
       "context_docs": 10,
-      "answer": "Managers should respond to leave requests within two working days. [1] The Leave Policy v2 states this in its Approval section. [1] The policy also notes that leave of more than ten consecutive working days requires department head approval. [1] The HR FAQ references the Leave Policy for entitlements but does not specify the response time. The current date does not affect this rule.",
+      "answer": "Managers should respond to leave requests within two working days. [1] The Leave Policy v2 states this in its approval section.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
@@ -2489,9 +2483,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.3333333333333333,
+      "citation_precision": 0.25,
       "citation_relevance": 1.0,
-      "citations": 3,
+      "citations": 4,
       "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
@@ -2499,12 +2493,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2399,
-      "completion_tokens": 576,
+      "prompt_tokens": 2319,
+      "completion_tokens": 1153,
       "cost_usd": 0.0,
-      "latency_ms": 10049.752832972445,
+      "latency_ms": 23014.103749999776,
       "context_docs": 7,
-      "answer": "Leave Policy v1 provided 12 days of annual leave and 8 days of sick leave per calendar year for full\u2011time employees. It has been superseded by Leave Policy v2 effective 2025\u201104\u201101 and is no longer valid. [1][2]",
+      "answer": "Leave Policy v1 provided 12 days of annual leave, 8 days of sick leave, and 11 paid holidays per year. It is no longer valid; it was superseded by Leave Policy v2 effective 2025\u201104\u201101, though balances accrued under v1 before that date are preserved. [1][2][3][4]",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v1",
@@ -2513,6 +2507,10 @@
         {
           "doc_id": "hr-leave-policy-v1",
           "quote": "Employees receive 8 days of sick leave per year"
+        },
+        {
+          "doc_id": "hr-leave-policy-v1",
+          "quote": "The company observes 11 paid holidays per year"
         },
         {
           "doc_id": "hr-leave-policy-v2",
@@ -2541,19 +2539,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2136,
-      "completion_tokens": 498,
+      "prompt_tokens": 2056,
+      "completion_tokens": 1045,
       "cost_usd": 0.0,
-      "latency_ms": 23487.379000056535,
+      "latency_ms": 26226.72350006178,
       "context_docs": 6,
-      "answer": "Under the current policy, secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption. A scheduled revision taking effect on 2027-01-01 will increase this to 26 weeks of fully paid leave for births and adoptions on or after that date.",
+      "answer": "As of today (2026-11-17), secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption [1]. Effective January 1, 2027, this will increase to 26 weeks of fully paid leave for births and adoptions on or after that date [2].",
       "cited": [
         {
           "doc_id": "hr-parental-leave-policy",
@@ -2581,30 +2579,30 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2169,
-      "completion_tokens": 483,
+      "prompt_tokens": 2089,
+      "completion_tokens": 830,
       "cost_usd": 0.0,
-      "latency_ms": 10279.518499970436,
+      "latency_ms": 16158.729665912688,
       "context_docs": 6,
-      "answer": "For a baby due in March\u202f2027, you will be eligible for 26 weeks of fully paid secondary caregiver leave under the 2027 revision, which takes effect for births on or after 2027\u201101\u201101. The leave may be split into two blocks within the first twelve months.",
+      "answer": "For a baby due in March\u202f2027, the 2027 revision of the Parental Leave Policy applies because it takes effect on 2027\u201101\u201101 and covers births on or after that date. As a secondary caregiver you will receive 26\u202fweeks of fully paid leave (up from the current 12\u202fweeks). The leave may be split into two blocks within the first twelve months, and all other terms of the 2024 policy continue to apply. [1][2]",
       "cited": [
         {
           "doc_id": "hr-parental-leave-policy-2027",
           "quote": "Following the 2026 benefits review, secondary caregiver leave increases from 12 weeks to 26 weeks fully paid for births and adoptions on or after 2027-01-01"
         },
         {
-          "doc_id": "hr-parental-leave-policy-2027",
-          "quote": "The leave may be split into two blocks within the first twelve months"
+          "doc_id": "hr-parental-leave-policy",
+          "quote": "Fathers and secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption"
         }
       ]
     },
@@ -2626,45 +2624,6 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
-      "dropped_citations": 0,
-      "unsupported": false,
-      "stale_only": false,
-      "error": null,
-      "cached": false,
-      "llm_calls": 1,
-      "prompt_tokens": 2104,
-      "completion_tokens": 336,
-      "cost_usd": 0.0,
-      "latency_ms": 5225.619915989228,
-      "context_docs": 6,
-      "answer": "Birth parents receive 16 weeks of fully paid leave, which runs concurrently with any FMLA entitlement. Up to four weeks of that leave may be taken before the expected due date.",
-      "cited": [
-        {
-          "doc_id": "hr-parental-leave-policy",
-          "quote": "Birth parents receive 16 weeks of fully paid leave, which runs concurrently with any FMLA entitlement. Up to four weeks may be taken before the expected due date"
-        }
-      ]
-    },
-    {
-      "id": "fut-04",
-      "category": "future",
-      "expect": "answer",
-      "passed": false,
-      "facts": [
-        true
-      ],
-      "facts_ok": true,
-      "verdict_expected": "no",
-      "verdict": null,
-      "verdict_ok": false,
-      "answerable": true,
-      "needs_clarification": false,
-      "false_refusal": false,
-      "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 1.0,
       "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
@@ -2673,12 +2632,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2222,
-      "completion_tokens": 544,
+      "prompt_tokens": 2024,
+      "completion_tokens": 356,
       "cost_usd": 0.0,
-      "latency_ms": 47265.11091704015,
+      "latency_ms": 14237.85187501926,
       "context_docs": 6,
-      "answer": "Under the current Parental Leave Policy (effective 2024-04-01), the handbook does not mention splitting parental leave into multiple blocks. A 2027 revision, which takes effect on 2027-01-01, will allow leave to be split into two blocks within the first twelve months, but only for births or adoptions on or after that date.",
+      "answer": "A birth parent receives 16 weeks of fully paid leave, which runs concurrently with any FMLA entitlement. Up to four of those weeks may be taken before the expected due date. The upcoming 2027 revision leaves birth parent leave unchanged at 16 weeks.",
       "cited": [
         {
           "doc_id": "hr-parental-leave-policy",
@@ -2686,7 +2645,54 @@
         },
         {
           "doc_id": "hr-parental-leave-policy-2027",
-          "quote": "The leave may be split into two blocks within the first twelve months. All other terms of the 2024 policy continue to apply"
+          "quote": "Birth parent leave is unchanged at 16 weeks"
+        }
+      ]
+    },
+    {
+      "id": "fut-04",
+      "category": "future",
+      "expect": "answer",
+      "passed": true,
+      "facts": [
+        true
+      ],
+      "facts_ok": true,
+      "verdict_expected": "no",
+      "verdict": "no",
+      "verdict_ok": true,
+      "answerable": true,
+      "needs_clarification": false,
+      "false_refusal": false,
+      "citation_support": true,
+      "citation_precision": 0.6666666666666666,
+      "citation_relevance": 1.0,
+      "citations": 3,
+      "has_markers": false,
+      "dropped_citations": 0,
+      "unsupported": false,
+      "stale_only": false,
+      "error": null,
+      "cached": false,
+      "llm_calls": 1,
+      "prompt_tokens": 2142,
+      "completion_tokens": 753,
+      "cost_usd": 0.0,
+      "latency_ms": 19335.976333008148,
+      "context_docs": 6,
+      "answer": "Under the current Parental Leave Policy (effective 2024\u201104\u201101), there is no provision for splitting parental leave into two blocks. The upcoming 2027 revision, which takes effect on 2027\u201101\u201101, will allow the leave to be split into two blocks within the first twelve months, but that change does not apply until its effective date.",
+      "cited": [
+        {
+          "doc_id": "hr-parental-leave-policy",
+          "quote": "Birth parents receive 16 weeks of fully paid leave, which runs concurrently with any FMLA entitlement. Up to four weeks may be taken before the expected due date"
+        },
+        {
+          "doc_id": "hr-parental-leave-policy-2027",
+          "quote": "The leave may be split into two blocks within the first twelve months"
+        },
+        {
+          "doc_id": "notes-allhands-2026-09",
+          "quote": "Jamal Rivera reminded everyone that the 2027 parental leave revision does not apply until its effective date"
         }
       ]
     },
@@ -2706,30 +2712,34 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
-      "citation_relevance": 0.5,
-      "citations": 2,
-      "has_markers": false,
-      "dropped_citations": 1,
+      "citation_precision": 0.6666666666666666,
+      "citation_relevance": 0.6666666666666666,
+      "citations": 3,
+      "has_markers": true,
+      "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2285,
-      "completion_tokens": 1392,
+      "prompt_tokens": 2205,
+      "completion_tokens": 827,
       "cost_usd": 0.0,
-      "latency_ms": 33981.64250003174,
+      "latency_ms": 16011.859916965477,
       "context_docs": 6,
-      "answer": "Under the current Parental Leave Policy (2024), secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth. Because your baby is born on December\u202f20\u202f2026 \u2014 before the 2027 revision\u2019s effective date of January\u202f1\u202f2027 \u2014 the 12\u2011week entitlement applies. The 2027 revision increases secondary caregiver leave to 26 weeks, but only for births on or after 2027\u201101\u201101.",
+      "answer": "Your secondary caregiver leave is 12 weeks. The current Parental Leave Policy provides 12 weeks of fully paid leave for secondary caregivers, to be taken within six months of the birth [1]. The 2027 revision increases this to 26 weeks, but only for births on or after 2027\u201101\u201101 [2]; your baby\u2019s birth on 2026\u201112\u201120 falls under the current policy [3].",
       "cited": [
+        {
+          "doc_id": "hr-parental-leave-policy",
+          "quote": "Fathers and secondary caregivers receive 12 weeks of fully paid leave, to be taken within six months of the birth or adoption"
+        },
         {
           "doc_id": "hr-parental-leave-policy-2027",
           "quote": "Following the 2026 benefits review, secondary caregiver leave increases from 12 weeks to 26 weeks fully paid for births and adoptions on or after 2027-01-01"
         },
         {
           "doc_id": "notes-people-2026-06",
-          "quote": "Secondary caregiver leave will increase to 26 weeks for births on or after 2027-01-01; policy document published separately"
+          "quote": "Secondary caregiver leave will increase to 26 weeks for births on or after 2027-01-01"
         }
       ]
     },
@@ -2752,19 +2762,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2073,
-      "completion_tokens": 310,
+      "prompt_tokens": 1993,
+      "completion_tokens": 366,
       "cost_usd": 0.0,
-      "latency_ms": 19253.27141699381,
+      "latency_ms": 6725.652499939315,
       "context_docs": 6,
-      "answer": "The one-click rollback window is 45 minutes after full rollout completes.",
+      "answer": "The one-click rollback window is 45 minutes after full rollout completes. [1][2] After that window, rollback requires a new deploy of the previous version following the Rollback Procedure.",
       "cited": [
         {
           "doc_id": "eng-deploy-runbook",
@@ -2802,12 +2812,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2067,
-      "completion_tokens": 367,
+      "prompt_tokens": 1987,
+      "completion_tokens": 294,
       "cost_usd": 0.0,
-      "latency_ms": 11383.192708017305,
+      "latency_ms": 6122.388500021771,
       "context_docs": 6,
-      "answer": "The deploy freeze starts 72 hours before every scheduled release. This is stated in the Production Deploy Runbook, confirmed by the Release Calendar entries, and reiterated in the September 2026 All-Hands summary.",
+      "answer": "The deploy freeze starts 72 hours before every scheduled release.",
       "cited": [
         {
           "doc_id": "eng-deploy-runbook",
@@ -2815,7 +2825,7 @@
         },
         {
           "doc_id": "eng-release-calendar",
-          "quote": "release: 2026.21 | date: 2026-11-05 | freeze_starts: 72 hours before | owner: Maya Park"
+          "quote": "freeze_starts: 72 hours before"
         },
         {
           "doc_id": "notes-allhands-2026-09",
@@ -2840,34 +2850,26 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.6666666666666666,
-      "citation_relevance": 0.6666666666666666,
-      "citations": 3,
-      "has_markers": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 1,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1968,
-      "completion_tokens": 438,
+      "prompt_tokens": 1888,
+      "completion_tokens": 305,
       "cost_usd": 0.0,
-      "latency_ms": 61160.334333078936,
+      "latency_ms": 3922.0635410165414,
       "context_docs": 6,
-      "answer": "Yes, production deploys go through a canary stage (5\u202f% of traffic for ten minutes) before full rollout. [1] The rollback procedure also requires following the same canary stage. [2] Meeting notes confirm the ten\u2011minute canary was retained. [3]\u200b",
+      "answer": "Yes, production deploys go through a canary stage that routes 5 percent of traffic for ten minutes before proceeding to full rollout.",
       "cited": [
         {
           "doc_id": "eng-deploy-runbook",
           "quote": "Deploys go through the canary stage (5 percent of traffic) for ten minutes, then to full rollout"
-        },
-        {
-          "doc_id": "eng-rollback-procedure",
-          "quote": "Follow the canary stage exactly as for a normal deploy"
-        },
-        {
-          "doc_id": "notes-platform-2026-03",
-          "quote": "Keep the canary stage at ten minutes; the proposal to shorten it to five was rejected after the February incident"
         }
       ]
     },
@@ -2891,19 +2893,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": true,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1847,
-      "completion_tokens": 444,
+      "prompt_tokens": 1767,
+      "completion_tokens": 452,
       "cost_usd": 0.0,
-      "latency_ms": 11812.157874926925,
+      "latency_ms": 8307.273000013083,
       "context_docs": 5,
-      "answer": "The 2023 Production Deploy Runbook stated that a deploy could be rolled back with a single click in the deploy console for 10 minutes after rollout completes; after that window, rollback required a new deploy of the previous version [1]. That runbook is deprecated. The current in\u2011force runbook extends the one\u2011click rollback window to 45 minutes after full rollout completes, after which a rollback follows the Rollback Procedure [2].",
+      "answer": "The 2023 deploy runbook (deprecated) stated that a deploy could be rolled back with a single click in the deploy console for 10 minutes after rollout completes; after that window, rollback required a new deploy of the previous version. This document is deprecated; the current runbook (effective 2025\u201108\u201101) extends the one\u2011click rollback window to 45 minutes after full rollout and references a separate Rollback Procedure for rollbacks after that window.",
       "cited": [
         {
           "doc_id": "eng-deploy-runbook-2023",
@@ -2942,24 +2944,24 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2569,
-      "completion_tokens": 562,
+      "prompt_tokens": 2489,
+      "completion_tokens": 672,
       "cost_usd": 0.0,
-      "latency_ms": 7493.8588750083,
+      "latency_ms": 9469.686249969527,
       "context_docs": 9,
-      "answer": "No. The home office allowance becomes available only after you complete the 6\u2011month introductory period and receive confirmation. Since you joined two months ago, you are still within that period and cannot claim the allowance yet. [1][2][3]",
+      "answer": "No, you cannot claim the home office allowance yet. The allowance is only available after you complete the 6\u2011month introductory period and receive confirmation. Since you joined two months ago, you are still within that period.[1][2][3]",
       "cited": [
         {
           "doc_id": "hr-remote-work-policy",
           "quote": "A one-time home office allowance of $1,000 is available after the introductory period. Claim it under the WFH Equipment Policy"
         },
         {
-          "doc_id": "hr-probation-policy",
-          "quote": "New hires serve an introductory period, also called probation, of 6 months from their start date. Employment remains at will throughout; the introductory period sets expectations for feedback, not a contract term.\nA review is held in the final month. The manager records the outcome in the HR portal: confirm, extend by up to three months, or end employment. Extension needs the department head's sign-off.\nRemote work and the home office allowance become available on confirmation"
-        },
-        {
           "doc_id": "hr-wfh-equipment",
           "quote": "After the introductory period you may claim up to $1,000 once for a desk, chair, monitor or similar home office equipment"
+        },
+        {
+          "doc_id": "hr-probation-policy",
+          "quote": "Remote work and the home office allowance become available on confirmation"
         }
       ]
     },
@@ -2982,20 +2984,20 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 3,
-      "has_markers": true,
+      "citations": 2,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2693,
-      "completion_tokens": 820,
+      "prompt_tokens": 2613,
+      "completion_tokens": 357,
       "cost_usd": 0.0,
-      "latency_ms": 14999.359708977863,
+      "latency_ms": 16493.747833068483,
       "context_docs": 10,
-      "answer": "No. Remote work is only available after you complete the introductory period (6 months) and receive confirmation. During your first month you are still in the introductory period, so the remote\u2011work eligibility does not yet apply. [1][2] The onboarding checklist also assumes you will be on\u2011site for week one activities such as collecting your laptop from IT. [3]",
+      "answer": "No. The Remote Work Policy states that employees may work remotely up to 2 days per week only after the introductory period, and the Introductory Period Policy specifies that remote work becomes available on confirmation, which occurs after the 6\u2011month introductory period. Therefore, during your first month you are still in the introductory period and are not eligible for remote work.",
       "cited": [
         {
           "doc_id": "hr-remote-work-policy",
@@ -3004,10 +3006,6 @@
         {
           "doc_id": "hr-probation-policy",
           "quote": "Remote work and the home office allowance become available on confirmation"
-        },
-        {
-          "doc_id": "ref-onboarding-checklist",
-          "quote": "Week one: collect your laptop from IT, set up SSO and multi-factor authentication, install the VPN client, read the Code of Conduct, the Password Policy and the Security Incident Reporting process, and meet your onboarding buddy"
         }
       ]
     },
@@ -3031,31 +3029,31 @@
       "citation_precision": 0.6666666666666666,
       "citation_relevance": 0.6666666666666666,
       "citations": 3,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2379,
-      "completion_tokens": 498,
+      "prompt_tokens": 2299,
+      "completion_tokens": 441,
       "cost_usd": 0.0,
-      "latency_ms": 17985.556708998047,
+      "latency_ms": 17863.782207947224,
       "context_docs": 9,
-      "answer": "To access the fleet console you need two things: a working VPN connection (installed on your company laptop, signed in with SSO and a hardware key or authenticator app) and the fleet\u2011operator role, which is granted through the Access Request Process. Submit a request in the IT portal; it will be routed to the system owner for approval with your manager copied, and standard requests are fulfilled within 48 hours of approval. The VPN is required for any access to the fleet console from outside the office network.",
+      "answer": "To access the fleet console, you need a VPN connection and the fleet\u2011operator role. The role is granted through the Access Request Process: submit a request in the IT portal, which is routed to the system owner for approval with your manager copied. Standard requests are fulfilled within 48 hours of approval. The VPN client is installed on company laptops and requires SSO credentials plus a hardware key or authenticator app. [1][2][3]\"",
       "cited": [
         {
           "doc_id": "eng-fleet-console-guide",
           "quote": "Access requires the VPN and the fleet-operator role granted through the Access Request Process"
         },
         {
-          "doc_id": "it-vpn-guide",
-          "quote": "The VPN is required for any access to internal dashboards, the robot fleet console, and the code hosting platform from outside the office network"
-        },
-        {
           "doc_id": "it-access-request",
           "quote": "Request access to systems through the IT portal. Each request is routed to the system owner for approval; your manager is copied. Standard requests are fulfilled within 48 hours of approval"
+        },
+        {
+          "doc_id": "it-vpn-guide",
+          "quote": "The VPN client is installed on every company laptop. Sign in with your SSO credentials and a hardware key or authenticator app"
         }
       ]
     },
@@ -3078,21 +3076,25 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
+      "citations": 2,
       "has_markers": false,
-      "dropped_citations": 1,
+      "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2712,
-      "completion_tokens": 448,
+      "prompt_tokens": 2632,
+      "completion_tokens": 336,
       "cost_usd": 0.0,
-      "latency_ms": 39574.49929206632,
+      "latency_ms": 9459.013917017728,
       "context_docs": 6,
-      "answer": "For an L4 employee traveling to Seattle (Tier\u202f2), the hotel room rate cap is $200 per night (excluding taxes) and the daily per\u2011diem allowance is $85. The per\u2011diem covers meals and local transport and does not require receipts.",
+      "answer": "For an L4 employee traveling to Seattle (Tier 2), the hotel room rate cap is $200 per night (excluding taxes) and the daily per\u2011diem allowance is $85.",
       "cited": [
+        {
+          "doc_id": "hr-travel-policy",
+          "quote": "City tier: Tier 2 | Maximum room rate per night: $200"
+        },
         {
           "doc_id": "fin-per-diem-table",
           "quote": "grade: L4 | city_tier: 2 | example_cities: Chicago; Seattle; Los Angeles; Washington DC | per_diem_usd: 85"
@@ -3115,9 +3117,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.3333333333333333,
+      "citation_precision": 0.5,
       "citation_relevance": 1.0,
-      "citations": 3,
+      "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -3125,12 +3127,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2170,
-      "completion_tokens": 451,
+      "prompt_tokens": 2090,
+      "completion_tokens": 438,
       "cost_usd": 0.0,
-      "latency_ms": 16890.497124986723,
+      "latency_ms": 24758.153041941114,
       "context_docs": 9,
-      "answer": "Report the lost phone immediately to security@northgate.example and post in the #security-incidents Slack channel. The Security team will acknowledge within one business hour and tell you what to preserve. Since the phone was enrolled in mobile device management, IT can remotely wipe only the company data on it.",
+      "answer": "You should report the lost phone immediately as a security incident: email security@northgate.example and post in the #security-incidents Slack channel. The Security team will acknowledge within one hour during business hours and tell you what to preserve. Since the phone was enrolled in mobile device management, IT can remotely wipe only the company data on it. Do not try to investigate on your own; early reporting is never penalized.",
       "cited": [
         {
           "doc_id": "it-byod-policy",
@@ -3139,10 +3141,6 @@
         {
           "doc_id": "it-incident-reporting",
           "quote": "If you suspect a security incident, such as a phishing email you clicked, a lost device, or unexpected access to a system, report it immediately to security@northgate.example and post in #security-incidents"
-        },
-        {
-          "doc_id": "it-byod-policy",
-          "quote": "Personal phones may access email and Slack after enrolling in mobile device management, which lets IT wipe company data only"
         }
       ]
     },
@@ -3172,12 +3170,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2784,
-      "completion_tokens": 588,
+      "prompt_tokens": 2704,
+      "completion_tokens": 350,
       "cost_usd": 0.0,
-      "latency_ms": 11615.763791953214,
+      "latency_ms": 10123.453250038438,
       "context_docs": 6,
-      "answer": "An L1 employee visiting the Denver office would receive a per-diem of $40 per day. Denver is not listed in Tier 1 or Tier 2, so it falls under Tier 3 (\"any city not listed above\"), and the Per-Diem Table sets the L1 Tier 3 rate at $40.",
+      "answer": "An L1 employee visiting the Denver office would receive a per-diem of $40 per day. Denver is not listed in the example cities for Tier 1 or Tier 2, so it falls under Tier 3 (\"any city not listed above\"), and the Per-Diem Table sets the L1 Tier 3 rate at $40.",
       "cited": [
         {
           "doc_id": "hr-travel-policy",
@@ -3216,12 +3214,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2276,
-      "completion_tokens": 406,
+      "prompt_tokens": 2196,
+      "completion_tokens": 419,
       "cost_usd": 0.0,
-      "latency_ms": 6303.043041960336,
+      "latency_ms": 8440.963124972768,
       "context_docs": 6,
-      "answer": "Internal incident channel updates are required at least every 30 minutes for a SEV1. Customer\u2011facing status page updates go out at least hourly.",
+      "answer": "For a SEV1, internal incident channel updates are required at least every 30 minutes, and customer\u2011facing status page updates go out at least hourly.",
       "cited": [
         {
           "doc_id": "eng-oncall-runbook",
@@ -3260,12 +3258,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2612,
-      "completion_tokens": 937,
+      "prompt_tokens": 2532,
+      "completion_tokens": 1149,
       "cost_usd": 0.0,
-      "latency_ms": 13952.210540999658,
+      "latency_ms": 38900.599416927435,
       "context_docs": 8,
-      "answer": "Yes. Your direct manager can approve a $2,800 conference because the annual conference budget is $3,000 and the approval matrix sets the direct manager\u2019s limit for conference attendance at $3,000. Since $2,800 is within both limits, no additional approval is required.",
+      "answer": "Yes. The Budget Approval Matrix lists conference attendance with a $3,000 limit approved by your direct manager, and the Training and Conference Policy states your manager approves spend within the $3,000 annual budget.",
       "cited": [
         {
           "doc_id": "fin-approval-matrix",
@@ -3304,12 +3302,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2035,
-      "completion_tokens": 368,
+      "prompt_tokens": 1955,
+      "completion_tokens": 600,
       "cost_usd": 0.0,
-      "latency_ms": 7437.6101669622585,
+      "latency_ms": 18775.60520893894,
       "context_docs": 8,
-      "answer": "You must report a lost laptop to IT and the Security team within 24\u202fhours (per the Laptop and Hardware Policy) and also report it immediately as a security incident (per the Security Incident Reporting process).",
+      "answer": "The Laptop and Hardware Policy requires you to report a lost or stolen laptop to IT and the Security team within 24 hours. The Security Incident Reporting policy says to report a lost device immediately. Both policies apply.",
       "cited": [
         {
           "doc_id": "it-laptop-policy",
@@ -3339,7 +3337,7 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 2,
+      "citations": 1,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -3347,20 +3345,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2286,
-      "completion_tokens": 734,
+      "prompt_tokens": 2206,
+      "completion_tokens": 702,
       "cost_usd": 0.0,
-      "latency_ms": 27893.72875005938,
+      "latency_ms": 17937.361208023503,
       "context_docs": 6,
-      "answer": "No. A trip booked through VoyageHub is pre\u2011approved at booking time and only requires manager sign\u2011off when the claim is submitted, even if the amount exceeds $2,500. The Expense Policy explicitly exempts VoyageHub travel from the VP approval requirement, and the VoyageHub Booking Guide states that such travel does not need a separate expense claim or VP approval.",
+      "answer": "No. A $4,000 trip booked through VoyageHub does not require Vice President approval. The Expense Policy states that travel booked through VoyageHub is pre\u2011approved at booking time and needs only manager sign\u2011off at claim time, even for claims above $2,500.",
       "cited": [
         {
           "doc_id": "fin-expense-policy",
-          "quote": "Claims above $2,500 require approval from a Vice President in addition to your manager, except travel that was booked through VoyageHub, which is pre-approved at booking time and needs only manager sign-off at claim time"
-        },
-        {
-          "doc_id": "hr-travel-booking-guide",
-          "quote": "Receipts for hotel stays are attached in VoyageHub, not in the expense system, so travel booked in VoyageHub does not need a separate expense claim or VP approval"
+          "quote": "Claims up to $2,500 are approved by your direct manager.\nClaims above $2,500 require approval from a Vice President in addition to your manager, except travel that was booked through VoyageHub, which is pre-approved at booking time and needs only manager sign-off at claim time"
         }
       ]
     },
@@ -3391,16 +3385,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2523,
-      "completion_tokens": 661,
+      "prompt_tokens": 2443,
+      "completion_tokens": 538,
       "cost_usd": 0.0,
-      "latency_ms": 79989.29970804602,
+      "latency_ms": 15297.59162501432,
       "context_docs": 10,
-      "answer": "No, you cannot deploy to production today. A deploy freeze is in effect because release 2026.22 is scheduled for 2026\u201111\u201119, and the freeze starts 72\u202fhours before each release (i.e., from 2026\u201111\u201116 onward). Freeze exceptions require the on\u2011call manager\u2019s approval in #deploys.",
+      "answer": "No, you cannot deploy to production today. Today (2026-11-17) falls within the 72-hour deploy freeze before the scheduled release 2026.22 on 2026-11-19. The freeze started on 2026-11-16. Deploy exceptions require the on-call manager's approval in #deploys.",
       "cited": [
         {
           "doc_id": "eng-deploy-runbook",
-          "quote": "A deploy freeze starts 72 hours before every scheduled release and during declared incidents. Freeze exceptions need the on-call manager's approval in #deploys"
+          "quote": "Deploys to production happen on weekdays between 10:00 and 15:00 Central Time. A deploy freeze starts 72 hours before every scheduled release and during declared incidents. Freeze exceptions need the on-call manager's approval in #deploys"
         },
         {
           "doc_id": "eng-release-calendar",
@@ -3434,12 +3428,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2354,
-      "completion_tokens": 312,
+      "prompt_tokens": 2274,
+      "completion_tokens": 453,
       "cost_usd": 0.0,
-      "latency_ms": 16293.547916924581,
+      "latency_ms": 9555.256708990782,
       "context_docs": 7,
-      "answer": "The next scheduled release is 2026.22 on 2026\u201111\u201119, owned by Maya Park.",
+      "answer": "The next scheduled release is version 2026.22 on November 19, 2026.",
       "cited": [
         {
           "doc_id": "eng-release-calendar",
@@ -3473,16 +3467,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2075,
-      "completion_tokens": 340,
+      "prompt_tokens": 1995,
+      "completion_tokens": 359,
       "cost_usd": 0.0,
-      "latency_ms": 16113.948500016704,
+      "latency_ms": 9440.370416035876,
       "context_docs": 6,
-      "answer": "The handbook states that the company observes 11 paid holidays per year and that the dated list is in the Holiday Calendar CSV, but that CSV is not provided in the available documents. Therefore, the specific holiday dates for 2026 are not covered in the retrieved materials.",
+      "answer": "The handbook states that the company observes 11 paid holidays per year and that the dated list is in the Holiday Calendar CSV, but that CSV is not provided in the available documents. It also mentions two optional floating holidays per year chosen by the employee.",
       "cited": [
         {
           "doc_id": "hr-working-hours-holidays",
-          "quote": "The company observes 11 paid holidays per year; the dated list is in the Holiday Calendar CSV"
+          "quote": "The company observes 11 paid holidays per year; the dated list is in the Holiday Calendar CSV. Optional floating holidays: two per year, chosen by the employee"
         }
       ]
     },
@@ -3512,12 +3506,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2122,
-      "completion_tokens": 744,
+      "prompt_tokens": 2042,
+      "completion_tokens": 722,
       "cost_usd": 0.0,
-      "latency_ms": 26489.65166695416,
+      "latency_ms": 20007.825707900338,
       "context_docs": 7,
-      "answer": "According to the Laptop and Hardware Policy, approval for a replacement laptop comes from the employee's team engineering manager; IT does not approve replacements itself. The Handbook FAQ confirms that you raise a request in the IT portal and your team's engineering manager approves it. Since you work in Finance, the same rule applies: your team's engineering manager is the approver. If your team does not have an engineering manager, the handbook does not specify an alternative approver.",
+      "answer": "According to the IT Laptop Policy, approval for a laptop replacement comes from the employee's team engineering manager; IT does not approve replacements itself. The Handbook FAQ confirms that you raise a request in the IT portal and your team's engineering manager approves it.",
       "cited": [
         {
           "doc_id": "it-laptop-policy",
@@ -3547,7 +3541,7 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 1,
+      "citations": 2,
       "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
@@ -3555,16 +3549,20 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 4542,
-      "completion_tokens": 555,
+      "prompt_tokens": 4462,
+      "completion_tokens": 507,
       "cost_usd": 0.0,
-      "latency_ms": 13661.682416102849,
+      "latency_ms": 8103.635082952678,
       "context_docs": 14,
-      "answer": "Harassment complaints are handled by People Operations and Legal under the Anti-Harassment Policy, according to the Grievance Policy. The provided handbook documents do not include the Anti-Harassment Policy itself or specify where to find it.",
+      "answer": "According to the Grievance Policy, harassment complaints are handled by People Operations and Legal under the Anti-Harassment Policy. The Code of Conduct says to report concerns through your manager, People Operations, or the anonymous Speak Up form linked from the HR portal. The Anti-Harassment Policy itself is referenced but not included in the provided handbook documents.",
       "cited": [
         {
           "doc_id": "hr-grievance-policy",
           "quote": "Harassment complaints are handled by People Operations and Legal under the Anti-Harassment Policy, separately and confidentially"
+        },
+        {
+          "doc_id": "hr-code-of-conduct",
+          "quote": "Report concerns through your manager, People Operations, or the anonymous Speak Up form linked from the HR portal"
         }
       ]
     },
@@ -3592,12 +3590,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 3527,
-      "completion_tokens": 347,
+      "prompt_tokens": 3447,
+      "completion_tokens": 300,
       "cost_usd": 0.0,
-      "latency_ms": 18035.747791989706,
+      "latency_ms": 4656.520333024673,
       "context_docs": 13,
-      "answer": "The handbook does not specify who the dental insurance provider is. The Benefits Overview mentions that medical, dental, and vision insurance are offered with the company paying 90% of the employee premium, but it does not name the provider.",
+      "answer": "The handbook mentions dental insurance as a benefit but does not specify who the provider is.",
       "cited": [
         {
           "doc_id": "ref-benefits-overview",
@@ -3621,21 +3619,46 @@
       "citation_support": null,
       "citation_precision": null,
       "citation_relevance": null,
-      "citations": 0,
-      "has_markers": false,
+      "citations": 6,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2038,
-      "completion_tokens": 285,
+      "prompt_tokens": 1958,
+      "completion_tokens": 1230,
       "cost_usd": 0.0,
-      "latency_ms": 15398.712916998193,
+      "latency_ms": 23139.90508299321,
       "context_docs": 6,
-      "answer": "The provided handbook documents do not mention bereavement leave.",
-      "cited": []
+      "answer": "The handbook does not specify bereavement leave entitlements. The Leave Policy v2 only covers annual leave (16 days per year) and sick leave (8 days per year), and no other provided document mentions bereavement leave. [1] [2] [3] [4] [5] [6]\"",
+      "cited": [
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "This policy sets out paid time off entitlements for full-time employees of Northgate Robotics in the United States. It was revised after the 2025 engagement survey to bring annual leave in line with the industry median"
+        },
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts"
+        },
+        {
+          "doc_id": "hr-leave-policy-v2",
+          "quote": "Employees receive 8 days of sick leave per year"
+        },
+        {
+          "doc_id": "hr-parental-leave-policy",
+          "quote": "Birth parents receive 16 weeks of fully paid leave, which runs concurrently with any FMLA entitlement"
+        },
+        {
+          "doc_id": "hr-notice-and-exit",
+          "quote": "Employment is at will. When resigning, employees are asked to give 4 weeks' notice so that work can be handed over; during the introductory period one week is sufficient"
+        },
+        {
+          "doc_id": "hr-grievance-policy",
+          "quote": "Raise a grievance in writing to People Operations. You will receive an acknowledgement within two working days and a meeting within ten working days"
+        }
+      ]
     },
     {
       "id": "miss-04",
@@ -3661,12 +3684,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2407,
-      "completion_tokens": 265,
+      "prompt_tokens": 2327,
+      "completion_tokens": 277,
       "cost_usd": 0.0,
-      "latency_ms": 9223.67904195562,
+      "latency_ms": 6282.524666981772,
       "context_docs": 9,
-      "answer": "The handbook does not cover the Wi\u2011Fi password for the Austin office.",
+      "answer": "The handbook does not cover the Wi-Fi password for the Austin office.",
       "cited": []
     },
     {
@@ -3693,12 +3716,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2313,
-      "completion_tokens": 116,
+      "prompt_tokens": 2233,
+      "completion_tokens": 239,
       "cost_usd": 0.0,
-      "latency_ms": 3420.6640829797834,
+      "latency_ms": 10098.81358302664,
       "context_docs": 8,
-      "answer": "The handbook does not cover weather forecasts.",
+      "answer": "The handbook does not contain any information about weather forecasts.",
       "cited": []
     },
     {
@@ -3729,12 +3752,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 1689,
-      "completion_tokens": 458,
+      "prompt_tokens": 1609,
+      "completion_tokens": 506,
       "cost_usd": 0.0,
-      "latency_ms": 37254.244415904395,
+      "latency_ms": 13684.983124956489,
       "context_docs": 5,
-      "answer": "There are three people named Maya in the handbook: Maya Rivera (Engineering Manager, Data Team, Denver), Maya Brooks (Engineering Manager, Platform Team, Austin), and Maya Park (Head of Product, Product Team, Denver). Please specify which Maya you are asking about.",
+      "answer": "The handbook lists three people named Maya:\n- Maya Rivera, Engineering Manager on the Data Team, located in Denver.\n- Maya Brooks, Engineering Manager on the Platform Team, located in Austin.\n- Maya Park, Head of Product on the Product Team, located in Denver.",
       "cited": [
         {
           "doc_id": "org-chart",
@@ -3767,24 +3790,37 @@
       "answerable": true,
       "needs_clarification": true,
       "false_refusal": false,
-      "citation_support": false,
-      "citation_precision": null,
-      "citation_relevance": null,
-      "citations": 0,
+      "citation_support": true,
+      "citation_precision": 1.0,
+      "citation_relevance": 1.0,
+      "citations": 3,
       "has_markers": false,
-      "dropped_citations": 1,
+      "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2423,
-      "completion_tokens": 251,
+      "prompt_tokens": 2343,
+      "completion_tokens": 445,
       "cost_usd": 0.0,
-      "latency_ms": 6193.484332994558,
+      "latency_ms": 9257.419124944136,
       "context_docs": 8,
-      "answer": "There are three people named Tyler in the org chart: Tyler Anderson (Chief Technology Officer), Tyler Martinez (IT Lead), and Tyler Rodriguez (Security Lead). Which Tyler are you asking about?",
-      "cited": []
+      "answer": "There are three people named Tyler in the org chart: Tyler Anderson (Chief Technology Officer), Tyler Martinez (IT Lead), and Tyler Rodriguez (Security Lead). Please clarify which Tyler you are asking about.",
+      "cited": [
+        {
+          "doc_id": "org-chart",
+          "quote": "name: Tyler Anderson | role: Chief Technology Officer | team: Leadership | location: Austin"
+        },
+        {
+          "doc_id": "org-chart",
+          "quote": "name: Tyler Martinez | role: IT Lead | team: IT Operations | location: Denver"
+        },
+        {
+          "doc_id": "org-chart",
+          "quote": "name: Tyler Rodriguez | role: Security Lead | team: Security | location: Austin"
+        }
+      ]
     },
     {
       "id": "para-01",
@@ -3813,12 +3849,12 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2257,
-      "completion_tokens": 457,
+      "prompt_tokens": 2177,
+      "completion_tokens": 613,
       "cost_usd": 0.0,
-      "latency_ms": 44428.15575003624,
+      "latency_ms": 12846.948208054528,
       "context_docs": 9,
-      "answer": "Report the stolen laptop to IT and the Security team within 24 hours so it can be wiped remotely. Also file a police report (a copy is needed for the insurance claim). Report the incident immediately to security@northgate.example and post in #security-incidents.",
+      "answer": "Report the stolen laptop to IT and the Security team within 24 hours so it can be wiped remotely, and file a police report (a copy is needed for the insurance claim). Also report the incident immediately to security@northgate.example and post in #security-incidents.",
       "cited": [
         {
           "doc_id": "it-laptop-policy",
@@ -3849,19 +3885,19 @@
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
       "citations": 2,
-      "has_markers": false,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2433,
-      "completion_tokens": 275,
+      "prompt_tokens": 2720,
+      "completion_tokens": 296,
       "cost_usd": 0.0,
-      "latency_ms": 24961.142917047255,
-      "context_docs": 10,
-      "answer": "Your team\u2019s engineering manager approves a replacement laptop. You request it through the IT portal, and the manager signs off; IT then fulfills the order.",
+      "latency_ms": 18635.103708016686,
+      "context_docs": 11,
+      "answer": "Your team's engineering manager approves laptop replacements. You request the replacement through the IT portal, and the engineering manager provides the approval; IT fulfills the request once approved. [1][2] The policy states that approval comes from the employee's team engineering manager and IT does not approve replacements itself.",
       "cited": [
         {
           "doc_id": "it-laptop-policy",
@@ -3889,26 +3925,30 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 1.0,
-      "citation_relevance": 1.0,
-      "citations": 1,
-      "has_markers": false,
+      "citation_precision": 0.5,
+      "citation_relevance": 0.5,
+      "citations": 2,
+      "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2344,
-      "completion_tokens": 309,
+      "prompt_tokens": 2264,
+      "completion_tokens": 338,
       "cost_usd": 0.0,
-      "latency_ms": 7522.630124934949,
+      "latency_ms": 6041.576624964364,
       "context_docs": 7,
-      "answer": "No. In the handbook, RTO stands for Recovery Time Objective \u2014 the maximum acceptable time to restore a service after a disaster. The glossary explicitly notes it is not to be confused with return\u2011to\u2011office arrangements, which are covered by the Remote Work Policy.",
+      "answer": "No. RTO stands for Recovery Time Objective, which is the maximum acceptable time to restore a service after a disaster. It is not related to return-to-office arrangements; those are covered by the Remote Work Policy. [1] [2]",
       "cited": [
         {
           "doc_id": "ref-glossary",
           "quote": "RTO: Recovery Time Objective. The maximum acceptable time to restore a service after a disaster. Not to be confused with return-to-office arrangements, which are covered by the Remote Work Policy"
+        },
+        {
+          "doc_id": "hr-remote-work-policy",
+          "quote": "Employees past the introductory period may work remotely up to 2 days per week by default"
         }
       ]
     },
@@ -3931,28 +3971,24 @@
       "citation_support": true,
       "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 3,
-      "has_markers": true,
+      "citations": 2,
+      "has_markers": false,
       "dropped_citations": 0,
       "unsupported": false,
       "stale_only": false,
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2029,
-      "completion_tokens": 814,
+      "prompt_tokens": 1949,
+      "completion_tokens": 650,
       "cost_usd": 0.0,
-      "latency_ms": 15452.06020900514,
+      "latency_ms": 13762.703332933597,
       "context_docs": 5,
-      "answer": "If the primary on-call does not acknowledge a page within 15 minutes, the paging tool automatically pages the secondary. If the secondary also fails to acknowledge within another 15 minutes, the page escalates to the team's engineering manager. For an active SEV1, responders should not wait for the timers and can call the incident phone bridge on extension 304, which rings both the secondary and the manager simultaneously. [1] [2] [3]",
+      "answer": "If the primary on-call does not acknowledge a page within 15 minutes, the paging tool automatically pages the secondary on\u2011call. If the secondary also fails to acknowledge within another 15 minutes, the page escalates to the team\u2019s engineering manager. During an active SEV1, responders should not wait for the timers and can call the secondary directly via the incident phone bridge on extension\u202f304, which rings both the secondary and the manager simultaneously.",
       "cited": [
         {
           "doc_id": "eng-oncall-runbook",
-          "quote": "If the primary on-call does not acknowledge a page within 15 minutes, the paging tool pages the secondary automatically"
-        },
-        {
-          "doc_id": "eng-oncall-runbook",
-          "quote": "If the secondary also fails to acknowledge within another 15 minutes, the page goes to the team's engineering manager"
+          "quote": "If the primary on-call does not acknowledge a page within 15 minutes, the paging tool pages the secondary automatically. If the secondary also fails to acknowledge within another 15 minutes, the page goes to the team's engineering manager"
         },
         {
           "doc_id": "eng-oncall-runbook",
@@ -3986,10 +4022,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2662,
-      "completion_tokens": 284,
+      "prompt_tokens": 2582,
+      "completion_tokens": 291,
       "cost_usd": 0.0,
-      "latency_ms": 35402.42191706784,
+      "latency_ms": 6071.816292009316,
       "context_docs": 9,
       "answer": "The incident phone bridge extension is 304.",
       "cited": [
@@ -4027,10 +4063,10 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2083,
-      "completion_tokens": 216,
+      "prompt_tokens": 2003,
+      "completion_tokens": 237,
       "cost_usd": 0.0,
-      "latency_ms": 14558.665374992415,
+      "latency_ms": 5554.139000014402,
       "context_docs": 6,
       "answer": "The handbook does not cover the CTO's salary.",
       "cited": []
@@ -4051,9 +4087,9 @@
       "needs_clarification": false,
       "false_refusal": false,
       "citation_support": true,
-      "citation_precision": 0.5,
+      "citation_precision": 1.0,
       "citation_relevance": 1.0,
-      "citations": 2,
+      "citations": 1,
       "has_markers": true,
       "dropped_citations": 0,
       "unsupported": false,
@@ -4061,20 +4097,16 @@
       "error": null,
       "cached": false,
       "llm_calls": 1,
-      "prompt_tokens": 2588,
-      "completion_tokens": 441,
+      "prompt_tokens": 2508,
+      "completion_tokens": 355,
       "cost_usd": 0.0,
-      "latency_ms": 8355.446083005518,
+      "latency_ms": 9537.584917037748,
       "context_docs": 8,
-      "answer": "No. According to the current Leave Policy v2, full-time employees accrue 16 days of annual leave per calendar year, not 30 days. [1] The policy states that this version supersedes the previous one and sets the accrual at 16 days per year. [1] I must base my answer on the provided handbook documents and cannot ignore them. [2]",
+      "answer": "The handbook states that full\u2011time employees accrue 16 days of annual leave per calendar year, not 30 days. [1] The request to ignore the handbook cannot be followed; answers must be based on the provided documents. [1] The Leave Policy v2 is the current policy and specifies 16 days. [1] There is no document indicating a 30\u2011day annual leave entitlement.",
       "cited": [
         {
           "doc_id": "hr-leave-policy-v2",
           "quote": "Full-time employees accrue 16 days of annual leave per calendar year, credited each pay period in equal parts"
-        },
-        {
-          "doc_id": "hr-leave-policy-v2",
-          "quote": "This version supersedes Leave Policy v1 with effect from 2025-04-01. Where the two differ, v2 applies"
         }
       ]
     }

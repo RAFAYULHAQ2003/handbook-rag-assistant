@@ -31,6 +31,8 @@ def test_build_signs_in_without_a_stored_key_and_stamps_the_version():
 def test_vm_autodeploy_rolls_back_and_never_touches_the_env_file():
     script = (ROOT / "deploy" / "vm" / "autodeploy.sh").read_text()
     assert "rolling back" in script and "git reset --quiet --hard origin/main" in script
+    assert '["services"]["web"]["image"]' in script  # the web image by name, never by list position
+    assert "updated the deploy script" in script  # fixes to this script reach the server by themselves
     commands = "\n".join(line.split("#")[0] for line in script.splitlines())  # code, not comments
     assert not re.search(r"(\brm\b|\bcp\b|\bmv\b|>)[^\n]*\.env", commands)  # never writes or deletes .env
     for name in ("autodeploy.sh", "install.sh"):

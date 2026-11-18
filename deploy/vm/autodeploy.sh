@@ -20,9 +20,16 @@ after_commit="$(git rev-parse HEAD)"
 
 grep -q 'WEB_IMAGE' docker-compose.yml || exit 0  # a checkout from before the registry setup: nothing to do
 
+# keep this script itself up to date: a newer version from GitHub takes over from the next run
+installed=/usr/local/bin/handbook-autodeploy
+if [ -f "$installed" ] && ! cmp -s deploy/vm/autodeploy.sh "$installed"; then
+  install -m 755 deploy/vm/autodeploy.sh "$installed" && echo "updated the deploy script for the next run"
+fi
+
 running_image="$(docker inspect --format '{{.Image}}' "$(compose ps -q web 2>/dev/null)" 2>/dev/null || true)"
 compose pull --quiet web
-image_name="$(compose config --images web 2>/dev/null | head -1)"
+# the web service's own image (`config --images web` also lists Chroma, in no fixed order)
+image_name="$(compose config --format json | python3 -c 'import json, sys; print(json.load(sys.stdin)["services"]["web"]["image"])')"
 pulled_image="$(docker image inspect --format '{{.Id}}' "$image_name")"
 
 if [ "$pulled_image" = "$running_image" ] && [ "$before_commit" = "$after_commit" ]; then

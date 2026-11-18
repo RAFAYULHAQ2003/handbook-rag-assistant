@@ -13,6 +13,7 @@ MAX_QUESTION_CHARS = 2000
 # Reasoning models count their hidden thinking toward this limit; at 4,000, 2 of 97 dev answers were cut off.
 ANSWER_MAX_TOKENS = 8000
 MIN_QUOTE_CHARS = 8
+MAX_GAPPED_QUOTE_CHARS = 600  # a quote with "..." gaps may cover at most this much of a document
 
 STATE_LABEL = {
     State.IN_FORCE: "in force",
@@ -152,14 +153,15 @@ def build_messages(question: str, retrieval: Retrieval, index: HandbookIndex,
                    history: list[dict] | None = None) -> list[dict]:
     parts = [f"Today's date: {retrieval.reference_date.isoformat()} (company time zone: Central Time).", "", "<documents>"]
     for c in retrieval.context:
-        doc = index.docs[c.doc_id]
+        doc = retrieval.document(c.doc_id, index)
         meta = doc.meta
         attrs = (f'id="{c.doc_id}" title="{_safe(c.title)}" state="{STATE_LABEL[c.state]}" '
                  f'effective="{meta.effective_date.isoformat() if meta.effective_date else "unknown"}" '
                  f'category="{meta.category or "unknown"}" included="{c.reason}"')
         if meta.uploaded:
             attrs += ' origin="uploaded"'
-        parts += [f"<document {attrs}>", f"Status: {c.status_note}", _safe(c.text(doc)), "</document>"]
+        note = "Uploaded by the user in this conversation; not official policy." if meta.uploaded else c.status_note
+        parts += [f"<document {attrs}>", f"Status: {note}", _safe(c.text(doc)), "</document>"]
     parts += ["</documents>", ""]
     if history:
         parts += ["<conversation>", CONVERSATION_NOTE]
@@ -208,6 +210,7 @@ def locate_quote(quote: str, text: str) -> tuple[int, int] | None:
         return None
     start = end = None
     pos = 0
+    first_end = None
     for piece in pieces:
         found = norm_text.find(piece, pos)
         if found == -1:
@@ -215,7 +218,12 @@ def locate_quote(quote: str, text: str) -> tuple[int, int] | None:
         if start is None:
             start = offsets[found]
         end = offsets[found + len(piece) - 1] + 1
+        first_end = first_end or end
         pos = found + len(piece)
+    # pieces joined by "..." must not stretch one citation over a whole document: beyond the cap,
+    # only the first piece is cited
+    if len(pieces) > 1 and end - start > MAX_GAPPED_QUOTE_CHARS:
+        end = first_end
     return start, end
 
 
@@ -297,7 +305,8 @@ def tidy_answer(text: str, titles: dict[str, str] | None = None) -> str:
 # ---------- the answer step ----------
 
 def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=None,
-                    retrieval: Retrieval | None = None, history: list[dict] | None = None) -> Answer:
+                    retrieval: Retrieval | None = None, history: list[dict] | None = None,
+                    uploads=None) -> Answer:
     """Retrieve, ask the model, and verify every citation against the source text.
 
     Pass `retrieval` to answer from a prepared context instead of searching (used by the
@@ -316,7 +325,8 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
 
     start = time.perf_counter()
     if retrieval is None:
-        retrieval = index.retrieve(question, ref, follow_up_of=history[-1]["question"] if history else None)
+        retrieval = index.retrieve(question, ref, follow_up_of=history[-1]["question"] if history else None,
+                                   uploads=uploads)
     if not retrieval.context:
         return Answer(question, "The handbook does not cover this.", answerable=False, retrieval=retrieval,
                       latency_ms=(time.perf_counter() - start) * 1000)
@@ -343,12 +353,12 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
         if doc_id not in in_context:
             dropped += 1
             continue
-        span = locate_quote(quote, index.docs[doc_id].text)
+        span = locate_quote(quote, retrieval.document(doc_id, index).text)
         if span is None:
             dropped += 1
             continue
         if (doc_id, span) not in number_of:
-            text = index.docs[doc_id].text
+            text = retrieval.document(doc_id, index).text
             citations.append(Citation(doc_id, in_context[doc_id].title, text[span[0]:span[1]], span[0], span[1],
                                       in_context[doc_id].state))
             number_of[(doc_id, span)] = len(citations)
@@ -358,7 +368,7 @@ def answer_question(question: str, index: HandbookIndex, client: LLMClient, ref=
     return Answer(
         question=question,
         answer=tidy_answer(renumber_markers(str(c.get("answer") or ""), mapping),
-                           {d: doc.meta.title for d, doc in index.docs.items()}),
+                           {d: doc.meta.title for d, doc in {**index.docs, **retrieval.docs}.items()}),
         verdict=verdict,
         answerable=bool(c.get("answerable")),
         needs_clarification=bool(c.get("needs_clarification")),

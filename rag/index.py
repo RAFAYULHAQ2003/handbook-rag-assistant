@@ -73,6 +73,11 @@ class Retrieval:
     top_bm25: float | None
     top_cosine: float | None
     corrections: list[tuple[str, str]] = field(default_factory=list)  # typos also searched as (typed, meant)
+    docs: dict[str, Document] = field(default_factory=dict)  # documents uploaded in this conversation
+
+    def document(self, doc_id: str, index: "HandbookIndex") -> Document:
+        """A context document: one uploaded in this conversation, or a handbook document."""
+        return self.docs.get(doc_id) or index.docs[doc_id]
 
 
 @dataclass
@@ -150,10 +155,13 @@ class HandbookIndex:
 
     def retrieve(self, question: str, ref: date | str | None = None, k: int = TOP_K,
                  use_validity: bool = True, follow_references: bool = True,
-                 follow_up_of: str | None = None) -> Retrieval:
+                 follow_up_of: str | None = None, uploads=None) -> Retrieval:
         """Search for `question`. For a follow-up ("which one lives in Austin?"), pass the previous
         question as `follow_up_of`: results for the question alone and for both together are merged,
-        so the follow-up finds what it refers to while a new topic is not swamped by the old one."""
+        so the follow-up finds what it refers to while a new topic is not swamped by the old one.
+
+        `uploads` (a rag.uploads.Conversation) adds the documents uploaded in this conversation: they
+        are searched on their own and their best passages are merged with the handbook's."""
         day = self.date_for(ref)
         statuses = self.statuses(day)
         states = statuses if use_validity else None
@@ -165,13 +173,21 @@ class HandbookIndex:
             combined = self.retriever.search(f"{self.spelling.expand(follow_up_of.strip())} {query}", k=k,
                                              statuses=states)
             hits = _interleave(result.hits, combined.hits, k)
+        docs, passages_by_doc, extra = self.docs, self.passages_by_doc, {}
+        if uploads is not None and uploads.retriever is not None and uploads.docs:
+            own = uploads.retriever.search(query, k=4, statuses=None).hits
+            hits = _interleave(own, hits, k)  # this conversation's documents first, then the handbook
+            extra = uploads.docs
+            docs = {**self.docs, **extra}
+            passages_by_doc = {**self.passages_by_doc, **uploads.passages_by_doc}
         schedules = []
         if follow_references and DATED_QUESTION.search(question):
             top = " ".join(h.passage.text for h in hits[:SCHEDULE_HITS])
             schedules = [d for d, subject in self.schedules.items() if subject.search(top)]
-        context = build_context(hits, self.docs, statuses, result.pool, self.passages_by_doc,
+        context = build_context(hits, docs, statuses, result.pool, passages_by_doc,
                                 self.references if follow_references else None, schedules=schedules)
-        return Retrieval(question, day, hits, context, result.pool, result.top_bm25, result.top_cosine, corrections)
+        return Retrieval(question, day, hits, context, result.pool, result.top_bm25, result.top_cosine, corrections,
+                         extra)
 
 
 def _interleave(first: list[Hit], second: list[Hit], k: int, max_per_doc: int = 2) -> list[Hit]:

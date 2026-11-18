@@ -14,14 +14,14 @@
       <span class="doc-id">{{ meta.doc_id }}</span>
     </div>
     {% if uploaded %}
-    <p class="notice notice-uploaded">Uploaded through this site, not part of the official handbook. Check the official policy for binding rules.</p>
+    <p class="notice notice-uploaded">Uploaded in this conversation, not part of the official handbook. It is deleted when the conversation ends. Check the official policy for binding rules.</p>
     {% endif %}
     {% if show_notice %}
     <p class="notice notice-{{ state }}">{{ status_note }} <span class="muted">(as of {{ reference_date|date:"j M Y" }})</span></p>
     {% endif %}
     <div class="doc-actions">
       {% if highlighted %}<a class="button-secondary" href="#hl">Jump to the cited passage</a>{% endif %}
-      {% if has_file %}<a class="button-secondary" href="{% url 'handbook:source_file' meta.doc_id %}">Open original file ({{ meta.format|upper }})</a>{% endif %}
+      {% if has_file %}<a class="button-secondary" href="{{ file_url }}">Open original file ({{ meta.format|upper }})</a>{% endif %}
     </div>
   </header>
 

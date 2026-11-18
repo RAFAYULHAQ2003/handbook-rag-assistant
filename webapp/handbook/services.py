@@ -1,15 +1,14 @@
-"""Shared, lazily built objects for the web app: one search index and one model client per process.
+"""Shared, lazily built objects for the web app: one search index, one model client and one store of
+conversation uploads per process.
 
 Building the index loads 64 documents and the embedding model (a few seconds), so it is done
 once, on first use, behind a lock: parallel requests during start-up wait for the same build
-instead of each starting their own.
-
-Uploaded documents live in their own folder. When it changes (an upload here or in another worker
-process), the next request rebuilds the index from the already-parsed handbook plus the uploads,
-reusing the loaded embedding model and the embedding cache, so only new passages are embedded.
+instead of each starting their own. Uploads never change it: they belong to one conversation
+(rag.uploads.SessionUploads) and are searched alongside it.
 """
 
 import logging
+import os
 import threading
 from datetime import date
 
@@ -19,46 +18,53 @@ from rag.answer import STATE_LABEL, Answer
 from rag.index import HandbookIndex
 from rag.llm import LLMClient, LLMError, client_from_env
 from rag.retrieval.search import ContextDoc
-from rag.uploads import UploadStore
+from rag.retrieval.vector_store import ChromaStore
+from rag.uploads import SessionUploads
 
 log = logging.getLogger(__name__)
 
 _lock = threading.Lock()
 _index: HandbookIndex | None = None
-_index_uploads: int | None = None  # the uploads version the index was built with
+_uploads: SessionUploads | None = None
 _client: LLMClient | None = None
 _client_error: str | None = None
 
 
-def upload_store() -> UploadStore:
-    return UploadStore(settings.UPLOAD_DIR, settings.UPLOAD_MAX_BYTES, settings.UPLOAD_MAX_DOCUMENTS)
-
-
 def get_index() -> HandbookIndex:
-    global _index, _index_uploads
-    store = upload_store()
-    version = store.version()
-    if _index is None or version != _index_uploads:
+    global _index
+    if _index is None:
         with _lock:
-            version = store.version()
             if _index is None:
                 _index = HandbookIndex.from_corpus(settings.CORPUS_DIR)
-                _index_uploads = 0
-                log.info("handbook index ready: %d documents, %d passages, mode %s",
-                         len(_index.docs), len(_index.passages), _index.mode)
-            if version != _index_uploads:
-                official = [d for d in _index.docs.values() if not d.meta.uploaded]
-                uploads = store.load()
-                _index = HandbookIndex.build(official + uploads, _index.default_date, _index.mode,
-                                             _index.retriever.embeddings, _index.findings)
-                _index_uploads = version
-                log.info("index rebuilt with %d uploaded document(s)", len(uploads))
+                log.info("handbook index ready: %d documents, %d passages, mode %s, vectors in %s",
+                         len(_index.docs), len(_index.passages), _index.mode, _index.retriever.vector_store_name)
     return _index
 
 
-def is_uploaded(doc_id: str) -> bool:
-    doc = _index.docs.get(doc_id) if _index is not None else None
-    return bool(doc and doc.meta.uploaded)
+def uploads() -> SessionUploads:
+    """Each conversation's uploads: chunked and embedded with the handbook's model, kept apart, temporary."""
+    global _uploads
+    if _uploads is None:
+        index = get_index()
+        embeddings = index.retriever.embeddings
+        embedder = embeddings.embedder if embeddings is not None else None
+        store_factory = None
+        if isinstance(index.retriever.store, ChromaStore):  # the handbook's vectors are in Chroma: so are these
+            def store_factory(sid, model=embedder.name):
+                return _session_store(sid, model)
+        with _lock:
+            if _uploads is None:
+                _uploads = SessionUploads(settings.UPLOAD_DIR, embedder, index.mode, store_factory,
+                                          ttl_seconds=settings.UPLOAD_SESSION_TTL_MINUTES * 60,
+                                          max_bytes=settings.UPLOAD_MAX_BYTES,
+                                          max_documents=settings.UPLOAD_MAX_DOCUMENTS)
+    return _uploads
+
+
+def _session_store(sid: str, model_name: str) -> ChromaStore:
+    """A temporary Chroma collection for one conversation: "conversation-<id>-<model>"."""
+    url = os.environ.get("CHROMA_URL", "").strip() or "http://localhost:8001"
+    return ChromaStore.connect(url, model_name, prefix=f"conversation-{sid}")
 
 
 def get_client() -> LLMClient | None:
@@ -81,21 +87,22 @@ def client_error() -> str | None:
 
 
 def reset() -> None:
-    """Forget the cached index and client (used by tests and after uploads)."""
-    global _index, _index_uploads, _client, _client_error
+    """Forget the cached index, uploads store and client (used by tests)."""
+    global _index, _uploads, _client, _client_error
     with _lock:
-        _index = _index_uploads = _client = _client_error = None
+        _index = _uploads = _client = _client_error = None
 
 
 # ---------- turning results into JSON-friendly dicts ----------
 
-def context_json(context: list[ContextDoc]) -> list[dict]:
+def context_json(context: list[ContextDoc], uploaded: set[str] = frozenset()) -> list[dict]:
     return [{"doc_id": c.doc_id, "title": c.title, "state": c.state.value, "state_label": STATE_LABEL[c.state],
-             "status_note": c.status_note, "reason": c.reason, "uploaded": is_uploaded(c.doc_id)} for c in context]
+             "status_note": c.status_note, "reason": c.reason, "uploaded": c.doc_id in uploaded} for c in context]
 
 
 def answer_json(a: Answer, source_url) -> dict:
     """The API's answer shape. `source_url(doc_id, start, end)` builds the link that opens a citation."""
+    uploaded = set(a.retrieval.docs) if a.retrieval else set()
     return {
         "question": a.question,
         "answer": a.answer,
@@ -106,13 +113,13 @@ def answer_json(a: Answer, source_url) -> dict:
         "citations": [
             {"n": i, "doc_id": c.doc_id, "title": c.title, "state": c.state.value,
              "state_label": STATE_LABEL[c.state], "quote": c.quote, "start": c.start, "end": c.end,
-             "url": source_url(c.doc_id, c.start, c.end), "uploaded": is_uploaded(c.doc_id)}
+             "url": source_url(c.doc_id, c.start, c.end), "uploaded": c.doc_id in uploaded}
             for i, c in enumerate(a.citations, 1)
         ],
         "dropped_citations": a.dropped_citations,
         "reference_date": a.retrieval.reference_date.isoformat() if a.retrieval else None,
         "search_corrections": [{"typed": t, "searched": f} for t, f in a.retrieval.corrections] if a.retrieval else [],
-        "context": context_json(a.retrieval.context) if a.retrieval else [],
+        "context": context_json(a.retrieval.context, uploaded) if a.retrieval else [],
         "model": a.model,
         "cached": a.cached,
         "used_fallback": a.used_fallback,

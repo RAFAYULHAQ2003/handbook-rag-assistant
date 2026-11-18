@@ -82,6 +82,8 @@
     uploads: "{% url 'handbook:api_uploads' %}",
     uploadDelete: "{% url 'handbook:api_upload_delete' '__id__' %}",
     uploadMaxMb: {{ upload_max_mb }},
+    uploadKeepMinutes: {{ upload_ttl_minutes }},
+    clearConversation: "{% url 'handbook:api_conversation_clear' %}",
     maxChars: {{ max_chars }}
   };
 </script>

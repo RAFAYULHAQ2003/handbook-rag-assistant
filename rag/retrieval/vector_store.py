@@ -50,10 +50,19 @@ class ChromaStore:
     hashes, so running it again, or from several workers at once, changes nothing.
     """
 
-    def __init__(self, collection, url: str = ""):
+    def __init__(self, collection, url: str = "", client=None):
         self.collection = collection
         self.name = f"chroma {collection.name}"
         self.url = url
+        self.client = client
+
+    def drop(self) -> None:
+        """Delete the whole collection (a conversation's temporary uploads)."""
+        try:
+            if self.client is not None:
+                self.client.delete_collection(self.collection.name)
+        except Exception as exc:
+            raise VectorStoreError(f"ChromaDB delete failed: {_short(exc)}") from exc
 
     @classmethod
     def connect(cls, url: str, model_name: str, prefix: str = "handbook") -> "ChromaStore":
@@ -72,7 +81,7 @@ class ChromaStore:
             )
         except Exception as exc:  # unreachable server, bad URL, version mismatch
             raise VectorStoreError(f"cannot connect to ChromaDB at {url}: {_short(exc)}") from exc
-        return cls(collection, url)
+        return cls(collection, url, client)
 
     def sync(self, ids: list[str], vectors: np.ndarray, doc_ids: list[str]) -> tuple[int, int]:
         """Make the collection hold exactly these passages. Returns (added, removed)."""

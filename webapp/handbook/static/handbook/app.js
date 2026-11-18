@@ -39,7 +39,33 @@
     conversation.push({ question: question, answer: answer });
     conversation = conversation.slice(-3);
   }
+  // ---------- conversation id: uploads belong to one conversation and are deleted when it ends ----------
+  var CONVERSATION_KEY = "handbook-conversation-id";
+  function newConversationId() {
+    var bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  }
+  var conversationId = null;
+  try { conversationId = localStorage.getItem(CONVERSATION_KEY); } catch (e) { /* storage off */ }
+  if (!/^[0-9a-f]{32}$/.test(conversationId || "")) {
+    conversationId = newConversationId();
+    try { localStorage.setItem(CONVERSATION_KEY, conversationId); } catch (e) { /* storage off */ }
+  }
+
   newChat.addEventListener("click", function () {
+    // delete this conversation's uploads (files, chunks, vectors) on the server, then start afresh
+    var old = conversationId;
+    var body = new FormData();
+    body.append("conversation", old);
+    fetch(cfg.clearConversation, { method: "POST", body: body, credentials: "same-origin",
+                                   headers: { "X-CSRFToken": csrfToken(), "X-Conversation-Id": old } })
+      .catch(function () { /* the server also deletes idle conversations after a while */ });
+    conversationId = newConversationId();
+    try { localStorage.setItem(CONVERSATION_KEY, conversationId); } catch (e) { /* ignore */ }
+    renderUploads([]);
+    showUploadStatus("", false);
+    input.placeholder = "Ask a question, e.g. How many days of annual leave do I get?";
     conversation = [];
     try { localStorage.removeItem(STORE); } catch (e) { /* ignore */ }
     thread.textContent = "";
@@ -143,7 +169,8 @@
     fetch(cfg.ask, {
       method: "POST",
       signal: controller.signal,
-      headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
+      headers: { "Content-Type": "application/json", Accept: "application/x-ndjson",
+                 "X-Conversation-Id": conversationId },
       body: JSON.stringify({ question: question, as_of: date, history: conversation.slice() })
     })
       .then(function (response) {
@@ -334,7 +361,8 @@
         if (c.uploaded) head.appendChild(el("span", "state state-uploaded", "uploaded, not official"));
         head.appendChild(el("span", "source-open", "Open source ↗"));
         link.appendChild(head);
-        link.appendChild(el("p", "source-quote", c.quote));
+        // long quotes are shortened here; the source page highlights the whole passage
+        link.appendChild(el("p", "source-quote", c.quote.length > 320 ? c.quote.slice(0, 300).trim() + " \u2026" : c.quote));
         item.appendChild(link);
         list.appendChild(item);
       });
@@ -405,15 +433,18 @@
       uploadsBox.appendChild(chip);
     });
     uploadsBox.hidden = docs.length === 0;
+    if (docs.length) newChat.hidden = false;  // "New conversation" also deletes these uploads
   }
   function refreshUploads() {
-    return fetch(cfg.uploads, { headers: { Accept: "application/json" } })
+    return fetch(cfg.uploads, { headers: { Accept: "application/json", "X-Conversation-Id": conversationId } })
       .then(function (r) { return r.ok ? r.json() : { documents: [] }; })
       .then(function (body) { renderUploads(body.documents || []); })
       .catch(function () { /* the list is a convenience; asking still works */ });
   }
   function postForm(url, body) {
-    return fetch(url, { method: "POST", headers: { "X-CSRFToken": csrfToken(), Accept: "application/json" },
+    body.append("conversation", conversationId);
+    return fetch(url, { method: "POST", headers: { "X-CSRFToken": csrfToken(), Accept: "application/json",
+                                                   "X-Conversation-Id": conversationId },
                         body: body, credentials: "same-origin" })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (data) {
@@ -443,7 +474,8 @@
     postForm(cfg.upload, body)
       .then(function (d) {
         showUploadStatus((d.created ? "Added \u201c" : "Already added: \u201c") + d.title +
-          "\u201d. Ask about it now; answers will cite it and mark it as not official.", false);
+          "\u201d to this conversation only. Ask about it now. It is deleted when you start a new conversation " +
+          "or after " + cfg.uploadKeepMinutes + " minutes without use.", false);
         input.placeholder = "Ask about \u201c" + d.title + "\u201d\u2026";
         input.focus();
         return refreshUploads();

@@ -14,4 +14,5 @@ urlpatterns = [
     path("api/upload", views.api_upload, name="api_upload"),
     path("api/uploads", views.api_uploads, name="api_uploads"),
     path("api/uploads/<slug:doc_id>/delete", views.api_upload_delete, name="api_upload_delete"),
+    path("api/conversation/clear", views.api_conversation_clear, name="api_conversation_clear"),
 ]

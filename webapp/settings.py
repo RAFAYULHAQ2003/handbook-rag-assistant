@@ -147,10 +147,12 @@ REFERENCE_DATE = os.environ.get("REFERENCE_DATE")  # YYYY-MM-DD, empty = today
 
 # Questions allowed per client address per minute (protects the model provider's quota; 0 = no limit)
 ASK_RATE_LIMIT_PER_MIN = int(os.environ.get("ASK_RATE_LIMIT_PER_MIN", "20") or 0)
-# Uploaded documents (web page "Upload a document"): their own folder, never mixed into the handbook.
+# Documents uploaded in a conversation: a temporary folder per conversation, never mixed into the handbook.
 UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "").strip() or MEDIA_ROOT / "uploads")
 UPLOAD_MAX_BYTES = int(os.environ.get("UPLOAD_MAX_MB", "5") or 5) * 1_000_000
-UPLOAD_MAX_DOCUMENTS = int(os.environ.get("UPLOAD_MAX_DOCUMENTS", "50") or 50)
+UPLOAD_MAX_DOCUMENTS = int(os.environ.get("UPLOAD_MAX_DOCUMENTS", "10") or 10)  # per conversation
+# a conversation's uploads (files, chunks, vectors) are deleted after this long without use
+UPLOAD_SESSION_TTL_MINUTES = int(os.environ.get("UPLOAD_SESSION_TTL_MINUTES", "60") or 60)
 UPLOAD_RATE_LIMIT_PER_MIN = int(os.environ.get("UPLOAD_RATE_LIMIT_PER_MIN", "10") or 0)
 STATIC_ROOT = BASE_DIR / "staticfiles"  # where collectstatic gathers files for deployment
 if STATIC_ROOT.is_dir():  # collected in the Docker image; `runserver` serves static files itself

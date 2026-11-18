@@ -17,6 +17,25 @@ print(f"ChromaDB did not answer at {url}; starting anyway (search uses the in-me
 PY
 fi
 
+# Conversation uploads are temporary: nothing of them survives a restart (files and Chroma collections)
+rm -rf "${UPLOAD_DIR:-/app/media/uploads}"/* 2>/dev/null || true
+if [ "${VECTOR_STORE:-chroma}" = "chroma" ]; then
+  python - <<'PY' || true
+import os
+from urllib.parse import urlparse
+try:
+    import chromadb
+    url = urlparse(os.environ.get("CHROMA_URL", "http://chroma:8000"))
+    client = chromadb.HttpClient(host=url.hostname, port=url.port or 8000)
+    old = [c.name for c in client.list_collections() if c.name.startswith("conversation-")]
+    for name in old:
+        client.delete_collection(name)
+    print(f"removed {len(old)} leftover conversation collection(s)", flush=True)
+except Exception as exc:
+    print(f"could not tidy conversation collections: {exc}", flush=True)
+PY
+fi
+
 python manage.py migrate --noinput -v 0
 
 # Threads, not just processes: an answer can wait up to 90 s on the model, and a thread waiting on the

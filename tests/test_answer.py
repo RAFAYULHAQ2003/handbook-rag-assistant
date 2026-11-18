@@ -816,3 +816,11 @@ def test_client_cached_never_calls_the_model(client, monkeypatch):
     monkeypatch.setattr(OpenAICompatibleClient, "_post", lambda self, payload: calls.append(1) or {})
     assert client.cached([{"role": "user", "content": "never asked"}], {"type": "object"}) is None
     assert calls == []
+
+
+def test_a_gapped_quote_cannot_cover_a_whole_document():
+    text = "Start of the plan. " + "Filler sentence about nothing. " * 60 + "End of the plan."
+    span = locate_quote("Start of the plan ... End of the plan", text)
+    assert span == (0, len("Start of the plan"))  # only the first piece: the gap was too long
+    short = "Rates are $275. Approval needed. Booking via VoyageHub."
+    assert locate_quote("Rates are $275 ... via VoyageHub", short) == (0, len(short) - 1)

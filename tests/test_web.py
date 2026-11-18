@@ -46,7 +46,7 @@ def app(bm25_index, monkeypatch, tmp_path):
     from django.conf import settings
     fake = FakeClient()
     monkeypatch.setattr(settings, "UPLOAD_DIR", tmp_path / "uploads")
-    monkeypatch.setattr(services, "_index_uploads", 0)
+    monkeypatch.setattr(services, "_uploads", None)
     monkeypatch.setattr(services, "_index", bm25_index)
     monkeypatch.setattr(services, "_client", fake)
     monkeypatch.setattr(services, "_client_error", None)
@@ -317,45 +317,68 @@ def test_complete_question_drops_history_before_the_model(web, app, monkeypatch)
     assert len(sent) == 2 and sent[0] == sent[1] and "<conversation>" not in sent[1]
 
 
-# ---------- uploads ----------
+# ---------- uploads (one conversation's own documents) ----------
 
 NOTE = b"# Team Offsite\n\nThe platform team offsite is in Lisbon on 2027-03-10. Flights are booked by People Ops.\n"
+ME, OTHER = "1" * 32, "2" * 32  # two conversations
 
 
-def upload(web, name="offsite.md", data=NOTE):
+def upload(web, name="offsite.md", data=NOTE, conversation=ME):
     from django.core.files.uploadedfile import SimpleUploadedFile
-    return web.post("/api/upload", {"file": SimpleUploadedFile(name, data)})
+    return web.post("/api/upload", {"file": SimpleUploadedFile(name, data), "conversation": conversation})
 
 
-def test_uploaded_document_can_be_asked_about_straight_away(web, app):
+def stream_events(web, question, conversation=ME):
+    r = web.post("/api/ask/stream", data=json.dumps({"question": question}), content_type="application/json",
+                 HTTP_X_CONVERSATION_ID=conversation)
+    return [json.loads(line) for line in b"".join(r.streaming_content).decode().splitlines() if line]
+
+
+def test_an_upload_is_searched_in_its_own_conversation_only(web, app):
     r = upload(web)
     assert r.status_code == 201, r.content
     doc_id = r.json()["doc_id"]
     assert r.json()["created"] and r.json()["passages"] >= 1
-    events = [json.loads(line) for line in
-              b"".join(ask(web, "Where is the platform team offsite?", stream=True).streaming_content)
-              .decode().splitlines() if line]
-    context = {c["doc_id"]: c for c in events[0]["context"]}
-    assert doc_id in context and context[doc_id]["uploaded"] is True
-    assert [d["doc_id"] for d in web.get("/api/uploads").json()["documents"]] == [doc_id]
+    mine = {c["doc_id"]: c for c in stream_events(web, "Where is the platform team offsite?")[0]["context"]}
+    assert doc_id in mine and mine[doc_id]["uploaded"] is True
+    other = {c["doc_id"] for c in stream_events(web, "Where is the platform team offsite?", OTHER)[0]["context"]}
+    assert doc_id not in other  # another conversation never sees it
+    assert [d["doc_id"] for d in web.get("/api/uploads", HTTP_X_CONVERSATION_ID=ME).json()["documents"]] == [doc_id]
+    assert web.get("/api/uploads", HTTP_X_CONVERSATION_ID=OTHER).json()["documents"] == []
 
 
-def test_uploaded_source_page_says_it_is_not_official_and_serves_the_file(web, app):
+def test_citation_links_to_an_upload_carry_the_conversation(web, app, monkeypatch):
     doc_id = upload(web).json()["doc_id"]
-    page = web.get(f"/source/{doc_id}/").content.decode()
-    assert "not part of the official handbook" in page and "Lisbon" in page
-    original = web.get(f"/source/{doc_id}/file")
+    quote = "The platform team offsite is in Lisbon on 2027-03-10"
+    monkeypatch.setattr(services, "_client", FakeClient({"answer": "Lisbon [1].", "verdict": None, "answerable": True,
+                                                         "needs_clarification": False,
+                                                         "citations": [{"doc_id": doc_id, "quote": quote}]}))
+    answer = stream_events(web, "Where is the platform team offsite?")[-1]
+    citation = answer["citations"][0]
+    assert citation["uploaded"] and f"conversation={ME}" in citation["url"]
+    page = web.get(citation["url"])
+    assert page.status_code == 200 and "not part of the official handbook" in page.content.decode()
+    assert web.get(f"/source/{doc_id}/?conversation={OTHER}").status_code == 404  # not from another conversation
+    original = web.get(f"/source/{doc_id}/file?conversation={ME}")
     assert original.status_code == 200 and b"".join(original.streaming_content) == NOTE
+
+
+def test_new_conversation_deletes_its_uploads(web, app):
+    doc_id = upload(web).json()["doc_id"]
+    assert web.post("/api/conversation/clear", {"conversation": ME}).json() == {"cleared": True}
+    assert web.get("/api/uploads", HTTP_X_CONVERSATION_ID=ME).json()["documents"] == []
+    assert web.get(f"/source/{doc_id}/?conversation={ME}").status_code == 404
 
 
 def test_upload_needs_a_csrf_token(app):
     from django.core.files.uploadedfile import SimpleUploadedFile
     strict = Client(enforce_csrf_checks=True)
-    r = strict.post("/api/upload", {"file": SimpleUploadedFile("offsite.md", NOTE)})
+    r = strict.post("/api/upload", {"file": SimpleUploadedFile("offsite.md", NOTE), "conversation": ME})
     assert r.status_code == 403
     strict.get("/")  # the page sets the CSRF cookie
     token = strict.cookies["csrftoken"].value
-    r = strict.post("/api/upload", {"file": SimpleUploadedFile("offsite.md", NOTE)}, HTTP_X_CSRFTOKEN=token)
+    r = strict.post("/api/upload", {"file": SimpleUploadedFile("offsite.md", NOTE), "conversation": ME},
+                    HTTP_X_CSRFTOKEN=token)
     assert r.status_code == 201
 
 
@@ -368,9 +391,10 @@ def test_bad_uploads_are_rejected_clearly(web, app, name, data, status, message)
     assert r.status_code == status and message in r.json()["error"]
 
 
-def test_upload_without_a_file_and_oversized_uploads(web, app, monkeypatch):
+def test_upload_without_a_file_conversation_or_within_size(web, app, monkeypatch):
     from django.conf import settings
-    assert web.post("/api/upload", {}).status_code == 400
+    assert web.post("/api/upload", {"conversation": ME}).status_code == 400
+    assert "conversation" in upload(web, conversation="not-an-id").json()["error"]
     monkeypatch.setattr(settings, "UPLOAD_MAX_BYTES", 50)
     r = upload(web, data=b"x" * 500_000)
     assert r.status_code == 413 and "larger than" in r.json()["error"]
@@ -386,18 +410,10 @@ def test_upload_is_rate_limited(web, app, monkeypatch):
 
 def test_removing_an_upload_takes_it_out_of_search(web, app):
     doc_id = upload(web).json()["doc_id"]
-    assert web.post(f"/api/uploads/{doc_id}/delete").status_code == 200
-    assert doc_id not in services.get_index().docs
-    assert web.get(f"/source/{doc_id}/").status_code == 404
-    assert web.post(f"/api/uploads/{doc_id}/delete").status_code == 404
-    assert web.post("/api/uploads/hr-leave-policy-v2/delete").status_code == 404  # handbook files can't be removed
-    assert "hr-leave-policy-v2" in services.get_index().docs
-
-
-def test_an_upload_from_another_worker_is_picked_up(web, app):
-    """Each worker process has its own index; a change to the upload folder rebuilds it on the next request."""
-    doc, _ = services.upload_store().add("offsite.md", NOTE, date(2026, 11, 17))
-    assert doc.doc_id in services.get_index().docs
+    assert web.post(f"/api/uploads/{doc_id}/delete", {"conversation": ME}).status_code == 200
+    assert doc_id not in {c["doc_id"] for c in stream_events(web, "Where is the platform team offsite?")[0]["context"]}
+    assert web.post(f"/api/uploads/{doc_id}/delete", {"conversation": ME}).status_code == 404
+    assert web.post("/api/uploads/hr-leave-policy-v2/delete", {"conversation": ME}).status_code == 404
 
 
 def test_page_has_the_upload_control(web, app):
@@ -434,3 +450,12 @@ def test_answer_says_which_corrected_words_were_also_searched(web, app):
     assert body["question"] == "ohw mny anual leves do i get?"
     js = open("webapp/handbook/static/handbook/app.js").read()
     assert "also searched for" in js
+
+
+def test_framing_is_refused_unless_a_site_is_allowed(web, app):
+    assert web.get("/").headers["X-Frame-Options"] == "DENY"
+
+
+def test_health_reports_the_running_version(web, app, monkeypatch):
+    monkeypatch.setenv("APP_VERSION", "abc1234")
+    assert web.get("/api/health").json()["version"] == "abc1234"

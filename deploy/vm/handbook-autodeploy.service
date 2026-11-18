@@ -1,0 +1,8 @@
+[Unit]
+Description=Deploy the latest handbook assistant image if CI pushed a new one
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /usr/local/bin/handbook-autodeploy

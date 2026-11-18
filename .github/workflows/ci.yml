@@ -1,0 +1,96 @@
+# CI/CD
+#   test     every push and pull request: lint and the full test suite (no model calls, no secrets)
+#   build    main only, after the tests pass: build the image (stamped with the commit) and push it to
+#            Artifact Registry. GitHub signs in to Google Cloud with Workload Identity Federation: no
+#            stored key, and only this repository's main branch is trusted (README: Deployment)
+#   deploy   the VM pulls the new image within a minute (deploy/vm/autodeploy.sh), restarts, checks health
+#            and rolls back on failure; this job waits until the live site reports this commit's version
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: us-central1-docker.pkg.dev
+  IMAGE: us-central1-docker.pkg.dev/handbook-rag-43010f/handbook/app
+  WIF_PROVIDER: projects/67537778836/locations/global/workloadIdentityPools/github/providers/github
+  DEPLOY_SA: github-deploy@handbook-rag-43010f.iam.gserviceaccount.com
+  APP_URL: https://136-115-111-206.sslip.io
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      DJANGO_DEBUG: "1"        # no secret key needed for tests
+      VECTOR_STORE: memory     # no ChromaDB server in CI
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: ruff check .
+      - run: python -m pytest -q
+
+  build:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write   # proves to Google Cloud that this is this repository's main branch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker "$REGISTRY" --quiet
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          build-args: APP_VERSION=${{ github.sha }}
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ env.APP_URL }}
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - name: Wait for the server to run this commit
+        run: |
+          for i in $(seq 1 60); do
+            version=$(curl -fsS --max-time 10 "$APP_URL/api/health" | python3 -c "import sys, json; print(json.load(sys.stdin).get('version', ''))" || true)
+            if [ "$version" = "$GITHUB_SHA" ]; then echo "live: $APP_URL runs $GITHUB_SHA"; exit 0; fi
+            echo "live version: ${version:-unreachable}; waiting"
+            sleep 10
+          done
+          echo "the server did not switch to $GITHUB_SHA within 10 minutes (on the VM: journalctl -u handbook-autodeploy)" >&2
+          exit 1

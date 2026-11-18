@@ -67,7 +67,7 @@ python manage.py runserver
 
 Open http://127.0.0.1:8000. Ask a question; each answer lists its sources, with `[1]`-style markers in the text pointing to the source behind each claim. Opening a source shows the document with the cited passage highlighted, plus a link to the original file. Follow-up questions ("and who approves it?") use the last three turns. A link like `/?q=How+many+days+of+annual+leave+do+I+get%3F` asks straight away.
 
-**Upload a document** (below the question box) adds a `.md`, `.txt`, `.pdf`, `.docx`, `.csv` or `.html` file of up to 5 MB, and you can ask about it at once, without a restart. Uploads are stored in `media/uploads/` (set `UPLOAD_DIR` to change it), apart from the handbook. Answers cite them like any document, but they are always marked "uploaded, not official": they never replace or amend a handbook policy, and when they disagree, the answer gives the official rule. Remove one with the × on its chip.
+**Upload a document** (the paperclip) adds a `.md`, `.txt`, `.pdf`, `.docx`, `.xlsx`, `.pptx`, `.csv`, `.json` or `.html` file of up to 5 MB **to the current conversation only**, and you can ask about it at once. The file is parsed, chunked and embedded for that conversation alone: it gets its own temporary ChromaDB collection and is never added to the handbook index or seen by anyone else. Everything of it (file, chunks and vectors) is deleted on "New conversation", after 60 minutes without use (`UPLOAD_SESSION_TTL_MINUTES`), and when the server restarts. Answers cite uploads like any document, but they are always marked "uploaded, not official": an upload never replaces or amends a handbook policy, and when it disagrees, the answer gives the official rule. Scanned PDFs (images of text) need OCR first and are refused with that explanation.
 
 API (no login, JSON):
 
@@ -83,14 +83,23 @@ curl http://127.0.0.1:8000/api/health
 
 **Vectors:** passages are embedded locally with `BAAI/bge-small-en-v1.5` and stored in ChromaDB (one collection per embedding model). Every web worker searches the same collection; uploads are added to it and removed from it at once. Keyword search (BM25), rank fusion and the document-state rules stay in the app. If ChromaDB cannot be reached, search uses an in-memory copy of the vectors and `/api/health` says so. Through ChromaDB, all 132 eval questions get exactly the same context as with in-memory search.
 
-**Deploy on a server** with Docker: point a domain at it, or use `<ip-with-dashes>.sslip.io`. Set the server lines at the end of `.env.example`, then run:
-
-```bash
-docker compose --profile https up -d --build
-```
-
-Caddy gets and renews the HTTPS certificate. The app sits behind it, and ChromaDB is never exposed. Uploads, ChromaDB data and cached answers live in Docker volumes, so they survive restarts and rebuilds.
-
 `/api/ask/stream` returns the same answer as newline-delimited JSON: first which documents are being read, then the answer. Add `"as_of": "2027-01-15"` to answer as of another date, and `"history": [{"question": "...", "answer": "..."}]` for a follow-up.
 
 Uploads change state, so they need the CSRF token the page sets: `POST /api/upload` (multipart, field `file`), `GET /api/uploads`, and `POST /api/uploads/<doc_id>/delete`.
+
+## Deployment (Google Cloud VM + Docker Compose, CI/CD with GitHub Actions)
+
+Live: https://136-115-111-206.sslip.io
+
+| Stage | Where | What |
+|---|---|---|
+| Test | GitHub Actions (`.github/workflows/ci.yml`), every push and pull request | lint and the full test suite |
+| Build | GitHub Actions, `main` only, after the tests pass | builds the `Dockerfile` image for linux/amd64, stamped with the commit (`APP_VERSION`), and pushes it to Artifact Registry as `:<commit>` and `:latest` |
+| Deploy | the VM (`deploy/vm/autodeploy.sh`, run every minute by a systemd timer) | updates the checkout to `main` (compose file, Caddyfile), pulls the new image, restarts, waits for `/api/health`, and rolls back to the previous image if it is not healthy |
+| Verify | GitHub Actions | waits until `/api/health` on the live site reports the new commit |
+
+GitHub signs in to Google Cloud with Workload Identity Federation. No key is stored anywhere: Google trusts only this repository's `main` branch, and the `github-deploy` service account may only push images to the `handbook` repository. Nothing reaches into the server from outside: GitHub pushes the image, and the VM pulls it.
+
+The server is a Compute Engine e2-medium VM (Ubuntu 24.04) with a reserved IP. It runs `docker compose --profile https` (ChromaDB, the app, and Caddy with a Let's Encrypt certificate for `<ip-with-dashes>.sslip.io`). Its `.env` (debug off, its own secret key, `DOMAIN`, `WEB_IMAGE`) lives only on the server.
+
+One-time server setup: clone the repository, create `.env` from the server lines in `.env.example`, then run `sudo sh deploy/vm/install.sh`. Deploy logs: `journalctl -u handbook-autodeploy`.

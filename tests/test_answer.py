@@ -834,6 +834,20 @@ def test_a_stray_quote_mark_left_by_the_model_is_removed():
     assert tidy_answer(quoted, {}) == quoted
 
 
+def test_a_citation_list_pasted_after_the_answer_is_removed():
+    from rag.answer import tidy_answer
+    seen = ('Secondary caregivers receive 26 weeks of fully paid leave. [1]\\n\\n[1]: "secondary caregiver leave'
+            ' increases from 12 weeks to 26 weeks" The same document also states: "two blocks"')  # live, backup model
+    assert tidy_answer(seen, {}) == "Secondary caregivers receive 26 weeks of fully paid leave. [1]"
+    cached = ('You get $3,000 a year.\\n\\nCitations:\\n- hr-training-policy: "Each employee has an annual budget'
+              ' of $3,000"')
+    assert tidy_answer(cached, {"hr-training-policy": "Training Policy"}) == "You get $3,000 a year."
+    source = "One week is enough during the introductory period.\\n\\nSource: Resignation Notice states: \"...\""
+    assert tidy_answer(source, {}) == "One week is enough during the introductory period."
+    two_paragraphs = "You get 16 days. [1]\n\nPart-time staff accrue pro rata. [1]"  # real paragraphs stay
+    assert tidy_answer(two_paragraphs, {}) == two_paragraphs
+
+
 def test_on_a_date_after_an_amendment_the_amended_rule_leads(docs):
     """As of 2027 the 2024 parental policy is amended by the 2027 revision: the model must present
     26 weeks as the rule, and the old 12 weeks only for births before 2027-01-01."""

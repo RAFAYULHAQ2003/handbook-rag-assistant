@@ -319,6 +319,7 @@ def tidy_answer(text: str, titles: dict[str, str] | None = None) -> str:
     """
     text = (text or "").strip()
     original = text
+    text = text.replace("\\n", "\n")  # line breaks the model escaped twice, shown as a literal "\n"
     first = _FIELD.search(text)
     if first:
         before = text[:first.start()].strip().rstrip(",{[").strip()
@@ -327,6 +328,9 @@ def tidy_answer(text: str, titles: dict[str, str] | None = None) -> str:
         if _FIELD.search(after):  # nothing clean after the fields
             after = ""
         text = max((before, after), key=len)
+    # a citation list pasted after the answer ("Source: ...", "[1]: \"...\""): the source cards show it
+    text = re.sub(r"\n\s*\n\s*(?:(?:Sources?|Citations?|References?)\s*:|\[\d+\]\s*:)[\s\S]*$", "", text,
+                  flags=re.IGNORECASE)
     text = re.sub(r'\s*"?\s*\}\s*$', "", text)  # a closing brace left from the reply object
     if text.count('"') % 2:  # one unmatched quote mark at an end: a leftover of the reply's JSON string
         text = re.sub(r'^"\s*|\s*"$', "", text, count=1)

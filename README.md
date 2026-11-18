@@ -1,105 +1,213 @@
 # Handbook Q&A Assistant
 
-An assistant that answers Northgate Robotics employees' questions from the company handbook, citing the document and passage each answer rests on.
+Ask questions about the Northgate Robotics employee handbook. Every answer shows the exact passages it comes from.
 
-> Work in progress.
+**Live demo:** https://136-115-111-206.sslip.io
 
-## Project layout
+---
 
-| Path | What lives there |
-|---|---|
-| `rag/` | Core logic in plain Python (no Django): loading, validity rules, chunking, retrieval, answering |
-| `webapp/` | Django project; `webapp/handbook/` is the app (pages, API, upload) |
-| `evals/` | Evaluation questions, metrics and saved results |
-| `tests/` | Unit and web tests |
-| `data/corpus/` | The handbook documents and `manifest.json` (never modified) |
+## What it does
 
-## Setup
+- Answers questions using only the 64 handbook documents (md, pdf, docx, csv, txt, html).
+- Shows the source of every fact, with `[1]`-style markers and source cards.
+- Opens any source with the cited passage highlighted, plus the original file.
+- Knows which documents are current, outdated or not yet in force.
+- Can answer "as of a date", for example a policy that starts in 2027.
+- Understands follow-up questions ("and who approves it?").
+- Tolerates typos ("ohw mny anual leves" finds the leave policy).
+- Says "not covered" instead of guessing.
+- Resists instructions hidden in questions or documents (prompt injection).
+- Lets you upload a document and ask about it straight away (see [Uploads](#uploads)).
 
-Requires **Python 3.12 or newer** (Django 6.1 needs it).
+---
+
+## Quick start (Docker)
+
+You need Docker and an API key for an OpenAI-compatible model. We use NVIDIA's free API: get a key at https://build.nvidia.com. The model address and names are already set in `.env.example`.
+
+```bash
+git clone https://github.com/RAFAYULHAQ2003/handbook-rag-assistant.git
+cd handbook-rag-assistant
+cp .env.example .env          # then put your key in LLM_API_KEY
+docker compose up --build
+```
+
+Open **http://localhost:8000**.
+
+---
+
+## Run without Docker
+
+Needs **Python 3.12+**.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-```
-
-## Run tests
-
-```bash
-pytest
-```
-
-The first run of the app downloads the local embedding model (about 70 MB) into `.cache/models`. Until it is downloaded, the hybrid-search quality test is skipped and search falls back to keyword-only (BM25).
-
-## Evaluate
-
-```bash
-python -m evals.retrieval_eval                      # search configurations on the dev set, no model calls
-python -m evals.answer_eval --label thinking-on     # every dev question answered and scored (uses LLM_* in .env)
-python -m evals.answer_eval --context whole         # baseline: send the whole handbook instead of searching
-python -m evals.answer_eval --injection             # an uploaded document tries to make the assistant lie
-python -m evals.answer_eval --set holdout           # the blind set; run once, at the end
-python -m evals.answer_eval --set followup          # two-turn questions ("and who approves it?")
-```
-
-Answers are cached in `.cache/llm/`, so re-running unchanged questions makes no model calls.
-
-## Run the app
-
-Put a model key in `.env` first (`LLM_API_KEY`, with `LLM_BASE_URL` and `LLM_MODEL`; see `.env.example`).
-
-**With Docker (the app plus its ChromaDB vector store):**
-
-```bash
-docker compose up --build
-```
-
-Open http://localhost:8000. The first build downloads the embedding model and embeds the handbook into the image, so the container starts in seconds. ChromaDB keeps its data in a Docker volume and is reachable only from this machine (`127.0.0.1:8001`).
-
-**Without Docker:** start ChromaDB on its own (`docker compose up -d chroma`), or set `VECTOR_STORE=memory` to keep the vectors in memory. Then:
-
-```bash
+cp .env.example .env          # put your key in LLM_API_KEY, and set VECTOR_STORE=memory
 python manage.py migrate
 python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000. Ask a question; each answer lists its sources, with `[1]`-style markers in the text pointing to the source behind each claim. Opening a source shows the document with the cited passage highlighted, plus a link to the original file. Follow-up questions ("and who approves it?") use the last three turns. A link like `/?q=How+many+days+of+annual+leave+do+I+get%3F` asks straight away.
+Open **http://127.0.0.1:8000**.
 
-**Upload a document** (the paperclip) adds a `.md`, `.txt`, `.pdf`, `.docx`, `.xlsx`, `.pptx`, `.csv`, `.json` or `.html` file of up to 5 MB **to the current conversation only**, and you can ask about it at once. The file is parsed, chunked and embedded for that conversation alone: it gets its own temporary ChromaDB collection and is never added to the handbook index or seen by anyone else. Everything of it (file, chunks and vectors) is deleted on "New conversation", after 60 minutes without use (`UPLOAD_SESSION_TTL_MINUTES`), and when the server restarts. Answers cite uploads like any document, but they are always marked "uploaded, not official": an upload never replaces or amends a handbook policy, and when it disagrees, the answer gives the official rule. Scanned PDFs (images of text) need OCR first and are refused with that explanation.
+- The first run downloads a small embedding model (about 70 MB).
+- `VECTOR_STORE=memory` keeps vectors in memory. To use ChromaDB instead, run `docker compose up -d chroma`.
 
-API (no login, JSON):
+---
+
+## Settings (`.env`)
+
+| Setting | What it is |
+|---|---|
+| `LLM_API_KEY` | Your model API key (**required**) |
+| `LLM_BASE_URL` | Model API address, e.g. `https://integrate.api.nvidia.com/v1` |
+| `LLM_MODEL` | Main model, e.g. `nvidia/nemotron-3-ultra-550b-a55b` |
+| `LLM_FALLBACK_MODEL` | Backup model, used when the main one is slow or busy |
+| `DJANGO_SECRET_KEY` | Any long random text |
+| `DJANGO_DEBUG` | `1` locally, `0` on a server |
+| `VECTOR_STORE` | `chroma` (default) or `memory` |
+
+All settings, with comments, are in [`.env.example`](.env.example). Never commit `.env`.
+
+---
+
+## Try these questions
+
+| Question | Expected answer |
+|---|---|
+| How many days of annual leave do I get? | 16 days a year (Leave Policy v2) |
+| Can I deploy to production today? *(set the date to 17 Nov 2026)* | **No**: deploy freeze before release 2026.22 |
+| What is the per-diem for an L1 employee visiting the Denver office? | $40 a day (Denver falls under Tier 3) |
+| Does a $4,000 trip booked through VoyageHub need VP approval? | **No**: VoyageHub travel only needs the manager |
+| Who is Maya? → which one is based in Austin? | Lists three Mayas → **Maya Brooks** |
+
+---
+
+## How it works
+
+1. **Read:** every document is turned into clean text, then cut into passages.
+2. **Check status:** each document is marked current, outdated or not yet in force for the chosen date.
+3. **Search:** keyword search (BM25) plus meaning search (embeddings in ChromaDB) find the best passages.
+4. **Answer:** the model writes an answer using only those passages, with a quote for each fact.
+5. **Verify:** every quote is checked against the real document. Made-up quotes are removed.
+6. **Show:** the page shows the answer, its sources, and links to each highlighted passage.
+
+---
+
+## Uploads
+
+- Click the paperclip to add a file (md, txt, pdf, docx, xlsx, pptx, csv, json, html; max 5 MB).
+- The file belongs to **your conversation only**. Nobody else can see it.
+- It is chunked and embedded in its own temporary ChromaDB collection.
+- It is **deleted** on "New conversation", after 60 minutes without use, or on restart.
+- Uploads are always marked "uploaded, not official". They never override a handbook policy.
+- Scanned PDFs (images of text) are refused. They need OCR first.
+
+---
+
+## Tests
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/ask -H "Content-Type: application/json" \
-     -d '{"question": "How many days of annual leave do I get?"}'
-curl http://127.0.0.1:8000/api/health
+pytest          # about 1,170 tests, no API key needed
+ruff check .    # code style
 ```
 
-**Typos:** a question word that is neither a handbook word nor a known English word is also searched as the closest handbook word ("anual leves" → "annual leave"), using SymSpell (`symspellpy`) over the handbook's vocabulary, with its 82,000-word English dictionary keeping real words such as "dental" unchanged. The original words are kept, the model sees the question as typed, and the answer says what was also searched for.
+---
 
-**Repeated questions** come back instantly from the answer cache, whichever model (main or backup) gave the answer first.
+## Evaluation
 
-**Vectors:** passages are embedded locally with `BAAI/bge-small-en-v1.5` and stored in ChromaDB (one collection per embedding model). Every web worker searches the same collection; uploads are added to it and removed from it at once. Keyword search (BM25), rank fusion and the document-state rules stay in the app. If ChromaDB cannot be reached, search uses an in-memory copy of the vectors and `/api/health` says so. Through ChromaDB, all 132 eval questions get exactly the same context as with in-memory search.
+The dev and holdout questions were written from the handbook before the assistant was built. See [`evals/README.md`](evals/README.md) for the scoring rules.
 
-`/api/ask/stream` returns the same answer as newline-delimited JSON: first which documents are being read, then the answer. Add `"as_of": "2027-01-15"` to answer as of another date, and `"history": [{"question": "...", "answer": "..."}]` for a follow-up.
+```bash
+python -m evals.retrieval_eval                  # search quality, no model calls
+python -m evals.answer_eval                     # 97 dev questions, end to end
+python -m evals.answer_eval --set holdout       # 26 questions kept out of tuning
+python -m evals.answer_eval --set followup      # two-turn questions
+python -m evals.answer_eval --set typos         # misspelled questions
+python -m evals.answer_eval --injection         # prompt-injection attacks
+```
 
-Uploads change state, so they need the CSRF token the page sets: `POST /api/upload` (multipart, field `file`), `GET /api/uploads`, and `POST /api/uploads/<doc_id>/delete`.
+**Latest results** (main model: NVIDIA Nemotron 3 Ultra):
 
-## Deployment (Google Cloud VM + Docker Compose, CI/CD with GitHub Actions)
+| Set | Score |
+|---|---|
+| Dev | 93 / 97 |
+| Holdout | 25 / 26 |
+| Follow-ups | 8 / 9 |
+| Typos | 10 / 11 |
+| Injection attacks | 6 / 6 resisted |
+| Search: right documents found | 100% |
 
-Live: https://136-115-111-206.sslip.io
+Answers are cached in `.cache/llm/`, so re-running costs nothing.
 
-| Stage | Where | What |
-|---|---|---|
-| Test | GitHub Actions (`.github/workflows/ci.yml`), every push and pull request | lint and the full test suite |
-| Build | GitHub Actions, `main` only, after the tests pass | builds the `Dockerfile` image for linux/amd64, stamped with the commit (`APP_VERSION`), and pushes it to Artifact Registry as `:<commit>` and `:latest` |
-| Deploy | the VM (`deploy/vm/autodeploy.sh`, run every minute by a systemd timer) | updates the checkout to `main` (compose file, Caddyfile), pulls the new image, restarts, waits for `/api/health`, and rolls back to the previous image if it is not healthy |
-| Verify | GitHub Actions | waits until `/api/health` on the live site reports the new commit |
+---
 
-GitHub signs in to Google Cloud with Workload Identity Federation. No key is stored anywhere: Google trusts only this repository's `main` branch, and the `github-deploy` service account may only push images to the `handbook` repository. Nothing reaches into the server from outside: GitHub pushes the image, and the VM pulls it.
+## API
 
-The server is a Compute Engine e2-medium VM (Ubuntu 24.04) with a reserved IP. It runs `docker compose --profile https` (ChromaDB, the app, and Caddy with a Let's Encrypt certificate for `<ip-with-dashes>.sslip.io`). Its `.env` (debug off, its own secret key, `DOMAIN`, `WEB_IMAGE`) lives only on the server.
+```bash
+# ask a question
+curl -X POST http://localhost:8000/api/ask \
+     -H "Content-Type: application/json" \
+     -d '{"question": "How many days of annual leave do I get?"}'
 
-One-time server setup: clone the repository, create `.env` from the server lines in `.env.example`, then run `sudo sh deploy/vm/install.sh`. Deploy logs: `journalctl -u handbook-autodeploy`.
+# status
+curl http://localhost:8000/api/health
+```
+
+Optional fields for `/api/ask`:
+
+- `"as_of": "2027-01-15"`: answer as of another date.
+- `"history": [{"question": "...", "answer": "..."}]`: for follow-up questions.
+
+`/api/ask/stream` gives the same answer as it is being made (used by the page).
+
+---
+
+## Project layout
+
+| Folder | What is inside |
+|---|---|
+| `rag/` | The core: reading files, document status, search, answering (plain Python) |
+| `webapp/` | The Django web app: pages, API, uploads |
+| `evals/` | Test questions, scoring and saved results |
+| `tests/` | Automated tests |
+| `data/corpus/` | The 64 handbook documents (never changed) |
+| `deploy/vm/` | Auto-deploy script for the server |
+| `docker/` | Start script and Caddy (HTTPS) settings |
+
+---
+
+## Deployment and CI/CD
+
+The live site runs on a Google Cloud VM with Docker Compose (app, ChromaDB, and Caddy for HTTPS).
+
+Every push to `main` goes through:
+
+| Step | What happens |
+|---|---|
+| 1. Test | GitHub Actions runs lint and all tests |
+| 2. Build | The Docker image is built and pushed to Google Artifact Registry |
+| 3. Deploy | The VM pulls the new image within a minute, restarts and checks health. If it is not healthy, it rolls back |
+| 4. Verify | GitHub waits until the live site reports the new version |
+
+- No cloud keys are stored in GitHub. It signs in with Workload Identity Federation.
+- The server's `.env` lives only on the server.
+- Server setup: clone the repo, create `.env`, run `sudo sh deploy/vm/install.sh`.
+
+---
+
+## Known limits
+
+- The model adds `[n]` markers in about half of its answers. Sources are always listed below the answer.
+- Scanned PDFs are not supported (no OCR).
+- There is no login. Anyone with the link can use the app.
+- Answers depend on the model service. If it is slow, a backup model answers instead.
+
+---
+
+## More
+
+- [`DECISIONS.md`](DECISIONS.md): the main design choices and why.
+- [`AI_USAGE.md`](AI_USAGE.md): how AI tools were used to build this.
+- [`evals/README.md`](evals/README.md): how answers are scored.

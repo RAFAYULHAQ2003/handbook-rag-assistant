@@ -1,6 +1,6 @@
 # Evaluation set
 
-No test questions were provided, so these were written by hand from the corpus **before** building the assistant, to avoid picking questions the system already passes. A few were added later (`conf-03`, `fut-05`, `part-02`, `h-miss-02`, `h-conf-01`, `h-part-01`); they came from re-reading the corpus for traps and filling category gaps, never from the assistant's output.
+No test questions were provided, so these were written from the corpus **before** building the assistant, to avoid picking questions the system already passes. A few were added later (`conf-03`, `fut-05`, `part-02`, `h-miss-02`, `h-conf-01`, `h-part-01`); they came from re-reading the corpus for traps and filling category gaps, never from the assistant's output.
 
 - `questions.jsonl`: dev set (97 questions), used while building and tuning.
 - `questions_holdout.jsonl`: holdout set (26 questions), not looked at while tuning; run at the end to check the dev score is not inflated.

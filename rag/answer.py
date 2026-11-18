@@ -284,6 +284,8 @@ def tidy_answer(text: str, titles: dict[str, str] | None = None) -> str:
             after = ""
         text = max((before, after), key=len)
     text = re.sub(r'\s*"?\s*\}\s*$', "", text)  # a closing brace left from the reply object
+    if text.count('"') % 2:  # one unmatched quote mark at an end: a leftover of the reply's JSON string
+        text = re.sub(r'^"\s*|\s*"$', "", text, count=1)
     if titles:
         ids = "|".join(re.escape(d) for d in sorted(titles, key=len, reverse=True))
         # "(fin-expense-policy; fin-approval-matrix)", "[ref-faq]", "【it-laptop-policy: ..." (closed or not)

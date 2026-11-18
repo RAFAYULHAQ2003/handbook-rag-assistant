@@ -824,3 +824,11 @@ def test_a_gapped_quote_cannot_cover_a_whole_document():
     assert span == (0, len("Start of the plan"))  # only the first piece: the gap was too long
     short = "Rates are $275. Approval needed. Booking via VoyageHub."
     assert locate_quote("Rates are $275 ... via VoyageHub", short) == (0, len(short) - 1)
+
+
+def test_a_stray_quote_mark_left_by_the_model_is_removed():
+    from rag.answer import tidy_answer
+    seen = 'All other terms of the 2024 parental policy continue to apply. [1][2][3]"'  # live answer, 2027-02-17
+    assert tidy_answer(seen, {}) == "All other terms of the 2024 parental policy continue to apply. [1][2][3]"
+    quoted = 'The policy says "fully paid" leave. [1]'  # balanced quotes are part of the answer
+    assert tidy_answer(quoted, {}) == quoted

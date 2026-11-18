@@ -199,7 +199,7 @@ Every push to `main` goes through:
 
 ## Known limits
 
-- The model adds `[n]` markers in about half of its answers. Sources are always listed below the answer.
+- The model adds `[n]` markers in only about 40% of its answers. Sources are always listed below the answer.
 - Scanned PDFs are not supported (no OCR).
 - There is no login. Anyone with the link can use the app.
 - Answers depend on the model service. If it is slow, a backup model answers instead.

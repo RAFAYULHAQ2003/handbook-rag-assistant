@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from rag.loaders import csv, docx, html, markdown, pdf, text
+from rag.loaders import csv, docx, html, json_file, markdown, pdf, pptx, text, xlsx
 from rag.loaders.base import (
     EmptyDocument,
     LoaderError,
@@ -21,6 +21,9 @@ LOADERS = {
     ".html": html.load,
     ".htm": html.load,
     ".txt": text.load,
+    ".xlsx": xlsx.load,
+    ".pptx": pptx.load,
+    ".json": json_file.load,
 }
 
 SUPPORTED_EXTENSIONS = sorted(LOADERS)

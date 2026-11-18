@@ -8,7 +8,8 @@ from rag.models import Document, DocumentMeta, MetadataFinding
 
 FIELDS = ("doc_id", "title", "category", "owner", "effective_date", "status", "supersedes")
 FORMATS = {".md": "md", ".markdown": "md", ".pdf": "pdf", ".docx": "docx", ".csv": "csv",
-           ".txt": "txt", ".html": "html", ".htm": "html"}
+           ".txt": "txt", ".html": "html", ".htm": "html",
+           ".xlsx": "xlsx", ".pptx": "pptx", ".json": "json"}
 
 
 def slugify(value: str) -> str:
@@ -122,6 +123,7 @@ def load_corpus(corpus_dir: Path) -> tuple[list[Document], list[MetadataFinding]
 
     for path in sorted(corpus_dir.iterdir()):
         if (path.is_file() and path.name not in manifest and not path.name.startswith(".")
+                and path.name != "manifest.json"
                 and path.suffix.lower() in SUPPORTED_EXTENSIONS):
             add(path, None)
     return documents, findings
